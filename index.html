@@ -1,359 +1,79 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>IT Asset Management System</title>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/uuid/8.3.2/uuid.min.js"></script>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css" rel="stylesheet">
-    <script src="https://cdn.tailwindcss.com"></script>
-    <style>
-        .loading {
-            border: 4px solid #f3f3f3;
-            border-radius: 50%;
-            border-top: 4px solid #3498db;
-            width: 40px;
-            height: 40px;
-            animation: spin 1s linear infinite;
-        }
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
-    </style>
-</head>
-<body class="bg-gray-100">
-    <div class="container mx-auto px-4 py-8">
-        <h1 class="text-3xl font-bold text-center mb-8">IT Asset Management System</h1>
-
-        <!-- Add Asset Form -->
-        <div class="bg-white rounded-lg shadow-md p-6 mb-8">
-            <h2 class="text-xl font-semibold mb-4">Add New Asset</h2>
-            <form id="assetForm" class="space-y-4">
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div>
-                        <label class="block text-sm font-medium mb-1">Asset Type</label>
-                        <select id="assetType" class="w-full p-2 border rounded" required>
-                            <option value="">Select Type</option>
-                            <option value="laptop">Laptop</option>
-                            <option value="desktop">Desktop</option>
-                            <option value="monitor">Monitor</option>
-                            <option value="printer">Printer</option>
-                        </select>
-                    </div>
-                    <div>
-                        <label class="block text-sm font-medium mb-1">Model</label>
-                        <input type="text" id="model" class="w-full p-2 border rounded" required>
-                    </div>
-                    <div>
-                        <label class="block text-sm font-medium mb-1">Serial Number</label>
-                        <input type="text" id="serialNumber" class="w-full p-2 border rounded" required>
-                    </div>
-                    <div>
-                        <label class="block text-sm font-medium mb-1">Purchase Date</label>
-                        <input type="date" id="purchaseDate" class="w-full p-2 border rounded" required>
-                    </div>
+<!-- Add Asset Form -->
+    <div class="bg-white rounded-lg shadow-md p-6 mb-8">
+        <h2 class="text-xl font-semibold mb-4">Add New Asset</h2>
+        <form id="assetForm" class="space-y-4">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                    <label class="block text-sm font-medium mb-1">Asset Type</label>
+                    <select id="assetType" class="w-full p-2 border rounded" required>
+                        <option value="">Select Type</option>
+                        <option value="laptop">Laptop</option>
+                        <option value="desktop">Desktop</option>
+                        <option value="monitor">Monitor</option>
+                        <option value="printer">Printer</option>
+                    </select>
                 </div>
-                <button type="submit" class="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600">Add Asset</button>
-            </form>
-        </div>
-
-        <!-- Asset Allocation -->
-        <div class="bg-white rounded-lg shadow-md p-6 mb-8">
-            <h2 class="text-xl font-semibold mb-4">Asset Allocation</h2>
-            <form id="allocationForm" class="space-y-4">
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div>
-                        <label class="block text-sm font-medium mb-1">Asset ID</label>
-                        <select id="assetId" class="w-full p-2 border rounded" required></select>
-                    </div>
-                    <div>
-                        <label class="block text-sm font-medium mb-1">Assign To</label>
-                        <input type="text" id="assignTo" class="w-full p-2 border rounded" required>
-                    </div>
+                <div>
+                    <label class="block text-sm font-medium mb-1">Model</label>
+                    <input type="text" id="model" class="w-full p-2 border rounded" required>
                 </div>
-                <button type="submit" class="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600">Allocate Asset</button>
-            </form>
-        </div>
-
-        <!-- Asset List -->
-        <div class="bg-white rounded-lg shadow-md p-6">
-            <h2 class="text-xl font-semibold mb-4">Asset Inventory</h2>
-            <div class="overflow-x-auto">
-                <table class="min-w-full table-auto">
-                    <thead>
-                        <tr class="bg-gray-100">
-                            <th class="px-4 py-2">Asset ID</th>
-                            <th class="px-4 py-2">Type</th>
-                            <th class="px-4 py-2">Model</th>
-                            <th class="px-4 py-2">Current Owner</th>
-                            <th class="px-4 py-2">Status</th>
-                            <th class="px-4 py-2">Actions</th>
-                        </tr>
-                    </thead>
-                    <tbody id="assetList"></tbody>
-                </table>
+                <div>
+                    <label class="block text-sm font-medium mb-1">Serial Number</label>
+                    <input type="text" id="serialNumber" class="w-full p-2 border rounded" required>
+                </div>
+                <div>
+                    <label class="block text-sm font-medium mb-1">Purchase Date</label>
+                    <input type="date" id="purchaseDate" class="w-full p-2 border rounded" required>
+                </div>
             </div>
-        </div>
+            <button type="submit" class="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600">Add Asset</button>
+        </form>
+    </div>
 
-        <!-- Asset History Modal -->
-        <div id="historyModal" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center">
-            <div class="bg-white rounded-lg p-6 w-full max-w-2xl">
-                <h2 class="text-xl font-semibold mb-4">Asset History</h2>
-                <div id="historyContent" class="max-h-96 overflow-y-auto"></div>
-                <button onclick="closeHistoryModal()" class="mt-4 bg-gray-500 text-white px-4 py-2 rounded hover:bg-gray-600">Close</button>
+    <!-- Asset Allocation -->
+    <div class="bg-white rounded-lg shadow-md p-6 mb-8">
+        <h2 class="text-xl font-semibold mb-4">Asset Allocation</h2>
+        <form id="allocationForm" class="space-y-4">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                    <label class="block text-sm font-medium mb-1">Asset ID</label>
+                    <select id="assetId" class="w-full p-2 border rounded" required></select>
+                </div>
+                <div>
+                    <label class="block text-sm font-medium mb-1">Assign To</label>
+                    <input type="text" id="assignTo" class="w-full p-2 border rounded" required>
+                </div>
             </div>
+            <button type="submit" class="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600">Allocate Asset</button>
+        </form>
+    </div>
+
+    <!-- Asset List -->
+    <div class="bg-white rounded-lg shadow-md p-6">
+        <h2 class="text-xl font-semibold mb-4">Asset Inventory</h2>
+        <div class="overflow-x-auto">
+            <table class="min-w-full table-auto">
+                <thead>
+                    <tr class="bg-gray-100">
+                        <th class="px-4 py-2">Asset ID</th>
+                        <th class="px-4 py-2">Type</th>
+                        <th class="px-4 py-2">Model</th>
+                        <th class="px-4 py-2">Current Owner</th>
+                        <th class="px-4 py-2">Status</th>
+                        <th class="px-4 py-2">Actions</th>
+                    </tr>
+                </thead>
+                <tbody id="assetList"></tbody>
+            </table>
         </div>
     </div>
 
-    <script>
-        const appSlug = 'it-asset-management-987654';
-        let assets = [];
-
-        // Initialize the application
-        async function init() {
-            await loadAssets();
-            updateAssetDropdown();
-        }
-
-        // Load assets from the database
-        async function loadAssets() {
-            showLoading();
-            try {
-                const response = await fetch('https://r0c8kgwocscg8gsokogwwsw4.zetaverse.one/mongodb', {
-                    method: 'POST',
-                    headers: {
-                        'Authorization': 'Bearer lIiCWmvARYT4JgMnUbY3CDkQtMK2',
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify({
-                        appSlug,
-                        action: 'read',
-                        collection: 'assets'
-                    })
-                });
-                const data = await response.json();
-                if (data.success) {
-                    assets = data.result;
-                    renderAssetList();
-                }
-            } catch (error) {
-                console.error('Error loading assets:', error);
-            }
-            hideLoading();
-        }
-
-        // Add new asset
-	    <script>
-  const { v4: uuidv4 } = uuid;
-</script>
-        document.getElementById('assetForm').addEventListener('submit', async (e) => {
-            e.preventDefault();
-            const assetData = {
-                assetId: uuidv4(),
-                type: document.getElementById('assetType').value,
-                model: document.getElementById('model').value,
-                serialNumber: document.getElementById('serialNumber').value,
-                purchaseDate: document.getElementById('purchaseDate').value,
-                status: 'available',
-                history: [{
-                    date: new Date().toISOString(),
-                    action: 'Asset Added',
-                    details: 'Initial registration'
-                }]
-            };
-
-            showLoading();
-            try {
-                const response = await fetch('https://r0c8kgwocscg8gsokogwwsw4.zetaverse.one/mongodb', {
-                    method: 'POST',
-                    headers: {
-                        'Authorization': 'Bearer lIiCWmvARYT4JgMnUbY3CDkQtMK2',
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify({
-                        appSlug,
-                        action: 'create',
-                        collection: 'assets',
-                        data: assetData
-                    })
-                });
-                if ((await response.json()).success) {
-                    await loadAssets();
-                    e.target.reset();
-                }
-            } catch (error) {
-                console.error('Error adding asset:', error);
-            }
-            hideLoading();
-        });
-
-        // Allocate asset
-        document.getElementById('allocationForm').addEventListener('submit', async (e) => {
-            e.preventDefault();
-            const assetId = document.getElementById('assetId').value;
-            const assignTo = document.getElementById('assignTo').value;
-
-            const asset = assets.find(a => a.assetId === assetId);
-            if (!asset) return;
-
-            const historyEntry = {
-                date: new Date().toISOString(),
-                action: 'Allocated',
-                details: `Assigned to ${assignTo}`
-            };
-
-            showLoading();
-            try {
-                const response = await fetch('https://r0c8kgwocscg8gsokogwwsw4.zetaverse.one/mongodb', {
-                    method: 'POST',
-                    headers: {
-                        'Authorization': 'Bearer lIiCWmvARYT4JgMnUbY3CDkQtMK2',
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify({
-                        appSlug,
-                        action: 'update',
-                        collection: 'assets',
-                        conditions: { assetId },
-                        body: JSON.stringify({
-    appSlug,
-    action: 'update',
-    collection: 'assets',
-    conditions: { assetId },
-    data: {
-        currentOwner: assignTo,
-        status: 'allocated',
-        $push: {
-            history: historyEntry
-        }
-    }
-})
-                if ((await response.json()).success) {
-                    await loadAssets();
-                    e.target.reset();
-                }
-            } catch (error) {
-                console.error('Error allocating asset:', error);
-            }
-            hideLoading();
-        });
-
-        // Return asset
-        async function returnAsset(assetId) {
-            const asset = assets.find(a => a.assetId === assetId);
-            if (!asset) return;
-
-            const historyEntry = {
-                date: new Date().toISOString(),
-                action: 'Returned',
-                details: `Returned from ${asset.currentOwner}`
-            };
-
-            showLoading();
-            try {
-                const response = await fetch('https://r0c8kgwocscg8gsokogwwsw4.zetaverse.one/mongodb', {
-                    method: 'POST',
-                    headers: {
-                        'Authorization': 'Bearer lIiCWmvARYT4JgMnUbY3CDkQtMK2',
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify({
-                        appSlug,
-                        action: 'update',
-                        collection: 'assets',
-                        conditions: { assetId },
-                        update: {
-  $set: {
-    currentOwner: null,
-    status: 'available'
-  },
-  $push: {
-    history: historyEntry}
-                        }
-                    })
-                });
-                if ((await response.json()).success) {
-                    await loadAssets();
-                }
-            } catch (error) {
-                console.error('Error returning asset:', error);
-            }
-            hideLoading();
-        }
-
-        // Show asset history
-        function showHistory(assetId) {
-            const asset = assets.find(a => a.assetId === assetId);
-            if (!asset) return;
-
-            const historyHtml = asset.history.map(h => `
-                <div class="border-b py-2">
-                    <div class="font-semibold">${new Date(h.date).toLocaleString()}</div>
-                    <div>${h.action}</div>
-                    <div class="text-gray-600">${h.details}</div>
-                </div>
-            `).join('');
-
-            document.getElementById('historyContent').innerHTML = historyHtml;
-            document.getElementById('historyModal').classList.remove('hidden');
-        }
-
-        function closeHistoryModal() {
-            document.getElementById('historyModal').classList.add('hidden');
-        }
-
-        // Utility functions
-        function updateAssetDropdown() {
-            const dropdown = document.getElementById('assetId');
-            dropdown.innerHTML = '<option value="">Select Asset</option>' +
-                assets.filter(a => a.status === 'available')
-                    .map(a => `<option value="${a.assetId}">${a.assetId} - ${a.type} ${a.model}</option>`)
-                    .join('');
-        }
-
-        function renderAssetList() {
-            const tbody = document.getElementById('assetList');
-            tbody.innerHTML = assets.map(asset => `
-                <tr class="border-b">
-                    <td class="px-4 py-2">${asset.assetId}</td>
-                    <td class="px-4 py-2">${asset.type}</td>
-                    <td class="px-4 py-2">${asset.model}</td>
-                    <td class="px-4 py-2">${asset.currentOwner || '-'}</td>
-                    <td class="px-4 py-2">
-                        <span class="px-2 py-1 rounded ${asset.status === 'available' ? 'bg-green-100 text-green-800' : 'bg-yellow-100 text-yellow-800'}">
-                            ${asset.status}
-                        </span>
-                    </td>
-                    <td class="px-4 py-2">
-                        <button onclick="showHistory('${asset.assetId}')" class="text-blue-500 hover:text-blue-700 mr-2">
-                            <i class="bi bi-clock-history"></i>
-                        </button>
-                        ${asset.status === 'allocated' ? `
-                            <button onclick="returnAsset('${asset.assetId}')" class="text-red-500 hover:text-red-700">
-                                <i class="bi bi-box-arrow-in-left"></i>
-                            </button>
-                        ` : ''}
-                    </td>
-                </tr>
-            `).join('');
-        }
-
-        function showLoading() {
-            const loader = document.createElement('div');
-            loader.id = 'loader';
-            loader.innerHTML = '<div class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50"><div class="loading"></div></div>';
-            document.body.appendChild(loader);
-        }
-
-        function hideLoading() {
-            const loader = document.getElementById('loader');
-            if (loader) loader.remove();
-        }
-
-        // Initialize the application
-        init();
-    </script>
-<script>document.body.addEventListener('wheel', e => { if (!e.ctrlKey) return; e.preventDefault(); return }, { passive: false })</script>
-	</body>
-</html>
+    <!-- Asset History Modal -->
+    <div id="historyModal" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center">
+        <div class="bg-white rounded-lg p-6 w-full max-w-2xl">
+            <h2 class="text-xl font-semibold mb-4">Asset History</h2>
+            <div id="historyContent" class="max-h-96 overflow-y-auto"></div>
+            <button onclick="closeHistoryModal()" class="mt-4 bg-gray-500 text-white px-4 py-2 rounded hover:bg-gray-600">Close</button>
+        </div>
+    </div>
+</div>
