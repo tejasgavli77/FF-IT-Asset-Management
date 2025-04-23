@@ -144,10 +144,13 @@
         }
 
         // Add new asset
+	    <script>
+  const { v4: uuidv4 } = uuid;
+</script>
         document.getElementById('assetForm').addEventListener('submit', async (e) => {
             e.preventDefault();
             const assetData = {
-                assetId: uuid.v4(),
+                assetId: uuidv4(),
                 type: document.getElementById('assetType').value,
                 model: document.getElementById('model').value,
                 serialNumber: document.getElementById('serialNumber').value,
@@ -213,16 +216,19 @@
                         action: 'update',
                         collection: 'assets',
                         conditions: { assetId },
-                        update: {
-                           $set: {
-                              currentOwner: assignTo,
-                              status: 'allocated'
-                     },
-                  $push: {
-                         history: historyEntry }
-                        }
-                    })
-                });
+                        body: JSON.stringify({
+    appSlug,
+    action: 'update',
+    collection: 'assets',
+    conditions: { assetId },
+    data: {
+        currentOwner: assignTo,
+        status: 'allocated',
+        $push: {
+            history: historyEntry
+        }
+    }
+})
                 if ((await response.json()).success) {
                     await loadAssets();
                     e.target.reset();
