@@ -213,10 +213,13 @@
                         action: 'update',
                         collection: 'assets',
                         conditions: { assetId },
-                        data: {
-                            currentOwner: assignTo,
-                            status: 'allocated',
-                            $push: { history: historyEntry }
+                        update: {
+                           $set: {
+                              currentOwner: assignTo,
+                              status: 'allocated'
+                     },
+                  $push: {
+                         history: historyEntry }
                         }
                     })
                 });
@@ -254,10 +257,13 @@
                         action: 'update',
                         collection: 'assets',
                         conditions: { assetId },
-                        data: {
-                            currentOwner: null,
-                            status: 'available',
-                            $push: { history: historyEntry }
+                        update: {
+  $set: {
+    currentOwner: null,
+    status: 'available'
+  },
+  $push: {
+    history: historyEntry}
                         }
                     })
                 });
