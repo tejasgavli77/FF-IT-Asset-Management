@@ -1,7 +1,3 @@
-// Firebase setup (already included in index.html before this)
-const db = firebase.firestore();
-
-// When button is clicked
 document.getElementById('addAssetBtn').addEventListener('click', () => {
   const assetType = document.getElementById('assetType').value;
   const model = document.getElementById('model').value;
@@ -17,8 +13,8 @@ document.getElementById('addAssetBtn').addEventListener('click', () => {
     currentOwner: "",
     createdAt: new Date()
   }).then(() => {
-    alert("Asset added successfully!");
+    alert("✅ Asset added successfully!");
   }).catch((error) => {
-    console.error("Error adding asset:", error);
+    console.error("❌ Error adding asset:", error);
   });
 });
