@@ -372,6 +372,63 @@ async function returnAsset(assetId) {
   }
   hideLoading();
 }
+    document.getElementById('assetForm').addEventListener('submit', async (e) => {
+  e.preventDefault();
+
+  const assetType = document.getElementById('assetType').value;
+  const model = document.getElementById('model').value;
+  const serialNumber = document.getElementById('serialNumber').value;
+  const purchaseDate = document.getElementById('purchaseDate').value;
+
+  const assetId = uuidv4();
+
+  const newAsset = {
+    assetId,
+    type: assetType,
+    model,
+    serialNumber,
+    purchaseDate,
+    currentOwner: '',
+    status: 'available',
+    history: [{
+      date: new Date().toISOString(),
+      action: 'Added',
+      details: 'Asset created in system'
+    }]
+  };
+
+  showLoading();
+  try {
+    const response = await fetch('https://r0c8kgwocscg8gsokogwwsw4.zetaverse.one/mongodb', {
+      method: 'POST',
+      headers: {
+        'Authorization': 'Bearer lIiCWmvARYT4JgMnUbY3CDkQtMK2',
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        appSlug,
+        action: 'create',
+        collection: 'assets',
+        data: newAsset
+      })
+    });
+
+    const result = await response.json();
+    if (result.success) {
+      alert('✅ Asset added!');
+      await loadAssets();
+      updateAssetDropdown();
+      e.target.reset();
+    } else {
+      alert('❌ Failed to add asset: ' + (result.message || 'Unknown error'));
+      console.error(result);
+    }
+  } catch (err) {
+    console.error('❌ Error adding asset:', err);
+    alert('❌ Server error. See console.');
+  }
+  hideLoading();
+});
     init();
   </script>
 </body>
