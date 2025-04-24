@@ -69,5 +69,19 @@
   </main>
 
   <!-- ✅ Firebase SDK and script will go at the end -->
+  const assetData = {
+  assetId: uuidv4(),
+  type: document.getElementById('assetType').value,
+  model: document.getElementById('model').value,
+  serialNumber: document.getElementById('serialNumber').value,
+  purchaseDate: document.getElementById('purchaseDate').value,
+  status: 'available',
+  history: [{
+    date: new Date().toISOString(),
+    action: 'Asset Added',
+    details: 'Initial registration'
+  }]
+};
 </body>
+  
 </html>
