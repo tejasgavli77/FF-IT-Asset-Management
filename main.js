@@ -1,7 +1,7 @@
 document.getElementById('addAssetBtn').addEventListener('click', () => {
   const assetType = document.getElementById('assetType').value;
   const model = document.getElementById('model').value;
-  const serial = document.getElementById('serial').value;
+  const serial = document.getElementById('serialNumber').value;
   const purchaseDate = document.getElementById('purchaseDate').value;
 
   db.collection("assets").add({
