@@ -141,46 +141,58 @@
       }
       hideLoading();
     }
+    document.getElementById('allocationForm').addEventListener('submit', async (e) => {
+  e.preventDefault();
+  const assetId = document.getElementById('assetId').value;
+  const assignTo = document.getElementById('assignTo').value;
+  const asset = assets.find(a => a.assetId === assetId);
+  if (!asset) {
+    alert("⚠️ Selected asset not found.");
+    return;
+  }
 
-    document.getElementById('assetForm').addEventListener('submit', async (e) => {
-      e.preventDefault();
-      const assetData = {
-        assetId: uuidv4(),
-        type: document.getElementById('assetType').value,
-        model: document.getElementById('model').value,
-        serialNumber: document.getElementById('serialNumber').value,
-        purchaseDate: document.getElementById('purchaseDate').value,
-        status: 'available',
-        history: [{
-          date: new Date().toISOString(),
-          action: 'Asset Added',
-          details: 'Initial registration'
-        }]
-      };
+  const historyEntry = {
+    date: new Date().toISOString(),
+    action: 'Allocated',
+    details: `Assigned to ${assignTo}`
+  };
 
-      showLoading();
-      try {
-        const response = await fetch('https://r0c8kgwocscg8gsokogwwsw4.zetaverse.one/mongodb', {
-          method: 'POST',
-          headers: {
-            'Authorization': 'Bearer lIiCWmvARYT4JgMnUbY3CDkQtMK2',
-            'Content-Type': 'application/json'
-          },
-          body: JSON.stringify({
-            appSlug,
-            action: 'create',
-            collection: 'assets',
-            data: assetData
-          })
-        });
-        if ((await response.json()).success) {
-          await loadAssets();
-          e.target.reset();
+  showLoading();
+  try {
+    const response = await fetch('https://r0c8kgwocscg8gsokogwwsw4.zetaverse.one/mongodb', {
+      method: 'POST',
+      headers: {
+        'Authorization': 'Bearer lIiCWmvARYT4JgMnUbY3CDkQtMK2',
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        appSlug,
+        action: 'update',
+        collection: 'assets',
+        conditions: { assetId },
+        data: {
+          currentOwner: assignTo,
+          status: 'allocated',
+          history: [...(asset.history || []), historyEntry]  // Fallback if no history
         }
-      } catch (error) {
-        console.error('Error adding asset:', error);
-      }
-      hideLoading();
+      })
+    });
+
+    const result = await response.json();
+    if (result.success) {
+      alert("✅ Asset allocated!");
+      await loadAssets();
+      updateAssetDropdown();
+      e.target.reset();
+    } else {
+      alert("❌ Allocation failed: " + (result.message || 'Unknown error'));
+      console.error(result);
+    }
+  } catch (error) {
+    console.error('❌ Server error during allocation:', error);
+    alert("❌ Server error during allocation. See console for details.");
+  }
+  hideLoading();
     });
 
     document.getElementById('allocationForm').addEventListener('submit', async (e) => {
@@ -210,9 +222,9 @@
             collection: 'assets',
             conditions: { assetId },
             data: {
-              currentOwner: assignTo,
-              status: 'allocated',
-              $push: { history: historyEntry }
+             currentOwner: assignTo,
+             status: 'allocated',
+             history: [...asset.history, historyEntry]
             }
           })
         });
