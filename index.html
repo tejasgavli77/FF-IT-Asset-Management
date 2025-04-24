@@ -235,28 +235,31 @@
     }
 
     function renderAssetList() {
-      const tbody = document.getElementById('assetList');
-      tbody.innerHTML = assets.map(asset => `
-        <tr class="border-b">
-          <td class="px-4 py-2">${asset.assetId}</td>
-          <td class="px-4 py-2">${asset.type}</td>
-          <td class="px-4 py-2">${asset.model}</td>
-          <td class="px-4 py-2">${asset.currentOwner || '-'}</td>
-          <td class="px-4 py-2">
-            <span class="px-2 py-1 rounded ${asset.status === 'available' ? 'bg-green-100 text-green-800' : 'bg-yellow-100 text-yellow-800'}">${asset.status}</span>
-          </td>
-          <td class="px-4 py-2">
-            <button onclick="showHistory('${asset.assetId}')" class="text-blue-500 hover:text-blue-700 mr-2">
-              <i class="bi bi-clock-history"></i>
-            </button>
-            ${asset.status === 'allocated' ? `
-              <button onclick="returnAsset('${asset.assetId}')" class="text-red-500 hover:text-red-700">
-                <i class="bi bi-box-arrow-in-left"></i>
-              </button>` : ''}
-          </td>
-        </tr>
-      `).join('');
-    }
+  const tbody = document.getElementById('assetList');
+  tbody.innerHTML = assets.map(asset => `
+    <tr class="border-b">
+      <td class="px-4 py-2">${asset.assetId}</td>
+      <td class="px-4 py-2">${asset.type}</td>
+      <td class="px-4 py-2">${asset.model}</td>
+      <td class="px-4 py-2">${asset.currentOwner || '-'}</td>
+      <td class="px-4 py-2">
+        <span class="px-2 py-1 rounded ${asset.status === 'available' ? 'bg-green-100 text-green-800' : 'bg-yellow-100 text-yellow-800'}">${asset.status}</span>
+      </td>
+      <td class="px-4 py-2 flex space-x-2">
+        <button onclick="showHistory('${asset.assetId}')" class="text-blue-500 hover:text-blue-700" title="View History">
+          <i class="bi bi-clock-history"></i>
+        </button>
+        ${asset.status === 'allocated' ? `
+          <button onclick="returnAsset('${asset.assetId}')" class="text-red-500 hover:text-red-700" title="Return Asset">
+            <i class="bi bi-box-arrow-in-left"></i>
+          </button>` : ''}
+        <button onclick="deleteAsset('${asset.assetId}')" class="text-gray-500 hover:text-gray-700" title="Delete Asset">
+          <i class="bi bi-trash"></i>
+        </button>
+      </td>
+    </tr>
+  `).join('');
+}
 
     function showHistory(assetId) {
       const asset = assets.find(a => a.assetId === assetId);
