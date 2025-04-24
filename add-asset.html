@@ -69,49 +69,40 @@
   </main>
 
   <!-- ✅ Firebase SDK and script will go at the end -->
-  const assetData = {
-  assetId: uuidv4(),
-  type: document.getElementById('assetType').value,
-  model: document.getElementById('model').value,
-  serialNumber: document.getElementById('serialNumber').value,
-  purchaseDate: document.getElementById('purchaseDate').value,
-  status: 'available',
-  history: [{
-    date: new Date().toISOString(),
-    action: 'Asset Added',
-    details: 'Initial registration'
-  }]
-};
-  aste that entire block right before </body>, like this:
+  
 
-html
-Copy
-Edit
   <!-- JavaScript section -->
-  <script type="module">
+   <script type="module">
     import { db, assetsCollection } from './firebaseConfig.js';
     import { addDoc } from 'https://www.gstatic.com/firebasejs/10.11.0/firebase-firestore.js';
 
-    const addAssetForm = document.getElementById('addAssetForm');
+    const assetForm = document.getElementById('assetForm');
 
-    addAssetForm.addEventListener('submit', async (e) => {
+    assetForm.addEventListener('submit', async (e) => {
       e.preventDefault();
-      const asset = {
-        name: document.getElementById('assetName').value,
+
+      const assetData = {
         type: document.getElementById('assetType').value,
-        serial: document.getElementById('assetSerial').value,
+        model: document.getElementById('model').value,
+        serialNumber: document.getElementById('serialNumber').value,
+        purchaseDate: document.getElementById('purchaseDate').value,
         status: 'available',
+        history: [{
+          date: new Date().toISOString(),
+          action: 'Asset Added',
+          details: 'Initial registration'
+        }]
       };
+
       try {
-        await addDoc(assetsCollection, asset);
+        await addDoc(assetsCollection, assetData);
         alert('Asset added successfully!');
-        addAssetForm.reset();
+        assetForm.reset();
       } catch (error) {
-        console.error('Error adding asset: ', error);
+        console.error('Error adding asset:', error);
         alert('Failed to add asset.');
       }
     });
   </script>
 </body>
-  
 </html>
