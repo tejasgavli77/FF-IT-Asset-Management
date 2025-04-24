@@ -1,48 +1,33 @@
-document.addEventListener('DOMContentLoaded', function () {
-  const assetTableBody = document.getElementById('asset-table').querySelector('tbody');
+document.addEventListener('DOMContentLoaded', () => {
+  const tableBody = document.querySelector('#asset-table tbody');
 
-  // Fetch the assets from Firebase (or your backend API)
-  fetch('https://ffassetmanager-default-rtdb.asia-southeast1.firebasedatabase.app/assets.json') // Update with the correct API endpoint
+  fetch('https://ffassetmanager-default-rtdb.asia-southeast1.firebasedatabase.app/assets.json')
     .then(response => response.json())
     .then(data => {
-      // Clear the table first
-      assetTableBody.innerHTML = '';
+      tableBody.innerHTML = '';
 
-      // Loop through assets and add them to the table
-      for (const assetId in data) {
-        const asset = data[assetId];
-
-        // Create a table row
-        const row = document.createElement('tr');
-        
-        // Create table cells for each asset field
-        const assetIdCell = document.createElement('td');
-        assetIdCell.textContent = assetId;
-        row.appendChild(assetIdCell);
-        
-        const nameCell = document.createElement('td');
-        nameCell.textContent = asset.name;
-        row.appendChild(nameCell);
-
-        const typeCell = document.createElement('td');
-        typeCell.textContent = asset.type; // Assuming 'type' exists
-        row.appendChild(typeCell);
-
-        const statusCell = document.createElement('td');
-        statusCell.textContent = asset.status; // Assuming 'status' exists
-        row.appendChild(statusCell);
-
-        const actionCell = document.createElement('td');
-        actionCell.classList.add('text-blue-600', 'cursor-pointer');
-        actionCell.innerHTML = `<i class="bi bi-pencil"></i> Edit / <i class="bi bi-trash"></i> Delete`; // Add actions for editing or deleting
-        row.appendChild(actionCell);
-
-        // Append the row to the table body
-        assetTableBody.appendChild(row);
+      if (!data) {
+        tableBody.innerHTML = `<tr><td colspan="5" class="text-center p-4">No assets found.</td></tr>`;
+        return;
       }
+
+      Object.entries(data).forEach(([id, asset]) => {
+        const row = document.createElement('tr');
+        row.innerHTML = `
+          <td class="px-4 py-2 border">${id}</td>
+          <td class="px-4 py-2 border">${asset.name || '-'}</td>
+          <td class="px-4 py-2 border">${asset.type || '-'}</td>
+          <td class="px-4 py-2 border">${asset.status || '-'}</td>
+          <td class="px-4 py-2 border">
+            <i class="bi bi-pencil-square text-blue-500 cursor-pointer"></i>
+            <i class="bi bi-trash text-red-500 ml-2 cursor-pointer"></i>
+          </td>
+        `;
+        tableBody.appendChild(row);
+      });
     })
     .catch(error => {
-      console.error('Error fetching assets:', error);
-      alert('Failed to load assets. Please try again later.');
+      console.error('Error fetching asset data:', error);
+      tableBody.innerHTML = `<tr><td colspan="5" class="text-center text-red-500 p-4">Failed to load assets.</td></tr>`;
     });
 });
