@@ -82,6 +82,36 @@
     details: 'Initial registration'
   }]
 };
+  aste that entire block right before </body>, like this:
+
+html
+Copy
+Edit
+  <!-- JavaScript section -->
+  <script type="module">
+    import { db, assetsCollection } from './firebaseConfig.js';
+    import { addDoc } from 'https://www.gstatic.com/firebasejs/10.11.0/firebase-firestore.js';
+
+    const addAssetForm = document.getElementById('addAssetForm');
+
+    addAssetForm.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const asset = {
+        name: document.getElementById('assetName').value,
+        type: document.getElementById('assetType').value,
+        serial: document.getElementById('assetSerial').value,
+        status: 'available',
+      };
+      try {
+        await addDoc(assetsCollection, asset);
+        alert('Asset added successfully!');
+        addAssetForm.reset();
+      } catch (error) {
+        console.error('Error adding asset: ', error);
+        alert('Failed to add asset.');
+      }
+    });
+  </script>
 </body>
   
 </html>
