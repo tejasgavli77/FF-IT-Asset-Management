@@ -1,20 +1,31 @@
-document.getElementById('addAssetBtn').addEventListener('click', () => {
-  const assetType = document.getElementById('assetType').value;
-  const model = document.getElementById('model').value;
-  const serial = document.getElementById('serial').value;
-  const purchaseDate = document.getElementById('purchaseDate').value;
-
-  db.collection("assets").add({
-    type: assetType,
-    model: model,
-    serialNumber: serial,
-    purchaseDate: purchaseDate,
-    status: "Available",
-    currentOwner: "",
-    createdAt: new Date()
-  }).then(() => {
-    alert("✅ Asset added successfully!");
-  }).catch((error) => {
-    console.error("❌ Error adding asset:", error);
-  });
+const allocateBtn = document.createElement('button');
+allocateBtn.textContent = 'Allocate';
+allocateBtn.addEventListener('click', () => {
+  const user = prompt("Enter the name or ID of the user to allocate this asset:");
+  if (user) {
+    db.collection("assets").doc(doc.id).update({
+      status: "Allocated",
+      currentOwner: user
+    }).then(() => {
+      alert("✅ Asset allocated successfully!");
+      location.reload(); // refresh to update UI
+    }).catch((error) => {
+      console.error("❌ Allocation failed:", error);
+    });
+  }
 });
+row.appendChild(allocateBtn);
+const deleteBtn = document.createElement('button');
+deleteBtn.textContent = 'Delete';
+deleteBtn.style.marginLeft = '10px';
+deleteBtn.addEventListener('click', () => {
+  if (confirm("Are you sure you want to delete this asset?")) {
+    db.collection("assets").doc(doc.id).delete().then(() => {
+      alert("🗑️ Asset deleted successfully!");
+      location.reload();
+    }).catch((error) => {
+      console.error("❌ Error deleting asset:", error);
+    });
+  }
+});
+row.appendChild(deleteBtn);
