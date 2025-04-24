@@ -73,7 +73,9 @@
 
   <!-- JavaScript section -->
    <script type="module">
-    import { db, assetsCollection } from './firebaseConfig.js';
+    //import { db, assetsCollection } from './firebaseConfig.js';
+   import { db, assetsCollection, addDoc } from './firebaseConfig.js';
+
     import { addDoc } from 'https://www.gstatic.com/firebasejs/10.11.0/firebase-firestore.js';
 
     const assetForm = document.getElementById('assetForm');
