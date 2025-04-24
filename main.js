@@ -1,23 +1,16 @@
-document.getElementById('addAssetBtn').addEventListener('click', () => {
-  const assetType = document.getElementById('assetType').value;
-  const model = document.getElementById('model').value;
-  const serial = document.getElementById('serialNumber').value;
-  const purchaseDate = document.getElementById('purchaseDate').value;
-
-  db.collection("assets").add({
-    type: assetType,
-    model: model,
-    serialNumber: serial,
-    purchaseDate: purchaseDate,
-    status: "Available",
-    currentOwner: "",
-    createdAt: new Date()
-  }).then(() => {
-    alert("✅ Asset added successfully!");
-  }).catch((error) => {
-    console.error("❌ Error adding asset:", error);
-  });
-});
+const assetData = {
+  assetId: uuidv4(),
+  type: document.getElementById('assetType').value,
+  model: document.getElementById('model').value,
+  serialNumber: document.getElementById('serialNumber').value,
+  purchaseDate: document.getElementById('purchaseDate').value,
+  status: 'available',
+  history: [{
+    date: new Date().toISOString(),
+    action: 'Asset Added',
+    details: 'Initial registration'
+  }]
+};
 // Function to load and display assets
 function loadAssets() {
   const assetTableBody = document.getElementById("assetTableBody");
