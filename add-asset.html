@@ -34,6 +34,37 @@
     <!-- ✅ This is where your form will go -->
     <div id="pageContent">
       <!-- We will paste your Add Asset form and script here -->
+      <!-- Add Asset Form -->
+    <div class="bg-white rounded-lg shadow-md p-6 mb-8">
+      <h2 class="text-xl font-semibold mb-4">Add New Asset</h2>
+      <form id="assetForm" class="space-y-4">
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div>
+            <label class="block text-sm font-medium mb-1">Asset Type</label>
+            <select id="assetType" class="w-full p-2 border rounded" required>
+              <option value="">Select Type</option>
+              <option value="laptop">Laptop</option>
+              <option value="desktop">Desktop</option>
+              <option value="monitor">Monitor</option>
+              <option value="printer">Printer</option>
+            </select>
+          </div>
+          <div>
+            <label class="block text-sm font-medium mb-1">Model</label>
+            <input type="text" id="model" class="w-full p-2 border rounded" required />
+          </div>
+          <div>
+            <label class="block text-sm font-medium mb-1">Serial Number</label>
+            <input type="text" id="serialNumber" class="w-full p-2 border rounded" required />
+          </div>
+          <div>
+            <label class="block text-sm font-medium mb-1">Purchase Date</label>
+            <input type="date" id="purchaseDate" class="w-full p-2 border rounded" required />
+          </div>
+        </div>
+        <button type="submit" class="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600">Add Asset</button>
+      </form>
+    </div>
     </div>
   </main>
 
