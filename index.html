@@ -278,7 +278,33 @@
     function closeHistoryModal() {
       document.getElementById('historyModal').classList.add('hidden');
     }
-
+async function deleteAsset(assetId) {
+  if (!confirm("Are you sure you want to delete this asset?")) return;
+  showLoading();
+  try {
+    const response = await fetch('https://r0c8kgwocscg8gsokogwwsw4.zetaverse.one/mongodb', {
+      method: 'POST',
+      headers: {
+        'Authorization': 'Bearer lIiCWmvARYT4JgMnUbY3CDkQtMK2',
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        appSlug,
+        action: 'delete',
+        collection: 'assets',
+        conditions: { assetId }
+      })
+    });
+    const result = await response.json();
+    if (result.success) {
+      await loadAssets();
+      updateAssetDropdown(); // Refresh dropdown as well
+    }
+  } catch (error) {
+    console.error('Error deleting asset:', error);
+  }
+  hideLoading();
+}
     function showLoading() {
       const loader = document.createElement('div');
       loader.id = 'loader';
