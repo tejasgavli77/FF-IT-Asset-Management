@@ -27,7 +27,7 @@ document.addEventListener('DOMContentLoaded', function () {
     };
     
     // Send POST request to backend API (Replace 'your-api-endpoint.com' with your actual API endpoint)
-    fetch('https://your-api-endpoint.com/allocate-asset', {
+    fetch('https://ffassetmanager-default-rtdb.asia-southeast1.firebasedatabase.app/allocate-asset', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json'
