@@ -328,7 +328,50 @@ async function deleteAsset(assetId) {
       const loader = document.getElementById('loader');
       if (loader) loader.remove();
     }
+async function returnAsset(assetId) {
+  const asset = assets.find(a => a.assetId === assetId);
+  if (!asset) return;
 
+  const historyEntry = {
+    date: new Date().toISOString(),
+    action: 'Returned',
+    details: `Returned by ${asset.currentOwner || 'unknown'}`
+  };
+
+  showLoading();
+  try {
+    const response = await fetch('https://r0c8kgwocscg8gsokogwwsw4.zetaverse.one/mongodb', {
+      method: 'POST',
+      headers: {
+        'Authorization': 'Bearer lIiCWmvARYT4JgMnUbY3CDkQtMK2',
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        appSlug,
+        action: 'update',
+        collection: 'assets',
+        conditions: { assetId },
+        data: {
+          currentOwner: '',
+          status: 'available',
+          history: [...(asset.history || []), historyEntry]
+        }
+      })
+    });
+
+    const result = await response.json();
+    if (result.success) {
+      alert("✅ Asset returned successfully.");
+      await loadAssets();
+      updateAssetDropdown();
+    } else {
+      alert("❌ Return failed.");
+    }
+  } catch (error) {
+    console.error('Error returning asset:', error);
+  }
+  hideLoading();
+}
     init();
   </script>
 </body>
