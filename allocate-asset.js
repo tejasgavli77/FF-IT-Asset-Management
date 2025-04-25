@@ -7,13 +7,13 @@ document.addEventListener('DOMContentLoaded', async function () {
   try {
     const snapshot = await getDocs(assetsCollection);
     snapshot.forEach(doc => {
-      const data = doc.data();
+      const asset = doc.data();
 
-      // Only include available assets
-      if (data.status && data.status.toLowerCase() === 'available') {
+      // Only show assets with status "available"
+      if (asset.status && asset.status.toLowerCase() === 'available') {
         const option = document.createElement('option');
         option.value = doc.id;
-        option.textContent = `${data.name || data.type} (${data.model || 'No Model'})`;
+        option.textContent = `${asset.name || asset.type} (${asset.model || 'No Model'})`;
         assetSelect.appendChild(option);
       }
     });
@@ -23,7 +23,7 @@ document.addEventListener('DOMContentLoaded', async function () {
     }
 
   } catch (error) {
-    console.error('Error fetching assets from Firestore:', error);
-    alert('Error loading asset list.');
+    console.error('Error loading assets:', error);
+    alert('Failed to load available assets.');
   }
 });
