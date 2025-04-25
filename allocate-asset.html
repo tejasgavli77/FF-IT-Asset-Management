@@ -42,20 +42,21 @@
       <h2 class="text-xl font-semibold mb-4">Assign Asset to User</h2>
       <form id="allocateForm" class="space-y-4">
         <div>
-          <label class="block text-sm font-medium mb-1">Select Asset</label>
-         <select id="asset-id" name="asset-id" class="form-input w-full" required>
+          <div class-:mb4:>
+          <label for="assetSelect" class="block text-sm font-medium text-gray-700 mb-1">Select Asset</label>
+         <select id="assetSelect" class="w-full border border-gray-300 rounded px-3 py-2">
   <option value="">-- Select an Asset --</option>
 </select>
         </div>
-        <div>
-          <label class="block text-sm font-medium mb-1">User Name / Employee ID</label>
-          <input type="text" id="userName" class="w-full p-2 border rounded" required />
+        <div class="mb-4">
+           <label for="userName" class="block text-sm font-medium text-gray-700 mb-1">User Name / Employee ID</label>
+          <input type="text" id="userName" class="w-full border border-gray-300 rounded px-3 py-2" />
         </div>
-        <div>
-          <label class="block text-sm font-medium mb-1">Allocation Date</label>
-          <input type="date" id="allocationDate" class="w-full p-2 border rounded" required />
+        <div class-:mb4:>
+          <label for="allocationDate" class="block text-sm font-medium text-gray-700 mb-1">Allocation Date</label>
+          <input type="date" id="allocationDate" class="w-full border border-gray-300 rounded px-3 py-2" />
         </div>
-        <button type="submit" class="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600">Allocate</button>
+        <button id="allocateBtn" class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">Allocate</button>
       </form>
     </div>
   </main>
