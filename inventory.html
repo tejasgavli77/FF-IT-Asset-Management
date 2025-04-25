@@ -41,7 +41,6 @@
             <th class="px-4 py-2 border-b">Type</th>
             <th class="px-4 py-2 border-b">Status</th>
             <th class="px-4 py-2 border-b">Actions</th>
-            <div id="assetList" class="space-y-4"></div>
           </tr>
         </thead>
         <tbody>
@@ -82,12 +81,12 @@
 
   window.addEventListener('DOMContentLoaded', loadAssets);
 </script>
-  <script type="module">
+<script type="module">
   import { assetsCollection, getDocs } from './firebaseConfig.js';
 
   async function loadAssets() {
-    const assetList = document.getElementById('assetList');
-    assetList.innerHTML = '<p>Loading...</p>';
+    const tableBody = document.querySelector('#asset-table tbody');
+    tableBody.innerHTML = '<tr><td colspan="5">Loading...</td></tr>';
 
     try {
       const snapshot = await getDocs(assetsCollection);
@@ -95,22 +94,23 @@
       snapshot.forEach(doc => {
         const data = doc.data();
         html += `
-          <div class="bg-white p-4 rounded shadow mb-2">
-            <p><strong>Type:</strong> ${data.type}</p>
-            <p><strong>Model:</strong> ${data.model}</p>
-            <p><strong>Serial:</strong> ${data.serialNumber}</p>
-            <p><strong>Status:</strong> ${data.status}</p>
-          </div>
+          <tr>
+            <td class="border px-4 py-2">${doc.id}</td>
+            <td class="border px-4 py-2">${data.model}</td>
+            <td class="border px-4 py-2">${data.type}</td>
+            <td class="border px-4 py-2">${data.status}</td>
+            <td class="border px-4 py-2 text-center">—</td>
+          </tr>
         `;
       });
-      assetList.innerHTML = html || '<p>No assets found.</p>';
+      tableBody.innerHTML = html || '<tr><td colspan="5">No assets found.</td></tr>';
     } catch (err) {
-      assetList.innerHTML = `<p class="text-red-500">Error loading assets.</p>`;
+      tableBody.innerHTML = `<tr><td colspan="5" class="text-red-500">Error loading assets.</td></tr>`;
       console.error('Error:', err);
     }
   }
+
   window.addEventListener('DOMContentLoaded', loadAssets);
 </script>
-
 </body>
 </html>
