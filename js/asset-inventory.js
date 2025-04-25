@@ -50,6 +50,8 @@ async function loadAssets() {
 
 // Delete asset function
 async function deleteAsset(assetId) {
+  console.log("Delete button clicked for asset ID:", assetId);  // Debugging log
+
   try {
     const assetRef = doc(db, "assets", assetId);
     await deleteDoc(assetRef);
