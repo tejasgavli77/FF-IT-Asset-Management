@@ -24,23 +24,23 @@ async function loadAssets() {
     const snapshot = await getDocs(assetsCollection);
     let rows = "";
 
-   snapshot.forEach(doc => {
-  const asset = doc.data();
+    snapshot.forEach(doc => {
+      const asset = doc.data();
 
-  rows += `
-    <tr>
-      <td class="px-4 py-2 border-b">${doc.id}</td>
-      <td class="px-4 py-2 border-b">${asset.name || asset.type}</td>
-      <td class="px-4 py-2 border-b">${asset.type}</td>
-      <td class="px-4 py-2 border-b">${asset.status}</td>
-      <td class="px-4 py-2 border-b text-center">
-        <button onclick="deleteAsset('${doc.id}')" class="text-red-500 hover:text-red-700">
-          🗑️
-        </button>
-      </td>
-    </tr>
-  `;
-});
+      rows += `
+        <tr>
+          <td class="px-4 py-2 border-b">${doc.id}</td>
+          <td class="px-4 py-2 border-b">${asset.name || 'No Name'}</td>
+          <td class="px-4 py-2 border-b">${asset.type || 'No Type'}</td>
+          <td class="px-4 py-2 border-b">${asset.status || 'No Status'}</td>
+          <td class="px-4 py-2 border-b text-center">
+            <button onclick="deleteAsset('${doc.id}')" class="text-red-500 hover:text-red-700">
+              🗑️
+            </button>
+          </td>
+        </tr>
+      `;
+    });
 
     tableBody.innerHTML = rows || '<tr><td colspan="5">No assets found.</td></tr>';
   } catch (error) {
@@ -49,3 +49,9 @@ async function loadAssets() {
 }
 
 document.addEventListener("DOMContentLoaded", loadAssets);
+
+// Add deleteAsset function if you haven't already
+function deleteAsset(assetId) {
+  console.log(`Asset with ID ${assetId} will be deleted.`);
+  // Add your logic to delete the asset from Firestore here
+}
