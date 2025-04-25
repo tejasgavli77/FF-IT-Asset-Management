@@ -1,5 +1,5 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
-import { getFirestore, getDocs, collection } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+import { getFirestore, getDocs, collection, doc, deleteDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
 // Firebase config
 const firebaseConfig = {
@@ -48,10 +48,19 @@ async function loadAssets() {
   }
 }
 
-document.addEventListener("DOMContentLoaded", loadAssets);
+// Delete asset function
+async function deleteAsset(assetId) {
+  try {
+    const assetRef = doc(db, "assets", assetId);
+    await deleteDoc(assetRef);
+    console.log(`Asset with ID ${assetId} deleted successfully.`);
 
-// Add deleteAsset function if you haven't already
-function deleteAsset(assetId) {
-  console.log(`Asset with ID ${assetId} will be deleted.`);
-  // Add your logic to delete the asset from Firestore here
+    // Reload the assets after deletion
+    loadAssets();
+  } catch (error) {
+    console.error("Error deleting asset: ", error);
+  }
 }
+
+// Load assets when the page loads
+document.addEventListener("DOMContentLoaded", loadAssets);
