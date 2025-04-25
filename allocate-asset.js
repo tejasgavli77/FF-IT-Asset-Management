@@ -9,7 +9,6 @@ document.addEventListener('DOMContentLoaded', async function () {
     snapshot.forEach(doc => {
       const asset = doc.data();
 
-      // Only show assets with status "available"
       if (asset.status && asset.status.toLowerCase() === 'available') {
         const option = document.createElement('option');
         option.value = doc.id;
