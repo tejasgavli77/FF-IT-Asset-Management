@@ -18,21 +18,6 @@ const assetsCollection = collection(db, "assets");
 
 // Load and display assets
 async function loadAssets() {
-  import { deleteDoc, doc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
-
-window.deleteAsset = async function (id) {
-  const confirmDelete = confirm("Are you sure you want to delete this asset?");
-  if (!confirmDelete) return;
-
-  try {
-    await deleteDoc(doc(db, "assets", id));
-    alert("Asset deleted successfully!");
-    loadAssets(); // Refresh the table
-  } catch (error) {
-    console.error("Error deleting asset:", error);
-    alert("Failed to delete asset.");
-  }
-};
   const tableBody = document.querySelector("#asset-table tbody");
 
   try {
