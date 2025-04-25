@@ -1,5 +1,6 @@
+// firebaseConfig.js
 import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
-import { getFirestore, collection, addDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+import { getFirestore, collection, getDocs } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
 const firebaseConfig = {
   apiKey: "AIzaSyAspahfUUGnBzh0mh6U53evGQzWQP956xQ",
@@ -15,4 +16,4 @@ const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 const assetsCollection = collection(db, "assets");
 
-export { db, assetsCollection, addDoc };
+export { db, assetsCollection, getDocs };
