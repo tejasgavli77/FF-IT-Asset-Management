@@ -18,24 +18,44 @@ const assetsCollection = collection(db, "assets");
 
 // Load and display assets
 async function loadAssets() {
+  import { deleteDoc, doc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+
+window.deleteAsset = async function (id) {
+  const confirmDelete = confirm("Are you sure you want to delete this asset?");
+  if (!confirmDelete) return;
+
+  try {
+    await deleteDoc(doc(db, "assets", id));
+    alert("Asset deleted successfully!");
+    loadAssets(); // Refresh the table
+  } catch (error) {
+    console.error("Error deleting asset:", error);
+    alert("Failed to delete asset.");
+  }
+};
   const tableBody = document.querySelector("#asset-table tbody");
 
   try {
     const snapshot = await getDocs(assetsCollection);
     let rows = "";
 
-    snapshot.forEach(doc => {
-      const asset = doc.data();
-      rows += `
-        <tr>
-          <td class="px-4 py-2 border-b">${doc.id}</td>
-          <td class="px-4 py-2 border-b">${asset.name || asset.type}</td>
-          <td class="px-4 py-2 border-b">${asset.type}</td>
-          <td class="px-4 py-2 border-b">${asset.status}</td>
-          <td class="px-4 py-2 border-b">-</td>
-        </tr>
-      `;
-    });
+   snapshot.forEach(doc => {
+  const asset = doc.data();
+
+  rows += `
+    <tr>
+      <td class="px-4 py-2 border-b">${doc.id}</td>
+      <td class="px-4 py-2 border-b">${asset.name || asset.type}</td>
+      <td class="px-4 py-2 border-b">${asset.type}</td>
+      <td class="px-4 py-2 border-b">${asset.status}</td>
+      <td class="px-4 py-2 border-b text-center">
+        <button onclick="deleteAsset('${doc.id}')" class="text-red-500 hover:text-red-700">
+          🗑️
+        </button>
+      </td>
+    </tr>
+  `;
+});
 
     tableBody.innerHTML = rows || '<tr><td colspan="5">No assets found.</td></tr>';
   } catch (error) {
