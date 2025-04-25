@@ -51,5 +51,66 @@
   </main>
 
   <script type="module" src="./js/asset-inventory.js"></script>
+  <script type="module">
+  import { assetsCollection, getDocs } from './firebaseConfig.js';
+
+  async function loadAssets() {
+    const assetList = document.getElementById('assetList');
+    assetList.innerHTML = '<p>Loading...</p>';
+
+    try {
+      const snapshot = await getDocs(assetsCollection);
+      let html = '';
+      snapshot.forEach(doc => {
+        const data = doc.data();
+        html += `
+          <div class="bg-white p-4 rounded shadow mb-2">
+            <p><strong>Type:</strong> ${data.type}</p>
+            <p><strong>Model:</strong> ${data.model}</p>
+            <p><strong>Serial:</strong> ${data.serialNumber}</p>
+            <p><strong>Status:</strong> ${data.status}</p>
+          </div>
+        `;
+      });
+      assetList.innerHTML = html || '<p>No assets found.</p>';
+    } catch (err) {
+      assetList.innerHTML = `<p class="text-red-500">Error loading assets.</p>`;
+      console.error('Error:', err);
+    }
+  }
+
+  window.addEventListener('DOMContentLoaded', loadAssets);
+</script>
+  <script type="module">
+  import { assetsCollection, getDocs } from './firebaseConfig.js';
+
+  async function loadAssets() {
+    const assetList = document.getElementById('assetList');
+    assetList.innerHTML = '<p>Loading...</p>';
+
+    try {
+      const snapshot = await getDocs(assetsCollection);
+      let html = '';
+      snapshot.forEach(doc => {
+        const data = doc.data();
+        html += `
+          <div class="bg-white p-4 rounded shadow mb-2">
+            <p><strong>Type:</strong> ${data.type}</p>
+            <p><strong>Model:</strong> ${data.model}</p>
+            <p><strong>Serial:</strong> ${data.serialNumber}</p>
+            <p><strong>Status:</strong> ${data.status}</p>
+          </div>
+        `;
+      });
+      assetList.innerHTML = html || '<p>No assets found.</p>';
+    } catch (err) {
+      assetList.innerHTML = `<p class="text-red-500">Error loading assets.</p>`;
+      console.error('Error:', err);
+    }
+  }
+
+  window.addEventListener('DOMContentLoaded', loadAssets);
+</script>
+
 </body>
 </html>
