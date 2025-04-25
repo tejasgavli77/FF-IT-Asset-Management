@@ -34,7 +34,7 @@ async function loadAssets() {
           <td class="px-4 py-2 border-b">${asset.type || 'No Type'}</td>
           <td class="px-4 py-2 border-b">${asset.status || 'No Status'}</td>
           <td class="px-4 py-2 border-b text-center">
-            <button onclick="deleteAsset('${doc.id}')" class="text-red-500 hover:text-red-700">
+            <button class="delete-btn text-red-500 hover:text-red-700" data-id="${doc.id}">
               🗑️
             </button>
           </td>
@@ -43,6 +43,16 @@ async function loadAssets() {
     });
 
     tableBody.innerHTML = rows || '<tr><td colspan="5">No assets found.</td></tr>';
+
+    // Add event listeners for delete buttons
+    const deleteButtons = document.querySelectorAll(".delete-btn");
+    deleteButtons.forEach(button => {
+      button.addEventListener("click", (event) => {
+        const assetId = event.target.getAttribute("data-id");
+        deleteAsset(assetId);
+      });
+    });
+
   } catch (error) {
     console.error("Error loading assets:", error);
   }
