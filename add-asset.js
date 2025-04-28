@@ -1,4 +1,3 @@
-// Firebase imports
 import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
 import { getFirestore, collection, addDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
@@ -21,21 +20,20 @@ const assetsCollection = collection(db, "assets");
 document.getElementById('addAssetForm').addEventListener('submit', async (e) => {
   e.preventDefault();
 
-  const assetType = document.getElementById('assetType').value;
-  const assetModel = document.getElementById('assetModel').value;
-  const assetSerialNumber = document.getElementById('assetSerialNumber').value;
-  const status = 'available';
+  const type = document.getElementById('assetType').value;
+  const model = document.getElementById('assetModel').value;
+  const serialNumber = document.getElementById('assetSerialNumber').value;
 
   // Generate random 4-digit Asset ID
-  const randomAssetId = Math.floor(1000 + Math.random() * 9000);  // random 4-digit number
+  const randomAssetId = Math.floor(1000 + Math.random() * 9000);  // random 4 digit number
 
   try {
     await addDoc(assetsCollection, {
-      assetId: randomAssetId,   // ✅ Save random ID
-      type: assetType,
-      model: assetModel,
-      serialNumber: assetSerialNumber,
-      status: status
+      assetId: randomAssetId,   // Correct way
+      type: type,               // ✅ Corrected
+      model: model,             // ✅ Corrected
+      serialNumber: serialNumber, // ✅ Corrected
+      status: "available"
     });
 
     alert('Asset added successfully!');
