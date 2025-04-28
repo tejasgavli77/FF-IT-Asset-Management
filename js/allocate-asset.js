@@ -74,3 +74,18 @@ document.addEventListener('DOMContentLoaded', async function () {
   });
 
 });
+// Toast function
+function showToast(message, type = "success") {
+  const toast = document.createElement("div");
+  toast.className = `px-4 py-2 rounded shadow-md text-white ${
+    type === "success" ? "bg-green-500" : "bg-red-500"
+  }`;
+  toast.textContent = message;
+
+  const container = document.getElementById("toastContainer");
+  container.appendChild(toast);
+
+  setTimeout(() => {
+    toast.remove();
+  }, 3000); // Remove after 3 seconds
+}
