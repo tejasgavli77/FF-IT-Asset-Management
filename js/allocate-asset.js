@@ -41,7 +41,7 @@ document.addEventListener('DOMContentLoaded', async function () {
 
   } catch (error) {
     console.error("Error fetching assets:", error);
-    alert("Failed to load available assets.");
+    showToast("Failed to load available assets.");
   }
 
   // ✅ ADD form submit event
@@ -51,7 +51,7 @@ document.addEventListener('DOMContentLoaded', async function () {
     const selectedAssetId = assetDropdown.value;
 
     if (!selectedAssetId) {
-      alert("Please select an asset to allocate.");
+      showToast("Please select an asset to allocate.");
       return;
     }
 
@@ -69,7 +69,7 @@ document.addEventListener('DOMContentLoaded', async function () {
       window.location.reload();
     } catch (error) {
       console.error("Error allocating asset:", error);
-      alert("Failed to allocate asset. Please try again.");
+      showToast("Failed to allocate asset. Please try again.");
     }
   });
 
