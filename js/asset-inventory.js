@@ -1,5 +1,5 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
-import { getFirestore, getDocs, collection, doc, deleteDoc, updateDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+import { getFirestore, getDocs, collection, deleteDoc, doc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
 // Firebase config
 const firebaseConfig = {
@@ -53,72 +53,30 @@ async function loadAssets() {
   }
 }
 
-// Show Edit Asset Popup
-function editAsset(assetId) {
-  const assetRef = doc(db, "assets", assetId);
+// Add Asset Function (Example)
+async function addAsset() {
+  // Collecting form values (example, adjust according to your form fields)
+  const newAssetData = {
+    model: document.getElementById("model").value,
+    serialNumber: document.getElementById("serialNumber").value,
+    status: document.getElementById("status").value,
+    type: document.getElementById("type").value,
+  };
 
-  // Fetch asset details
-  getDocs(assetRef).then(snapshot => {
-    const asset = snapshot.data();
+  try {
+    // Add new asset to Firestore
+    const docRef = await addDoc(assetsCollection, newAssetData);
+    console.log("Asset added with ID: ", docRef.id);
 
-    // Create popup HTML
-    const editPopup = document.createElement("div");
-    editPopup.className = "fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50";
-    editPopup.innerHTML = `
-      <div class="bg-white p-6 rounded shadow-lg text-center">
-        <h2 class="text-lg font-semibold mb-4">Edit Asset</h2>
-        <form id="editAssetForm">
-          <label for="model" class="block mb-2">Model:</label>
-          <input type="text" id="model" value="${asset.model || ''}" class="mb-4 p-2 border rounded w-full">
+    // Show success toast
+    showToast("Asset added successfully!", "success");
 
-          <label for="serialNumber" class="block mb-2">Serial Number:</label>
-          <input type="text" id="serialNumber" value="${asset.serialNumber || ''}" class="mb-4 p-2 border rounded w-full">
-
-          <label for="status" class="block mb-2">Status:</label>
-          <input type="text" id="status" value="${asset.status || ''}" class="mb-4 p-2 border rounded w-full">
-
-          <div class="flex justify-center gap-4">
-            <button type="submit" class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded">Save</button>
-            <button type="button" id="cancelEdit" class="bg-gray-300 hover:bg-gray-400 text-black px-4 py-2 rounded">Cancel</button>
-          </div>
-        </form>
-      </div>
-    `;
-
-    document.body.appendChild(editPopup);
-
-    // Close the popup if Cancel is clicked
-    document.getElementById("cancelEdit").addEventListener("click", () => {
-      editPopup.remove();
-    });
-
-    // Handle Save functionality
-    document.getElementById("editAssetForm").addEventListener("submit", async (e) => {
-      e.preventDefault();
-
-      const updatedData = {
-        model: document.getElementById("model").value,
-        serialNumber: document.getElementById("serialNumber").value,
-        status: document.getElementById("status").value,
-      };
-
-      try {
-        await updateDoc(assetRef, updatedData);
-        showToast("Asset updated successfully!", "success");
-        editPopup.remove();
-        loadAssets(); // Reload assets after update
-      } catch (error) {
-        console.error("Error updating asset:", error);
-        showToast("Error updating asset!", "error");
-      }
-    });
-  });
-}
-
-// View History (Placeholder for now)
-function viewHistory(assetId) {
-  alert(`Viewing history for asset ID: ${assetId}`);
-  // Later you can implement a method to fetch and show the asset history from Firestore
+    // Reload the assets table
+    loadAssets(); // This ensures the new asset appears in the table
+  } catch (error) {
+    console.error("Error adding asset: ", error);
+    showToast("Error adding asset!", "error");
+  }
 }
 
 // Confirm before deletion
@@ -149,4 +107,31 @@ function showToast(message, type) {
   toast.textContent = message;
   toast.className = `
     fixed bottom-5 right-5 
-    ${type === "success"
+    ${type === "success" ? "bg-green-500" : "bg-red-500"} 
+    text-white px-4 py-2 rounded shadow-lg animate-fade-in-out z-50
+  `;
+
+  document.body.appendChild(toast);
+
+  setTimeout(() => {
+    toast.remove();
+  }, 3000);
+}
+
+// Fade animation for toast
+const style = document.createElement('style');
+style.textContent = `
+@keyframes fadeInOut {
+  0% { opacity: 0; transform: translateY(20px); }
+  10% { opacity: 1; transform: translateY(0); }
+  90% { opacity: 1; transform: translateY(0); }
+  100% { opacity: 0; transform: translateY(-20px); }
+}
+.animate-fade-in-out {
+  animation: fadeInOut 3s ease-in-out forwards;
+}
+`;
+document.head.appendChild(style);
+
+// Load assets on page load
+document.addEventListener("DOMContentLoaded", loadAssets);
