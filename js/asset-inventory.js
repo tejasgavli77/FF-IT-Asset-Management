@@ -50,7 +50,7 @@ async function loadAssets() {
     deleteButtons.forEach(button => {
       button.addEventListener("click", (event) => {
         const assetId = event.target.getAttribute("data-id");
-        confirmDelete(assetId);
+        showConfirmPopup(assetId);
       });
     });
 
@@ -60,12 +60,36 @@ async function loadAssets() {
   }
 }
 
-// Confirm before deletion
-function confirmDelete(assetId) {
-  const confirmation = confirm("Are you sure you want to delete this asset?");
-  if (confirmation) {
-    deleteAsset(assetId);
-  }
+// Show confirm popup
+function showConfirmPopup(assetId) {
+  // Create overlay
+  const overlay = document.createElement("div");
+  overlay.className = "fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50";
+
+  // Create modal
+  const modal = document.createElement("div");
+  modal.className = "bg-white p-6 rounded shadow-lg text-center";
+  modal.innerHTML = `
+    <h2 class="text-lg font-semibold mb-4">Confirm Deletion</h2>
+    <p class="mb-4">Are you sure you want to delete this asset?</p>
+    <div class="flex justify-center gap-4">
+      <button id="confirmDelete" class="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded">Yes</button>
+      <button id="cancelDelete" class="bg-gray-300 hover:bg-gray-400 text-black px-4 py-2 rounded">No</button>
+    </div>
+  `;
+
+  overlay.appendChild(modal);
+  document.body.appendChild(overlay);
+
+  // Handle buttons
+  document.getElementById("confirmDelete").addEventListener("click", async () => {
+    await deleteAsset(assetId);
+    overlay.remove();
+  });
+
+  document.getElementById("cancelDelete").addEventListener("click", () => {
+    overlay.remove();
+  });
 }
 
 // Delete asset function
@@ -82,7 +106,7 @@ async function deleteAsset(assetId) {
   }
 }
 
-// Toast Notification (with type: success or error)
+// Toast Notification (success or error)
 function showToast(message, type) {
   const toast = document.createElement("div");
   toast.textContent = message;
@@ -94,13 +118,12 @@ function showToast(message, type) {
 
   document.body.appendChild(toast);
 
-  // Remove toast after 3 seconds
   setTimeout(() => {
     toast.remove();
   }, 3000);
 }
 
-// Fade In-Out Animation
+// Fade animation for toast
 const style = document.createElement('style');
 style.textContent = `
 @keyframes fadeInOut {
