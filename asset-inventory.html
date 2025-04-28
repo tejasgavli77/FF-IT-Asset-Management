@@ -33,17 +33,22 @@
     <!-- Asset List Table -->
     <div class="bg-white rounded-lg shadow-md p-6 mb-8">
       <h2 class="text-xl font-semibold mb-4">All Assets</h2>
-      <table id="asset-table" class="w-full table-auto">
-        <thead>
-          <tr>
-            <th class="px-4 py-2 border-b">Asset ID</th>
-            <th class="px-4 py-2 border-b">Name</th>
-            <th class="px-4 py-2 border-b">Type</th>
-            <th class="px-4 py-2 border-b">Status</th>
-            <th class="px-4 py-2 border-b">Actions</th>
-          </tr>
-        </thead>
-        <tbody>
+     <table id="asset-table" class="min-w-full bg-white">
+  <thead>
+    <tr>
+      <th class="px-4 py-2 border-b">Asset ID</th>
+      <th class="px-4 py-2 border-b">Type</th>
+      <th class="px-4 py-2 border-b">Model</th>
+      <th class="px-4 py-2 border-b">Serial Number</th>
+      <th class="px-4 py-2 border-b">Status</th>
+      <th class="px-4 py-2 border-b">Action</th>
+    </tr>
+  </thead>
+  <tbody>
+    <!-- Assets will be dynamically inserted here -->
+  </tbody>
+</table>
+
           <!-- Data will be populated dynamically -->
         </tbody>
       </table>
