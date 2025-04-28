@@ -107,3 +107,8 @@ document.head.appendChild(style);
 
 // Load assets on page load
 document.addEventListener("DOMContentLoaded", loadAssets);
+
+// Make functions globally available
+window.confirmDelete = confirmDelete;
+window.deleteAsset = deleteAsset;
+
