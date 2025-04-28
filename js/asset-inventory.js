@@ -24,17 +24,18 @@ async function loadAssets() {
     const snapshot = await getDocs(assetsCollection);
     let rows = "";
 
-    snapshot.forEach(doc => {
-      const asset = doc.data();
+    snapshot.forEach(docSnap => {
+      const asset = docSnap.data();
 
       rows += `
         <tr>
-          <td class="px-4 py-2 border-b">${doc.id}</td>
-          <td class="px-4 py-2 border-b">${asset.name || 'No Name'}</td>
-          <td class="px-4 py-2 border-b">${asset.type || 'No Type'}</td>
-          <td class="px-4 py-2 border-b">${asset.status || 'No Status'}</td>
+          <td class="px-4 py-2 border-b">${docSnap.id}</td>
+          <td class="px-4 py-2 border-b">${asset.type || 'N/A'}</td>
+          <td class="px-4 py-2 border-b">${asset.model || 'N/A'}</td>
+          <td class="px-4 py-2 border-b">${asset.serialNumber || 'N/A'}</td>
+          <td class="px-4 py-2 border-b">${asset.status || 'N/A'}</td>
           <td class="px-4 py-2 border-b text-center">
-            <button class="delete-btn text-red-500 hover:text-red-700" data-id="${doc.id}">
+            <button class="delete-btn text-red-500 hover:text-red-700" data-id="${docSnap.id}">
               🗑️
             </button>
           </td>
@@ -42,9 +43,9 @@ async function loadAssets() {
       `;
     });
 
-    tableBody.innerHTML = rows || '<tr><td colspan="5">No assets found.</td></tr>';
+    tableBody.innerHTML = rows || '<tr><td colspan="6" class="text-center py-4">No assets found.</td></tr>';
 
-    // Add event listeners for delete buttons
+    // Bind delete buttons
     const deleteButtons = document.querySelectorAll(".delete-btn");
     deleteButtons.forEach(button => {
       button.addEventListener("click", (event) => {
@@ -60,19 +61,15 @@ async function loadAssets() {
 
 // Delete asset function
 async function deleteAsset(assetId) {
-  console.log("Delete button clicked for asset ID:", assetId);  // Debugging log
-
   try {
     const assetRef = doc(db, "assets", assetId);
     await deleteDoc(assetRef);
     console.log(`Asset with ID ${assetId} deleted successfully.`);
-
-    // Reload the assets after deletion
-    loadAssets();
+    loadAssets(); // Reload assets after deletion
   } catch (error) {
     console.error("Error deleting asset: ", error);
   }
 }
 
-// Load assets when the page loads
+// Load assets when page loads
 document.addEventListener("DOMContentLoaded", loadAssets);
