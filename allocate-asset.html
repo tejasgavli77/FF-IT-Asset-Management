@@ -24,6 +24,9 @@
     </nav>
   </aside>
 
+  <!-- Toast Notifications Container -->
+  <div id="toastContainer" class="fixed top-5 right-5 space-y-2 z-50"></div>
+
   <!-- Main Content -->
   <main class="flex-1 p-6 overflow-y-auto">
     <header class="mb-6">
@@ -33,13 +36,11 @@
     <!-- Allocation Form Card -->
     <div class="bg-white rounded-lg shadow-md p-6 mb-8">
       <h2 class="text-xl font-semibold mb-4">Assign Asset to User</h2>
-
-      <!-- ✅ Corrected form ID -->
-      <form id="assignForm" class="space-y-4">
+      <form id="allocateForm" class="space-y-4">
 
         <!-- Select Asset -->
         <div class="mb-4">
-          <label for="assetSelect" class="block text-sm font-medium text-gray-700 mb-1">Select Asset</label>
+          <label for="asset-id" class="block text-sm font-medium text-gray-700 mb-1">Select Asset</label>
           <select id="assetSelect" class="w-full border border-gray-300 rounded px-3 py-2">
             <option value="">-- Select an Asset --</option>
           </select>
@@ -57,19 +58,47 @@
           <input type="date" id="allocationDate" class="w-full border border-gray-300 rounded px-3 py-2" required />
         </div>
 
-        <!-- Submit Button ✅ -->
-        <button type="submit" class="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded">
+        <!-- Submit Button -->
+        <button onclick="allocateAsset()" class="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded">
           Assign Asset
         </button>
 
       </form>
     </div>
-    <!-- Toast Notifications -->
-<div id="toastContainer" class="fixed top-5 right-5 space-y-2 z-50"></div>
-
   </main>
 
-  <!-- Your JS file -->
-  <script type="module" src="./js/allocate-asset.js"></script>
+  <!-- Toast Notification Function -->
+  <script type="module">
+    function showToast(message, type = "success") {
+      const toast = document.createElement("div");
+      toast.className = `px-4 py-2 rounded shadow-md text-white ${
+        type === "success" ? "bg-green-500" : "bg-red-500"
+      }`;
+      toast.textContent = message;
+
+      const container = document.getElementById("toastContainer");
+      container.appendChild(toast);
+
+      // Remove the toast after 3 seconds
+      setTimeout(() => {
+        toast.remove();
+      }, 3000);
+    }
+
+    async function allocateAsset() {
+      // Assuming you've already got the form values...
+      const selectedAsset = document.getElementById('assetSelect').value;
+      const userName = document.getElementById('userName').value;
+      const allocationDate = document.getElementById('allocationDate').value;
+
+      if (selectedAsset && userName && allocationDate) {
+        // Do the asset allocation here (update Firestore)
+        // For now, let's simulate success:
+        showToast("Asset allocated successfully!");
+      } else {
+        showToast("Please fill in all fields", "error");
+      }
+    }
+  </script>
 </body>
 </html>
