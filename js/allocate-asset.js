@@ -67,12 +67,12 @@ async function allocateAsset() {
   try {
     const assetRef = doc(db, "assets", assetId);
     await updateDoc(assetRef, {
-      status: "assigned",
-      assignedTo: userName,
+      status: "Allocated",
+      AllocatedTo: userName,
       allocationDate: allocationDate,
     });
 
-    showToast("Asset successfully assigned!", "success");
+    showToast("Asset successfully Allocated!", "success");
     document.getElementById("allocateForm").reset(); // Reset form after success
   } catch (error) {
     console.error("Error allocating asset: ", error);
