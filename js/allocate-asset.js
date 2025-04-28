@@ -16,8 +16,10 @@ const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 const assetsCollection = collection(db, "assets");
 
+// Load available assets into dropdown
 async function loadAvailableAssets() {
   const assetDropdown = document.getElementById('assetSelect');
+
   assetDropdown.innerHTML = `<option value="">-- Select an Asset --</option>`;
 
   try {
@@ -29,7 +31,7 @@ async function loadAvailableAssets() {
       if (asset.status && asset.status.toLowerCase() === 'available') {
         const option = document.createElement('option');
         option.value = docSnap.id;
-        option.textContent = `${asset.type || 'Type'} | ${asset.model || 'Model'} | ${asset.serialNumber || 'Serial Unknown'}`;
+        option.textContent = `${asset.type || 'Unknown'} (${asset.model || 'Model Unknown'})`;
         assetDropdown.appendChild(option);
       }
     });
@@ -44,6 +46,7 @@ async function loadAvailableAssets() {
   }
 }
 
+// Allocate asset when Assign button is clicked
 async function allocateAsset() {
   const assetId = document.getElementById('assetSelect').value;
 
@@ -57,11 +60,15 @@ async function allocateAsset() {
     await updateDoc(assetRef, { status: "Allocated" });
 
     alert("Asset allocated successfully!");
-    loadAvailableAssets();  // Refresh dropdown after allocation
+    await loadAvailableAssets();  // Reload dropdown after allocation
   } catch (error) {
     console.error("Error allocating asset:", error);
     alert("Failed to allocate asset.");
   }
 }
 
+// On page load
 document.addEventListener('DOMContentLoaded', loadAvailableAssets);
+
+// Export allocateAsset globally for button to access
+window.allocateAsset = allocateAsset;
