@@ -36,9 +36,9 @@ async function loadAssets() {
           <td class="px-4 py-2 border-b">${asset.status || 'N/A'}</td>
           <td class="px-4 py-2 border-b text-center">
             <div class="flex justify-center gap-2">
-              <button onclick="editAsset('${docSnap.id}')">✏️</button>
-              <button onclick="viewHistory('${docSnap.id}')">📜</button>
-              <button onclick="confirmDelete('${docSnap.id}')">🗑️</button>
+              <button onclick="editAsset('${docSnap.id}')" class="bg-yellow-400 hover:bg-yellow-500 text-white px-2 py-1 rounded">✏️ Edit</button>
+              <button onclick="viewHistory('${docSnap.id}')" class="bg-blue-400 hover:bg-blue-500 text-white px-2 py-1 rounded">📜 View History</button>
+              <button onclick="confirmDelete('${docSnap.id}')" class="bg-red-500 hover:bg-red-600 text-white px-2 py-1 rounded">🗑️ Delete</button>
             </div>
           </td>
         </tr>
@@ -149,31 +149,4 @@ function showToast(message, type) {
   toast.textContent = message;
   toast.className = `
     fixed bottom-5 right-5 
-    ${type === "success" ? "bg-green-500" : "bg-red-500"} 
-    text-white px-4 py-2 rounded shadow-lg animate-fade-in-out z-50
-  `;
-
-  document.body.appendChild(toast);
-
-  setTimeout(() => {
-    toast.remove();
-  }, 3000);
-}
-
-// Fade animation for toast
-const style = document.createElement('style');
-style.textContent = `
-@keyframes fadeInOut {
-  0% { opacity: 0; transform: translateY(20px); }
-  10% { opacity: 1; transform: translateY(0); }
-  90% { opacity: 1; transform: translateY(0); }
-  100% { opacity: 0; transform: translateY(-20px); }
-}
-.animate-fade-in-out {
-  animation: fadeInOut 3s ease-in-out forwards;
-}
-`;
-document.head.appendChild(style);
-
-// Load assets on page load
-document.addEventListener("DOMContentLoaded", loadAssets);
+    ${type === "success"
