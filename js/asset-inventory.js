@@ -27,6 +27,7 @@ async function loadAssets() {
   snapshot.forEach(docSnap => {
     const asset = docSnap.data();
     const assetId = asset.assetId || 'N/A'; // Show Asset ID or fallback N/A
+    console.log("Loaded Asset: ", assetId);  // Debugging: Check Asset ID in console
 
     const row = document.createElement('tr');
     row.classList.add('border-b');
