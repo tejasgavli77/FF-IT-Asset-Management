@@ -54,15 +54,10 @@ async function allocateAsset() {
 
   try {
     const assetRef = doc(db, "assets", assetId);
-    await updateDoc(assetRef, {
-      status: "Allocated"
-    });
+    await updateDoc(assetRef, { status: "Allocated" });
 
     alert("Asset allocated successfully!");
-
-    // Reload available assets dropdown
-    loadAvailableAssets();
-
+    loadAvailableAssets();  // Refresh dropdown after allocation
   } catch (error) {
     console.error("Error allocating asset:", error);
     alert("Failed to allocate asset.");
