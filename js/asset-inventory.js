@@ -98,6 +98,7 @@ window.confirmDelete = confirmDelete;
 window.confirmReturn = confirmReturn;
 window.editAsset = editAsset;
 window.viewHistory = viewHistory;
+window.closeEditModal = closeEditModal;
 
 // Load assets on page load
 document.addEventListener('DOMContentLoaded', loadAssets);
