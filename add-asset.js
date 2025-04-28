@@ -20,20 +20,31 @@ const assetsCollection = collection(db, "assets");
 document.getElementById('addAssetForm').addEventListener('submit', async (e) => {
   e.preventDefault();
 
-  // Correctly get the values
   const assetType = document.getElementById('assetType').value;
   const assetModel = document.getElementById('assetModel').value;
   const assetSerialNumber = document.getElementById('assetSerialNumber').value;
-  const purchaseDate = document.getElementById('purchaseDate').value || ""; // optional
+  const purchaseDate = document.getElementById('purchaseDate').value || "";
   const status = 'available';
 
-  // Generate random 4-digit number
   const randomAssetId = Math.floor(1000 + Math.random() * 9000);
+
+  // 👀 Log before adding
+  console.log("Saving asset:", {
+    assetId: randomAssetId,
+    type: assetType,
+    model: assetModel,
+    serialNumber: assetSerialNumber,
+    purchaseDate: purchaseDate,
+    status: status,
+    action: "Asset Added",
+    date: new Date().toISOString(),
+    details: "Initial registration"
+  });
 
   try {
     await addDoc(assetsCollection, {
-      assetId: randomAssetId,            // ✅ Properly saving assetId
-      type: assetType,                   // ✅ Correct field mapping
+      assetId: randomAssetId,
+      type: assetType,
       model: assetModel,
       serialNumber: assetSerialNumber,
       purchaseDate: purchaseDate,
