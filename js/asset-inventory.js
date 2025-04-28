@@ -1,5 +1,5 @@
-import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
-import { getFirestore, getDocs, collection, deleteDoc, doc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+\import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+import { getFirestore, getDocs, collection, deleteDoc, doc, addDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
 // Firebase config
 const firebaseConfig = {
@@ -36,8 +36,11 @@ async function loadAssets() {
           <td class="px-4 py-2 border-b">${asset.status || 'N/A'}</td>
           <td class="px-4 py-2 border-b text-center">
             <div class="flex justify-center gap-2">
+              <!-- Edit button - Currently no function -->
               <button onclick="editAsset('${docSnap.id}')" class="bg-yellow-400 hover:bg-yellow-500 text-white px-2 py-1 rounded">✏️ Edit</button>
+              <!-- View History button - Currently no function -->
               <button onclick="viewHistory('${docSnap.id}')" class="bg-blue-400 hover:bg-blue-500 text-white px-2 py-1 rounded">📜 View History</button>
+              <!-- Delete button -->
               <button onclick="confirmDelete('${docSnap.id}')" class="bg-red-500 hover:bg-red-600 text-white px-2 py-1 rounded">🗑️ Delete</button>
             </div>
           </td>
@@ -101,6 +104,18 @@ async function deleteAsset(assetId) {
   }
 }
 
+// Edit asset function (Currently no implementation)
+function editAsset(assetId) {
+  console.log("Edit asset:", assetId);
+  // Implement the functionality for editing an asset
+}
+
+// View asset history function (Currently no implementation)
+function viewHistory(assetId) {
+  console.log("View asset history:", assetId);
+  // Implement the functionality for viewing asset history
+}
+
 // Toast Notification (success or error)
 function showToast(message, type) {
   const toast = document.createElement("div");
@@ -120,17 +135,16 @@ function showToast(message, type) {
 
 // Fade animation for toast
 const style = document.createElement('style');
-style.textContent = `
-@keyframes fadeInOut {
-  0% { opacity: 0; transform: translateY(20px); }
-  10% { opacity: 1; transform: translateY(0); }
-  90% { opacity: 1; transform: translateY(0); }
-  100% { opacity: 0; transform: translateY(-20px); }
-}
-.animate-fade-in-out {
-  animation: fadeInOut 3s ease-in-out forwards;
-}
-`;
+style.textContent = ` 
+@keyframes fadeInOut { 
+  0% { opacity: 0; transform: translateY(20px); } 
+  10% { opacity: 1; transform: translateY(0); } 
+  90% { opacity: 1; transform: translateY(0); } 
+  100% { opacity: 0; transform: translateY(-20px); } 
+} 
+.animate-fade-in-out { 
+  animation: fadeInOut 3s ease-in-out forwards; 
+}`;
 document.head.appendChild(style);
 
 // Load assets on page load
