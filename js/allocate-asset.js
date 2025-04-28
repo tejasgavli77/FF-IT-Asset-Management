@@ -16,10 +16,10 @@ const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 const assetsCollection = collection(db, "assets");
 
-// Load available assets into dropdown
-async function loadAvailableAssets() {
+document.addEventListener('DOMContentLoaded', async function () {
   const assetDropdown = document.getElementById('assetSelect');
-
+  const assignForm = document.getElementById('assignForm'); // Form element
+  
   assetDropdown.innerHTML = `<option value="">-- Select an Asset --</option>`;
 
   try {
@@ -27,11 +27,10 @@ async function loadAvailableAssets() {
 
     snapshot.forEach(docSnap => {
       const asset = docSnap.data();
-
       if (asset.status && asset.status.toLowerCase() === 'available') {
         const option = document.createElement('option');
         option.value = docSnap.id;
-        option.textContent = `${asset.type || 'Unknown'} (${asset.model || 'Model Unknown'})`;
+        option.textContent = `${asset.type || "Unknown Type"} (${asset.model || "Unknown Model"})`;
         assetDropdown.appendChild(option);
       }
     });
@@ -44,31 +43,34 @@ async function loadAvailableAssets() {
     console.error("Error fetching assets:", error);
     alert("Failed to load available assets.");
   }
-}
 
-// Allocate asset when Assign button is clicked
-async function allocateAsset() {
-  const assetId = document.getElementById('assetSelect').value;
+  // ✅ ADD form submit event
+  assignForm.addEventListener('submit', async function (e) {
+    e.preventDefault(); // ❗ prevent page reload
 
-  if (!assetId) {
-    alert("Please select an asset to allocate.");
-    return;
-  }
+    const selectedAssetId = assetDropdown.value;
 
-  try {
-    const assetRef = doc(db, "assets", assetId);
-    await updateDoc(assetRef, { status: "Allocated" });
+    if (!selectedAssetId) {
+      alert("Please select an asset to allocate.");
+      return;
+    }
 
-    alert("Asset allocated successfully!");
-    await loadAvailableAssets();  // Reload dropdown after allocation
-  } catch (error) {
-    console.error("Error allocating asset:", error);
-    alert("Failed to allocate asset.");
-  }
-}
+    try {
+      const assetRef = doc(db, "assets", selectedAssetId);
 
-// On page load
-document.addEventListener('DOMContentLoaded', loadAvailableAssets);
+      // Update the status to Allocated
+      await updateDoc(assetRef, {
+        status: "Allocated"
+      });
 
-// Export allocateAsset globally for button to access
-window.allocateAsset = allocateAsset;
+      alert("Asset allocated successfully!");
+
+      // Optionally reload the page to refresh dropdown
+      window.location.reload();
+    } catch (error) {
+      console.error("Error allocating asset:", error);
+      alert("Failed to allocate asset. Please try again.");
+    }
+  });
+
+});
