@@ -1,5 +1,5 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
-import { getFirestore, getDocs, collection, updateDoc, doc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+import { getFirestore, getDocs, collection, doc, updateDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
 // Firebase config
 const firebaseConfig = {
@@ -18,8 +18,7 @@ const assetsCollection = collection(db, "assets");
 
 document.addEventListener('DOMContentLoaded', async function () {
   const assetDropdown = document.getElementById('assetSelect');
-  const assignForm = document.getElementById('assignForm'); // Form element
-  
+
   assetDropdown.innerHTML = `<option value="">-- Select an Asset --</option>`;
 
   try {
@@ -27,10 +26,11 @@ document.addEventListener('DOMContentLoaded', async function () {
 
     snapshot.forEach(docSnap => {
       const asset = docSnap.data();
+
       if (asset.status && asset.status.toLowerCase() === 'available') {
         const option = document.createElement('option');
         option.value = docSnap.id;
-        option.textContent = `${asset.type || "Unknown Type"} (${asset.model || "Unknown Model"})`;
+        option.textContent = `${asset.model || 'Model Unknown'} (${asset.type || 'Type Unknown'})`;
         assetDropdown.appendChild(option);
       }
     });
@@ -41,51 +41,73 @@ document.addEventListener('DOMContentLoaded', async function () {
 
   } catch (error) {
     console.error("Error fetching assets:", error);
-    showToast("Failed to load available assets.");
+    alert("Failed to load available assets.");
+  }
+});
+
+// Allocate Asset function with confirmation popup
+async function allocateAsset() {
+  // Get form values
+  const assetId = document.getElementById("assetSelect").value;
+  const userName = document.getElementById("userName").value;
+  const allocationDate = document.getElementById("allocationDate").value;
+
+  if (!assetId || !userName || !allocationDate) {
+    showToast("Please fill in all fields.", "error");
+    return;
   }
 
-  // ✅ ADD form submit event
-  assignForm.addEventListener('submit', async function (e) {
-    e.preventDefault(); // ❗ prevent page reload
+  // Show confirmation dialog before proceeding
+  const confirmation = confirm("Are you sure you want to assign this asset?");
+  if (!confirmation) return;  // If the user cancels, stop the allocation process
 
-    const selectedAssetId = assetDropdown.value;
+  try {
+    const assetRef = doc(db, "assets", assetId);
+    await updateDoc(assetRef, {
+      status: "assigned",
+      assignedTo: userName,
+      allocationDate: allocationDate,
+    });
 
-    if (!selectedAssetId) {
-      showToast("Please select an asset to allocate.");
-      return;
-    }
+    // Show success toast
+    showToast("Asset successfully assigned!", "success");
 
-    try {
-      const assetRef = doc(db, "assets", selectedAssetId);
+    // Optionally, clear the form or update the UI as needed
+    document.getElementById("allocateForm").reset();
+  } catch (error) {
+    console.error("Error allocating asset: ", error);
+    showToast("Error allocating asset.", "error");
+  }
+}
 
-      // Update the status to Allocated
-      await updateDoc(assetRef, {
-        status: "Allocated"
-      });
-
-      showToast("Asset assigned successfully!");
-
-      // Optionally reload the page to refresh dropdown
-      window.location.reload();
-    } catch (error) {
-      console.error("Error allocating asset:", error);
-      showToast("Failed to allocate asset. Please try again.");
-    }
-  });
-
-});
-// Toast function
-function showToast(message, type = "success") {
+// Toast Notification (success or error)
+function showToast(message, type) {
   const toast = document.createElement("div");
-  toast.className = `px-4 py-2 rounded shadow-md text-white ${
-    type === "success" ? "bg-green-500" : "bg-red-500"
-  }`;
   toast.textContent = message;
+  toast.className = `
+    fixed bottom-5 right-5 
+    ${type === "success" ? "bg-green-500" : "bg-red-500"} 
+    text-white px-4 py-2 rounded shadow-lg animate-fade-in-out z-50
+  `;
 
-  const container = document.getElementById("toastContainer");
-  container.appendChild(toast);
+  document.body.appendChild(toast);
 
   setTimeout(() => {
     toast.remove();
-  }, 3000); // Remove after 3 seconds
+  }, 3000);
 }
+
+// Fade animation for toast
+const style = document.createElement('style');
+style.textContent = `
+@keyframes fadeInOut {
+  0% { opacity: 0; transform: translateY(20px); }
+  10% { opacity: 1; transform: translateY(0); }
+  90% { opacity: 1; transform: translateY(0); }
+  100% { opacity: 0; transform: translateY(-20px); }
+}
+.animate-fade-in-out {
+  animation: fadeInOut 3s ease-in-out forwards;
+}
+`;
+document.head.appendChild(style);
