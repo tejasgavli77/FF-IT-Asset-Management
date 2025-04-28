@@ -63,7 +63,7 @@ document.addEventListener('DOMContentLoaded', async function () {
         status: "Allocated"
       });
 
-      alert("Asset allocated successfully!");
+      showToast("Asset assigned successfully!");
 
       // Optionally reload the page to refresh dropdown
       window.location.reload();
