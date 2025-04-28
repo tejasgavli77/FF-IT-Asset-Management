@@ -1,5 +1,5 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
-import { getFirestore, getDocs, collection, doc, deleteDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+import { getFirestore, getDocs, collection, doc, deleteDoc, updateDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
 // Firebase config
 const firebaseConfig = {
@@ -35,9 +35,11 @@ async function loadAssets() {
           <td class="px-4 py-2 border-b">${asset.serialNumber || 'N/A'}</td>
           <td class="px-4 py-2 border-b">${asset.status || 'N/A'}</td>
           <td class="px-4 py-2 border-b text-center">
-            <button class="delete-btn text-red-500 hover:text-red-700" data-id="${docSnap.id}">
-              🗑️
-            </button>
+            <div class="flex justify-center gap-2">
+              <button onclick="editAsset('${docSnap.id}')">✏️</button>
+              <button onclick="viewHistory('${docSnap.id}')">📜</button>
+              <button onclick="confirmDelete('${docSnap.id}')">🗑️</button>
+            </div>
           </td>
         </tr>
       `;
@@ -45,51 +47,86 @@ async function loadAssets() {
 
     tableBody.innerHTML = rows || '<tr><td colspan="6" class="text-center py-4">No assets found.</td></tr>';
 
-    // Bind delete buttons
-    const deleteButtons = document.querySelectorAll(".delete-btn");
-    deleteButtons.forEach(button => {
-      button.addEventListener("click", (event) => {
-        const assetId = event.target.getAttribute("data-id");
-        showConfirmPopup(assetId);
-      });
-    });
-
   } catch (error) {
     console.error("Error loading assets:", error);
     showToast("Error loading assets!", "error");
   }
 }
 
-// Show confirm popup
-function showConfirmPopup(assetId) {
-  // Create overlay
-  const overlay = document.createElement("div");
-  overlay.className = "fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50";
+// Show Edit Asset Popup
+function editAsset(assetId) {
+  const assetRef = doc(db, "assets", assetId);
 
-  // Create modal
-  const modal = document.createElement("div");
-  modal.className = "bg-white p-6 rounded shadow-lg text-center";
-  modal.innerHTML = `
-    <h2 class="text-lg font-semibold mb-4">Confirm Deletion</h2>
-    <p class="mb-4">Are you sure you want to delete this asset?</p>
-    <div class="flex justify-center gap-4">
-      <button id="confirmDelete" class="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded">Yes</button>
-      <button id="cancelDelete" class="bg-gray-300 hover:bg-gray-400 text-black px-4 py-2 rounded">No</button>
-    </div>
-  `;
+  // Fetch asset details
+  getDocs(assetRef).then(snapshot => {
+    const asset = snapshot.data();
 
-  overlay.appendChild(modal);
-  document.body.appendChild(overlay);
+    // Create popup HTML
+    const editPopup = document.createElement("div");
+    editPopup.className = "fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50";
+    editPopup.innerHTML = `
+      <div class="bg-white p-6 rounded shadow-lg text-center">
+        <h2 class="text-lg font-semibold mb-4">Edit Asset</h2>
+        <form id="editAssetForm">
+          <label for="model" class="block mb-2">Model:</label>
+          <input type="text" id="model" value="${asset.model || ''}" class="mb-4 p-2 border rounded w-full">
 
-  // Handle buttons
-  document.getElementById("confirmDelete").addEventListener("click", async () => {
-    await deleteAsset(assetId);
-    overlay.remove();
+          <label for="serialNumber" class="block mb-2">Serial Number:</label>
+          <input type="text" id="serialNumber" value="${asset.serialNumber || ''}" class="mb-4 p-2 border rounded w-full">
+
+          <label for="status" class="block mb-2">Status:</label>
+          <input type="text" id="status" value="${asset.status || ''}" class="mb-4 p-2 border rounded w-full">
+
+          <div class="flex justify-center gap-4">
+            <button type="submit" class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded">Save</button>
+            <button type="button" id="cancelEdit" class="bg-gray-300 hover:bg-gray-400 text-black px-4 py-2 rounded">Cancel</button>
+          </div>
+        </form>
+      </div>
+    `;
+
+    document.body.appendChild(editPopup);
+
+    // Close the popup if Cancel is clicked
+    document.getElementById("cancelEdit").addEventListener("click", () => {
+      editPopup.remove();
+    });
+
+    // Handle Save functionality
+    document.getElementById("editAssetForm").addEventListener("submit", async (e) => {
+      e.preventDefault();
+
+      const updatedData = {
+        model: document.getElementById("model").value,
+        serialNumber: document.getElementById("serialNumber").value,
+        status: document.getElementById("status").value,
+      };
+
+      try {
+        await updateDoc(assetRef, updatedData);
+        showToast("Asset updated successfully!", "success");
+        editPopup.remove();
+        loadAssets(); // Reload assets after update
+      } catch (error) {
+        console.error("Error updating asset:", error);
+        showToast("Error updating asset!", "error");
+      }
+    });
   });
+}
 
-  document.getElementById("cancelDelete").addEventListener("click", () => {
-    overlay.remove();
-  });
+// View History (Placeholder for now)
+function viewHistory(assetId) {
+  alert(`Viewing history for asset ID: ${assetId}`);
+  // Later you can implement a method to fetch and show the asset history from Firestore
+}
+
+// Confirm before deletion
+function confirmDelete(assetId) {
+  const confirmation = confirm("Are you sure you want to delete this asset?");
+  if (confirmation) {
+    deleteAsset(assetId);
+  }
 }
 
 // Delete asset function
