@@ -26,17 +26,16 @@ document.getElementById('addAssetForm').addEventListener('submit', async (e) => 
   const status = 'available';
 
   // Generate random 4-digit Asset ID
-  const assetId = Math.floor(1000 + Math.random() * 9000); // between 1000-9999
+  const randomAssetId = Math.floor(1000 + Math.random() * 9000);  // random 4 digit number
 
   try {
     await addDoc(assetsCollection, {
-      type,
-      model,
-      serialNumber,
-      status,
-      assetId: assetId, // Save the generated Asset ID
-      createdAt: new Date()
-    });
+  assetId: randomAssetId,  // ✅ Save it!
+  type: assetType,
+  model: assetModel,
+  serialNumber: assetSerialNumber,
+  status: "available"
+});
 
     alert('Asset added successfully!');
     window.location.reload();
