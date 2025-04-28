@@ -17,32 +17,27 @@ const db = getFirestore(app);
 const assetsCollection = collection(db, "assets");
 
 // Handle form submit
-document.getElementById('addAssetForm').addEventListener('submit', async (e) => {
-  e.preventDefault();
+document.addEventListener('DOMContentLoaded', function() {
+  const form = document.getElementById('addAssetForm');
 
-  const assetType = document.getElementById('assetType').value;
-  const assetModel = document.getElementById('assetModel').value;
-  const assetSerialNumber = document.getElementById('assetSerialNumber').value;
-  const purchaseDate = document.getElementById('purchaseDate').value || "";
-  const status = 'available';
+  if (!form) {
+    console.error("Form with id 'addAssetForm' not found!");
+    return;
+  }
 
-  const randomAssetId = Math.floor(1000 + Math.random() * 9000);
+  form.addEventListener('submit', async (e) => {
+    e.preventDefault();
 
-  // 👀 Log before adding
-  console.log("Saving asset:", {
-    assetId: randomAssetId,
-    type: assetType,
-    model: assetModel,
-    serialNumber: assetSerialNumber,
-    purchaseDate: purchaseDate,
-    status: status,
-    action: "Asset Added",
-    date: new Date().toISOString(),
-    details: "Initial registration"
-  });
+    const assetType = document.getElementById('assetType').value.trim();
+    const assetModel = document.getElementById('assetModel').value.trim();
+    const assetSerialNumber = document.getElementById('assetSerialNumber').value.trim();
+    const purchaseDate = document.getElementById('purchaseDate')?.value.trim() || "";
+    const status = "available";
 
-  try {
-    await addDoc(assetsCollection, {
+    const randomAssetId = Math.floor(1000 + Math.random() * 9000);
+
+    // ✅ Before adding, show in console
+    console.log("Saving asset:", {
       assetId: randomAssetId,
       type: assetType,
       model: assetModel,
@@ -54,10 +49,24 @@ document.getElementById('addAssetForm').addEventListener('submit', async (e) => 
       details: "Initial registration"
     });
 
-    alert('Asset added successfully!');
-    window.location.reload();
-  } catch (error) {
-    console.error("Error adding asset:", error);
-    alert('Failed to add asset.');
-  }
+    try {
+      await addDoc(assetsCollection, {
+        assetId: randomAssetId,
+        type: assetType,
+        model: assetModel,
+        serialNumber: assetSerialNumber,
+        purchaseDate: purchaseDate,
+        status: status,
+        action: "Asset Added",
+        date: new Date().toISOString(),
+        details: "Initial registration"
+      });
+
+      alert('Asset added successfully!');
+      window.location.reload();
+    } catch (error) {
+      console.error("Error adding asset:", error);
+      alert('Failed to add asset.');
+    }
+  });
 });
