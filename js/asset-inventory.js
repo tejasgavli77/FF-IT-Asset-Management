@@ -56,6 +56,7 @@ async function loadAssets() {
 
   } catch (error) {
     console.error("Error loading assets:", error);
+    showToast("Error loading assets!", "error");
   }
 }
 
@@ -73,19 +74,23 @@ async function deleteAsset(assetId) {
     const assetRef = doc(db, "assets", assetId);
     await deleteDoc(assetRef);
     console.log(`Asset with ID ${assetId} deleted successfully.`);
-    showToast("Asset deleted successfully!");
+    showToast("Asset deleted successfully!", "success");
     loadAssets(); // Reload assets after deletion
   } catch (error) {
     console.error("Error deleting asset: ", error);
+    showToast("Error deleting asset!", "error");
   }
 }
 
-// Toast Notification
-function showToast(message) {
-  // Create toast element
+// Toast Notification (with type: success or error)
+function showToast(message, type) {
   const toast = document.createElement("div");
   toast.textContent = message;
-  toast.className = "fixed bottom-5 right-5 bg-green-500 text-white px-4 py-2 rounded shadow-lg animate-fade-in-out z-50";
+  toast.className = `
+    fixed bottom-5 right-5 
+    ${type === "success" ? "bg-green-500" : "bg-red-500"} 
+    text-white px-4 py-2 rounded shadow-lg animate-fade-in-out z-50
+  `;
 
   document.body.appendChild(toast);
 
@@ -95,7 +100,7 @@ function showToast(message) {
   }, 3000);
 }
 
-// Fade In-Out Animation (add this with tailwind or manually)
+// Fade In-Out Animation
 const style = document.createElement('style');
 style.textContent = `
 @keyframes fadeInOut {
