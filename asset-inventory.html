@@ -215,6 +215,26 @@
     window.closeEditModal = closeEditModal;
 
     document.addEventListener('DOMContentLoaded', loadAssets);
+
+    <!-- Allocate Asset Modal -->
+<div id="allocateModal" class="fixed inset-0 bg-gray-500 bg-opacity-50 flex justify-center items-center hidden">
+  <div class="bg-white rounded-lg p-6 w-1/3">
+    <h3 class="text-lg font-semibold mb-4">Allocate Asset</h3>
+    <form id="allocateForm">
+      <div class="mb-4">
+        <label for="userName" class="block text-sm font-medium mb-2">User Name</label>
+        <input type="text" id="userName" name="userName" class="w-full p-2 border rounded" required />
+      </div>
+      <div class="mb-4">
+        <label for="allocationDate" class="block text-sm font-medium mb-2">Allocation Date</label>
+        <input type="date" id="allocationDate" name="allocationDate" class="w-full p-2 border rounded" required />
+      </div>
+      <button type="submit" class="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600">Allocate</button>
+      <button type="button" onclick="closeAllocateModal()" class="px-4 py-2 bg-gray-300 rounded hover:bg-gray-400 ml-2">Cancel</button>
+    </form>
+  </div>
+</div>
+
   </script>
 
 </body>
