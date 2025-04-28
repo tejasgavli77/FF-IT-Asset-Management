@@ -26,10 +26,12 @@ async function loadAssets() {
 
   snapshot.forEach(docSnap => {
     const asset = docSnap.data();
+    const assetId = asset.assetId || 'N/A'; // Show Asset ID or fallback N/A
     const row = document.createElement('tr');
     row.classList.add('border-b');
 
     row.innerHTML = `
+      <td class="border px-4 py-2">${assetId}</td>
       <td class="py-2 px-4">${asset.name || 'N/A'}</td>
       <td class="py-2 px-4">${asset.type || 'N/A'}</td>
       <td class="py-2 px-4">${asset.model || 'N/A'}</td>
