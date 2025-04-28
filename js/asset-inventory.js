@@ -101,3 +101,4 @@ window.viewHistory = viewHistory;
 
 // Load assets on page load
 document.addEventListener('DOMContentLoaded', loadAssets);
+
