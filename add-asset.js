@@ -1,35 +1,47 @@
-import { addDoc } from 'firebase/firestore';
-import { assetsCollection } from './firebaseConfig.js';
+import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+import { getFirestore, collection, addDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
-document.addEventListener('DOMContentLoaded', () => {
-  const form = document.getElementById('addAssetForm');
+// Firebase config
+const firebaseConfig = {
+  apiKey: "AIzaSyAspahfUUGnBzh0mh6U53evGQzWQP956xQ",
+  authDomain: "ffassetmanager.firebaseapp.com",
+  projectId: "ffassetmanager",
+  storageBucket: "ffassetmanager.appspot.com",
+  messagingSenderId: "803858971008",
+  appId: "1:803858971008:web:72d69ddce6cbc85010a965"
+};
 
-  form.addEventListener('submit', async (e) => {
-    e.preventDefault();
+// Initialize Firebase
+const app = initializeApp(firebaseConfig);
+const db = getFirestore(app);
+const assetsCollection = collection(db, "assets");
 
-    const assetName = document.getElementById('assetName').value;
-    const assetType = document.getElementById('assetType').value;
-    const assetStatus = document.getElementById('assetStatus').value;
+// Handle form submit
+document.getElementById('addAssetForm').addEventListener('submit', async (e) => {
+  e.preventDefault();
 
-    if (!assetName || !assetType || !assetStatus) {
-      alert('Please fill in all fields.');
-      return;
-    }
+  const type = document.getElementById('assetType').value;
+  const model = document.getElementById('assetModel').value;
+  const serialNumber = document.getElementById('assetSerialNumber').value;
+  const status = 'available';
 
-    const assetData = {
-      name: assetName,
-      type: assetType,
-      status: assetStatus,
-      createdAt: new Date().toISOString()
-    };
+  // Generate random 4-digit Asset ID
+  const assetId = Math.floor(1000 + Math.random() * 9000); // between 1000-9999
 
-    try {
-      await addDoc(assetsCollection, assetData);
-      alert('✅ Asset added successfully!');
-      form.reset();
-    } catch (error) {
-      console.error('❌ Firestore error:', error);
-      alert('Error adding asset. See console for details.');
-    }
-  });
+  try {
+    await addDoc(assetsCollection, {
+      type,
+      model,
+      serialNumber,
+      status,
+      assetId: assetId, // Save the generated Asset ID
+      createdAt: new Date()
+    });
+
+    alert('Asset added successfully!');
+    window.location.reload();
+  } catch (error) {
+    console.error("Error adding asset:", error);
+    alert('Failed to add asset.');
+  }
 });
