@@ -43,6 +43,12 @@ document.addEventListener('DOMContentLoaded', async function () {
     console.error("Error fetching assets:", error);
     alert("Failed to load available assets.");
   }
+
+  // Add event listener to the assign button
+  const assignButton = document.getElementById('assignBtn');
+  if (assignButton) {
+    assignButton.addEventListener('click', allocateAsset);
+  }
 });
 
 // Allocate Asset function with confirmation popup
