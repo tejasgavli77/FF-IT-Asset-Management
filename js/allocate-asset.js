@@ -24,13 +24,13 @@ document.addEventListener('DOMContentLoaded', async function () {
   try {
     const snapshot = await getDocs(assetsCollection);
 
-    snapshot.forEach(doc => {
-      const asset = doc.data();
+    snapshot.forEach(docSnap => {
+      const asset = docSnap.data();
 
       if (asset.status && asset.status.toLowerCase() === 'available') {
         const option = document.createElement('option');
-        option.value = doc.id;
-        option.textContent = `${asset.name || asset.type} (${asset.model || 'Model Unknown'})`;
+        option.value = docSnap.id; // Asset ID for allocation
+        option.textContent = `${asset.type || 'Type'} | ${asset.model || 'Model'} | ${asset.serialNumber || 'Serial Unknown'}`;
         assetDropdown.appendChild(option);
       }
     });
