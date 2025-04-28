@@ -1,5 +1,5 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
-import { getFirestore, getDocs, collection } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+import { getFirestore, getDocs, collection, updateDoc, doc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
 // Firebase config
 const firebaseConfig = {
@@ -16,9 +16,8 @@ const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 const assetsCollection = collection(db, "assets");
 
-document.addEventListener('DOMContentLoaded', async function () {
+async function loadAvailableAssets() {
   const assetDropdown = document.getElementById('assetSelect');
-
   assetDropdown.innerHTML = `<option value="">-- Select an Asset --</option>`;
 
   try {
@@ -29,7 +28,7 @@ document.addEventListener('DOMContentLoaded', async function () {
 
       if (asset.status && asset.status.toLowerCase() === 'available') {
         const option = document.createElement('option');
-        option.value = docSnap.id; // Asset ID for allocation
+        option.value = docSnap.id;
         option.textContent = `${asset.type || 'Type'} | ${asset.model || 'Model'} | ${asset.serialNumber || 'Serial Unknown'}`;
         assetDropdown.appendChild(option);
       }
@@ -43,4 +42,31 @@ document.addEventListener('DOMContentLoaded', async function () {
     console.error("Error fetching assets:", error);
     alert("Failed to load available assets.");
   }
-});
+}
+
+async function allocateAsset() {
+  const assetId = document.getElementById('assetSelect').value;
+
+  if (!assetId) {
+    alert("Please select an asset to allocate.");
+    return;
+  }
+
+  try {
+    const assetRef = doc(db, "assets", assetId);
+    await updateDoc(assetRef, {
+      status: "Allocated"
+    });
+
+    alert("Asset allocated successfully!");
+
+    // Reload available assets dropdown
+    loadAvailableAssets();
+
+  } catch (error) {
+    console.error("Error allocating asset:", error);
+    alert("Failed to allocate asset.");
+  }
+}
+
+document.addEventListener('DOMContentLoaded', loadAvailableAssets);
