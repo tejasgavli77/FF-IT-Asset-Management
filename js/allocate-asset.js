@@ -18,7 +18,6 @@ const assetsCollection = collection(db, "assets");
 
 document.addEventListener('DOMContentLoaded', async function () {
   const assetDropdown = document.getElementById('assetSelect');
-
   assetDropdown.innerHTML = `<option value="">-- Select an Asset --</option>`;
 
   try {
@@ -38,13 +37,12 @@ document.addEventListener('DOMContentLoaded', async function () {
     if (assetDropdown.options.length === 1) {
       assetDropdown.innerHTML = '<option value="">No available assets</option>';
     }
-
   } catch (error) {
     console.error("Error fetching assets:", error);
     alert("Failed to load available assets.");
   }
 
-  // Add event listener to the assign button
+  // Add event listener to the Assign Asset button
   const assignButton = document.getElementById('assignBtn');
   if (assignButton) {
     assignButton.addEventListener('click', allocateAsset);
@@ -53,7 +51,6 @@ document.addEventListener('DOMContentLoaded', async function () {
 
 // Allocate Asset function with confirmation popup
 async function allocateAsset() {
-  // Get form values
   const assetId = document.getElementById("assetSelect").value;
   const userName = document.getElementById("userName").value;
   const allocationDate = document.getElementById("allocationDate").value;
@@ -75,11 +72,8 @@ async function allocateAsset() {
       allocationDate: allocationDate,
     });
 
-    // Show success toast
     showToast("Asset successfully assigned!", "success");
-
-    // Optionally, clear the form or update the UI as needed
-    document.getElementById("allocateForm").reset();
+    document.getElementById("allocateForm").reset(); // Reset form after success
   } catch (error) {
     console.error("Error allocating asset: ", error);
     showToast("Error allocating asset.", "error");
