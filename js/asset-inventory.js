@@ -1,5 +1,5 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
-import { getFirestore, getDocs, collection, deleteDoc, doc, updateDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+import { getFirestore, getDocs, collection, deleteDoc, doc, updateDoc, getDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
 // Firebase config
 const firebaseConfig = {
@@ -109,6 +109,27 @@ async function editAsset(assetId) {
 function viewHistory(assetId) {
   // Placeholder function - display asset allocation/return history in a modal or popup
   alert(`Viewing history for Asset ID: ${assetId}`);
+}
+
+// Delete Asset Function
+async function deleteAsset(assetId) {
+  try {
+    const assetRef = doc(db, "assets", assetId);
+    await deleteDoc(assetRef);
+    showToast("Asset deleted successfully!", "success");
+    loadAssets(); // Reload assets after deletion
+  } catch (error) {
+    console.error("Error deleting asset: ", error);
+    showToast("Error deleting asset!", "error");
+  }
+}
+
+// Confirm Delete
+function confirmDelete(assetId) {
+  const confirmation = confirm("Are you sure you want to delete this asset?");
+  if (confirmation) {
+    deleteAsset(assetId);
+  }
 }
 
 // Toast Notification (success or error)
