@@ -50,12 +50,20 @@ async function loadAssets() {
     deleteButtons.forEach(button => {
       button.addEventListener("click", (event) => {
         const assetId = event.target.getAttribute("data-id");
-        deleteAsset(assetId);
+        confirmDelete(assetId);
       });
     });
 
   } catch (error) {
     console.error("Error loading assets:", error);
+  }
+}
+
+// Confirm before deletion
+function confirmDelete(assetId) {
+  const confirmation = confirm("Are you sure you want to delete this asset?");
+  if (confirmation) {
+    deleteAsset(assetId);
   }
 }
 
@@ -65,11 +73,42 @@ async function deleteAsset(assetId) {
     const assetRef = doc(db, "assets", assetId);
     await deleteDoc(assetRef);
     console.log(`Asset with ID ${assetId} deleted successfully.`);
+    showToast("Asset deleted successfully!");
     loadAssets(); // Reload assets after deletion
   } catch (error) {
     console.error("Error deleting asset: ", error);
   }
 }
 
-// Load assets when page loads
+// Toast Notification
+function showToast(message) {
+  // Create toast element
+  const toast = document.createElement("div");
+  toast.textContent = message;
+  toast.className = "fixed bottom-5 right-5 bg-green-500 text-white px-4 py-2 rounded shadow-lg animate-fade-in-out z-50";
+
+  document.body.appendChild(toast);
+
+  // Remove toast after 3 seconds
+  setTimeout(() => {
+    toast.remove();
+  }, 3000);
+}
+
+// Fade In-Out Animation (add this with tailwind or manually)
+const style = document.createElement('style');
+style.textContent = `
+@keyframes fadeInOut {
+  0% { opacity: 0; transform: translateY(20px); }
+  10% { opacity: 1; transform: translateY(0); }
+  90% { opacity: 1; transform: translateY(0); }
+  100% { opacity: 0; transform: translateY(-20px); }
+}
+.animate-fade-in-out {
+  animation: fadeInOut 3s ease-in-out forwards;
+}
+`;
+document.head.appendChild(style);
+
+// Load assets on page load
 document.addEventListener("DOMContentLoaded", loadAssets);
