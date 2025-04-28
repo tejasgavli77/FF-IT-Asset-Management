@@ -36,7 +36,6 @@
       <table class="min-w-full table-auto">
         <thead>
           <tr class="bg-gray-100 text-gray-600 uppercase text-sm leading-normal">
-            <th class="py-3 px-6 text-left">Asset ID</th>
             <th class="py-3 px-6 text-left">Type</th>
             <th class="py-3 px-6 text-left">Model</th>
             <th class="py-3 px-6 text-left">Serial Number</th>
@@ -76,7 +75,7 @@
     // Load assets
     async function loadAssets() {
       const assetTableBody = document.getElementById('assetTableBody');
-      assetTableBody.innerHTML = ""; // Clear table first
+      assetTableBody.innerHTML = ""; // Clear table
 
       const snapshot = await getDocs(assetsCollection);
       snapshot.forEach(docSnap => {
@@ -86,14 +85,19 @@
         row.className = "border-b border-gray-200 hover:bg-gray-100";
 
         row.innerHTML = `
-          <td class="py-3 px-6 text-left whitespace-nowrap">${asset.assetId ?? 'N/A'}</td>
           <td class="py-3 px-6 text-left">${asset.type ?? 'N/A'}</td>
           <td class="py-3 px-6 text-left">${asset.model ?? 'N/A'}</td>
           <td class="py-3 px-6 text-left">${asset.serialNumber ?? 'N/A'}</td>
           <td class="py-3 px-6 text-left">${asset.purchaseDate ?? 'N/A'}</td>
           <td class="py-3 px-6 text-left">${asset.status ?? 'N/A'}</td>
-          <td class="py-3 px-6 text-center">
-            <button class="text-red-500 hover:text-red-700" onclick="deleteAsset('${docSnap.id}')">
+          <td class="py-3 px-6 text-center flex gap-2 justify-center">
+            <button class="text-blue-500 hover:text-blue-700" title="Allocate">
+              <i class="bi bi-arrow-left-right"></i>
+            </button>
+            <button class="text-green-500 hover:text-green-700" title="Return">
+              <i class="bi bi-box-arrow-in-left"></i>
+            </button>
+            <button class="text-red-500 hover:text-red-700" title="Delete" onclick="deleteAsset('${docSnap.id}')">
               <i class="bi bi-trash"></i>
             </button>
           </td>
@@ -104,13 +108,13 @@
     }
 
     // Delete asset
-    async function deleteAsset(docId) {
+    window.deleteAsset = async function(docId) {
       const confirmDelete = confirm("Are you sure you want to delete this asset?");
       if (confirmDelete) {
         try {
           await deleteDoc(doc(db, "assets", docId));
           alert("Asset deleted successfully!");
-          loadAssets(); // Reload table
+          loadAssets(); // Reload assets after delete
         } catch (error) {
           console.error('Error deleting asset:', error);
           alert('Failed to delete asset.');
