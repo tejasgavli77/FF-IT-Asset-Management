@@ -28,11 +28,26 @@ document.addEventListener('DOMContentLoaded', function() {
   form.addEventListener('submit', async (e) => {
     e.preventDefault();
 
-    const assetType = document.getElementById('assetType').value.trim();
-    const assetModel = document.getElementById('assetModel').value.trim();
-    const assetSerialNumber = document.getElementById('assetSerialNumber').value.trim();
-    const purchaseDate = document.getElementById('purchaseDate')?.value.trim() || "";
-    const status = "available";
+const assetData = {
+  assetId: assetId,
+  type: document.getElementById('assetType').value,
+  model: document.getElementById('model').value,
+  serialNumber: document.getElementById('serialNumber').value,
+  purchaseDate: document.getElementById('purchaseDate').value,
+  status: 'available',
+  history: [{
+    date: new Date().toISOString(),
+    action: 'Asset Added',
+    details: 'Initial registration'
+  }]
+};
+
+    
+    //const assetType = document.getElementById('assetType').value.trim();
+  //  const assetModel = document.getElementById('assetModel').value.trim();
+  //  const assetSerialNumber = document.getElementById('assetSerialNumber').value.trim();
+  //  const purchaseDate = document.getElementById('purchaseDate')?.value.trim() || "";
+  //  const status = "available";
 
     //const randomAssetId = Math.floor(1000 + Math.random() * 9000);
 // Generate 4-digit random Asset ID
