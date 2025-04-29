@@ -50,69 +50,71 @@
 
   <!-- Firebase + Script -->
   <script type="module">
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
-    import { getFirestore, collection, getDocs, deleteDoc, doc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+  import { getFirestore, collection, getDocs, deleteDoc, doc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
-    const firebaseConfig = {
-      apiKey: "AIzaSyAspahfUUGnBzh0mh6U53evGQzWQP956xQ",
-      authDomain: "ffassetmanager.firebaseapp.com",
-      projectId: "ffassetmanager",
-      storageBucket: "ffassetmanager.appspot.com",
-      messagingSenderId: "803858971008",
-      appId: "1:803858971008:web:72d69ddce6cbc85010a965"
-    };
+  const firebaseConfig = {
+    apiKey: "AIzaSyAspahfUUGnBzh0mh6U53evGQzWQP956xQ",
+    authDomain: "ffassetmanager.firebaseapp.com",
+    projectId: "ffassetmanager",
+    storageBucket: "ffassetmanager.appspot.com",
+    messagingSenderId: "803858971008",
+    appId: "1:803858971008:web:72d69ddce6cbc85010a965"
+  };
 
-    const app = initializeApp(firebaseConfig);
-    const db = getFirestore(app);
-    const assetsCollection = collection(db, "assets");
+  const app = initializeApp(firebaseConfig);
+  const db = getFirestore(app);
+  const assetsCollection = collection(db, "assets");
 
-    const inventoryTableBody = document.getElementById("inventoryTableBody");
+  const inventoryTableBody = document.getElementById("inventoryTableBody");
 
-    async function loadAssets() {
-      const querySnapshot = await getDocs(assetsCollection);
-      inventoryTableBody.innerHTML = "";
-      querySnapshot.forEach((docSnap) => {
-        const asset = docSnap.data();
-        const row = document.createElement("tr");
-        row.innerHTML = `
-          <td class="border px-4 py-2">${asset.assetId || 'N/A'}</td>
-          <td class="border px-4 py-2">${asset.type || 'N/A'}</td>
-          <td class="border px-4 py-2">${asset.model || 'N/A'}</td>
-          <td class="border px-4 py-2">${asset.serialNumber || 'N/A'}</td>
-          <td class="border px-4 py-2">${asset.status || 'N/A'}</td>
-          <td class="border px-4 py-2 space-x-2 text-center">
-            <button onclick="editAsset('${docSnap.id}')" class="text-blue-500 hover:text-blue-700" title="Edit"><i class="bi bi-pencil-square"></i></button>
-            <button onclick="allocateAsset('${docSnap.id}')" class="text-green-500 hover:text-green-700" title="Allocate"><i class="bi bi-arrow-left-right"></i></button>
-            <button onclick="returnAsset('${docSnap.id}')" class="text-yellow-500 hover:text-yellow-700" title="Return"><i class="bi bi-arrow-counterclockwise"></i></button>
-            <button onclick="deleteAsset('${docSnap.id}')" class="text-red-500 hover:text-red-700" title="Delete"><i class="bi bi-trash"></i></button>
-          </td>
-        
-`;
-        inventoryTableBody.appendChild(row);
-      });
+  async function loadAssets() {
+    const querySnapshot = await getDocs(assetsCollection);
+    inventoryTableBody.innerHTML = "";
+
+    querySnapshot.forEach((docSnap) => {
+      const asset = docSnap.data();
+      const row = document.createElement("tr");
+
+      row.innerHTML = `
+        <td class="border px-4 py-2">${docSnap.id}</td>
+        <td class="border px-4 py-2">${asset.type || 'N/A'}</td>
+        <td class="border px-4 py-2">${asset.model || 'N/A'}</td>
+        <td class="border px-4 py-2">${asset.serialNumber || 'N/A'}</td>
+        <td class="border px-4 py-2">${asset.status || 'N/A'}</td>
+        <td class="border px-4 py-2 space-x-2 text-center">
+          <button onclick="editAsset('${docSnap.id}')" class="text-blue-500 hover:text-blue-700" title="Edit"><i class="bi bi-pencil-square"></i></button>
+          <button onclick="allocateAsset('${docSnap.id}')" class="text-green-500 hover:text-green-700" title="Allocate"><i class="bi bi-arrow-left-right"></i></button>
+          <button onclick="returnAsset('${docSnap.id}')" class="text-yellow-500 hover:text-yellow-700" title="Return"><i class="bi bi-arrow-counterclockwise"></i></button>
+          <button onclick="deleteAsset('${docSnap.id}')" class="text-red-500 hover:text-red-700" title="Delete"><i class="bi bi-trash"></i></button>
+        </td>
+      `;
+      inventoryTableBody.appendChild(row);
+    });
+  }
+
+  // ✅ Expose functions to global window object
+  window.editAsset = (id) => {
+    alert(`Edit feature for Asset ID ${id} coming soon.`);
+  };
+
+  window.allocateAsset = (id) => {
+    alert(`Allocate feature for Asset ID ${id} coming soon.`);
+  };
+
+  window.returnAsset = (id) => {
+    alert(`Return feature for Asset ID ${id} coming soon.`);
+  };
+
+  window.deleteAsset = async (id) => {
+    if (confirm("Are you sure you want to delete this asset?")) {
+      await deleteDoc(doc(db, "assets", id));
+      alert("Asset deleted.");
+      loadAssets(); // Refresh the table
     }
+  };
 
-    window.deleteAsset = async (id) => {
-      if (confirm("Are you sure you want to delete this asset?")) {
-        await deleteDoc(doc(db, "assets", id));
-        alert("Asset deleted.");
-        loadAssets();
-      }
-    };
-
-    window.editAsset = (id) => {
-      alert(`Edit feature for Asset ID ${id} coming soon.`);
-    };
-
-    window.allocateAsset = (id) => {
-      alert(`Allocate feature for Asset ID ${id} coming soon.`);
-    };
-
-    window.returnAsset = (id) => {
-      alert(`Return feature for Asset ID ${id} coming soon.`);
-    };
-
-    loadAssets();
+  loadAssets();
   </script>
 </body>
 </html>
