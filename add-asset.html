@@ -66,7 +66,7 @@
   <!-- Firebase & Script -->
  <script type="module">
   import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
-  import { getFirestore, collection, doc, setDoc, query, where, getDocs } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+  import { getFirestore, collection, addDoc, query, where, getDocs } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
   const firebaseConfig = {
     apiKey: "AIzaSyAspahfUUGnBzh0mh6U53evGQzWQP956xQ",
@@ -82,31 +82,42 @@
   const db = getFirestore(app);
   const assetsCollection = collection(db, "assets");
 
-  const generateAssetId = async () => {
-    let unique = false;
-    let assetId = "";
+  async function generateAssetId(assetType) {
+    let assetId;
+    let exists = true;
 
-    while (!unique) {
-      assetId = Math.floor(1000 + Math.random() * 9000).toString(); // 4-digit ID
+    const prefixMap = {
+      laptop: "L",
+      desktop: "D",
+      monitor: "M",
+      printer: "P"
+    };
+
+    const prefix = prefixMap[assetType.toLowerCase()] || "X";
+
+    while (exists) {
+      const randomId = Math.floor(1000 + Math.random() * 9000).toString();
+      assetId = `${prefix}-${randomId}`;
+
       const q = query(assetsCollection, where("assetId", "==", assetId));
       const snapshot = await getDocs(q);
-      if (snapshot.empty) {
-        unique = true;
-      }
+      exists = !snapshot.empty;
     }
+
     return assetId;
-  };
+  }
 
   const assetForm = document.getElementById("assetForm");
 
   assetForm.addEventListener("submit", async (e) => {
     e.preventDefault();
 
-    const assetId = await generateAssetId();
+    const type = document.getElementById("assetType").value;
+    const assetId = await generateAssetId(type);
 
     const assetData = {
       assetId: assetId,
-      type: document.getElementById("assetType").value,
+      type: type,
       model: document.getElementById("model").value,
       serialNumber: document.getElementById("serialNumber").value,
       purchaseDate: document.getElementById("purchaseDate").value,
@@ -119,12 +130,11 @@
     };
 
     try {
-      const assetDocRef = doc(db, "assets", assetId); // 👈 Use custom ID
-      await setDoc(assetDocRef, assetData);           // 👈 Use setDoc, not addDoc
-      alert("Asset added successfully!");
+      await addDoc(assetsCollection, assetData);
+      alert("✅ Asset added successfully!");
       assetForm.reset();
     } catch (error) {
-      console.error("Error adding asset: ", error);
+      console.error("❌ Error adding asset: ", error);
       alert("Failed to add asset.");
     }
   });
