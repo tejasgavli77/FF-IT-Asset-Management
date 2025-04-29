@@ -34,8 +34,14 @@ document.addEventListener('DOMContentLoaded', function() {
     const purchaseDate = document.getElementById('purchaseDate')?.value.trim() || "";
     const status = "available";
 
-    const randomAssetId = Math.floor(1000 + Math.random() * 9000);
+    //const randomAssetId = Math.floor(1000 + Math.random() * 9000);
+// Generate 4-digit random Asset ID
+const generateAssetId = () => {
+  return Math.floor(1000 + Math.random() * 9000).toString();
+};
 
+const assetId = generateAssetId();
+    
     // ✅ Before adding, show in console
     console.log("Saving asset:", {
       assetId: randomAssetId,
