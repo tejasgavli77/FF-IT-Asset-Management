@@ -74,10 +74,11 @@
 
     querySnapshot.forEach((docSnap) => {
       const asset = docSnap.data();
-      const row = document.createElement("tr");
+      const assetId = asset.assetId || docSnap.id;  // fallback just in case
 
+      const row = document.createElement("tr");
       row.innerHTML = `
-        <td class="border px-4 py-2">${docSnap.id}</td>
+        <td class="border px-4 py-2">${assetId}</td>
         <td class="border px-4 py-2">${asset.type || 'N/A'}</td>
         <td class="border px-4 py-2">${asset.model || 'N/A'}</td>
         <td class="border px-4 py-2">${asset.serialNumber || 'N/A'}</td>
@@ -93,7 +94,7 @@
     });
   }
 
-  // ✅ Expose functions to global window object
+  // Global functions for buttons
   window.editAsset = (id) => {
     alert(`Edit feature for Asset ID ${id} coming soon.`);
   };
@@ -110,11 +111,11 @@
     if (confirm("Are you sure you want to delete this asset?")) {
       await deleteDoc(doc(db, "assets", id));
       alert("Asset deleted.");
-      loadAssets(); // Refresh the table
+      loadAssets(); // Refresh
     }
   };
 
   loadAssets();
-  </script>
+</script>
 </body>
 </html>
