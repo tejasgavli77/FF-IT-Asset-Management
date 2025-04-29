@@ -27,11 +27,11 @@ document.addEventListener('DOMContentLoaded', async function () {
       const asset = docSnap.data();
 
       if (asset.status && asset.status.toLowerCase() === 'available') {
-        const option = document.createElement('option');
-        option.value = docSnap.id;
-        option.textContent = `${asset.model || 'Model Unknown'} (${asset.type || 'Type Unknown'})`;
-        assetDropdown.appendChild(option);
-      }
+        const option = document.createElement("option");
+option.value = asset.assetId;
+option.textContent = `${asset.assetId} | ${asset.type} | ${asset.model} | ${asset.serialNumber}`;
+assetSelect.appendChild(option);
+}
     });
 
     if (assetDropdown.options.length === 1) {
