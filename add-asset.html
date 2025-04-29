@@ -64,7 +64,7 @@
   </main>
 
   <!-- Firebase & Script -->
- <script type="module">
+<script type="module">
   import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
   import {
     getFirestore,
@@ -89,23 +89,21 @@
   const db = getFirestore(app);
   const assetsCollection = collection(db, "assets");
 
-  // ✅ Generate Asset ID with prefix (L-xxxx, D-xxxx, etc.)
+  // ✅ Generate prefixed 4-digit Asset ID
   async function generateAssetId(assetType) {
-    const prefixMap = {
-      laptop: "L",
-      desktop: "D",
-      monitor: "M",
-      printer: "P"
-    };
-    const prefix = prefixMap[assetType.toLowerCase()] || "X";
+    let prefix = "";
+    if (assetType === "laptop") prefix = "L";
+    else if (assetType === "desktop") prefix = "D";
+    else if (assetType === "monitor") prefix = "M";
+    else if (assetType === "printer") prefix = "P";
+    else prefix = "X";
 
     let assetId;
     let exists = true;
 
     while (exists) {
-      const randomId = Math.floor(1000 + Math.random() * 9000).toString();
+      const randomId = Math.floor(1000 + Math.random() * 9000);
       assetId = `${prefix}-${randomId}`;
-
       const q = query(assetsCollection, where("assetId", "==", assetId));
       const snapshot = await getDocs(q);
       exists = !snapshot.empty;
@@ -114,6 +112,7 @@
     return assetId;
   }
 
+  // ✅ Form submission
   const assetForm = document.getElementById("assetForm");
 
   assetForm.addEventListener("submit", async (e) => {
@@ -141,7 +140,7 @@
       alert("✅ Asset added successfully!");
       assetForm.reset();
     } catch (error) {
-      console.error("❌ Error adding asset: ", error);
+      console.error("❌ Error adding asset:", error);
       alert("Failed to add asset.");
     }
   });
