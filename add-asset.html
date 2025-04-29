@@ -65,8 +65,16 @@
 
   <!-- Firebase & Script -->
  <script type="module">
+  <script type="module">
   import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
-  import { getFirestore, collection, addDoc, query, where, getDocs } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+  import {
+    getFirestore,
+    collection,
+    addDoc,
+    query,
+    where,
+    getDocs
+  } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
   const firebaseConfig = {
     apiKey: "AIzaSyAspahfUUGnBzh0mh6U53evGQzWQP956xQ",
@@ -82,18 +90,18 @@
   const db = getFirestore(app);
   const assetsCollection = collection(db, "assets");
 
+  // ✅ Generate Asset ID with prefix (L-xxxx, D-xxxx, etc.)
   async function generateAssetId(assetType) {
-    let assetId;
-    let exists = true;
-
     const prefixMap = {
       laptop: "L",
       desktop: "D",
       monitor: "M",
       printer: "P"
     };
-
     const prefix = prefixMap[assetType.toLowerCase()] || "X";
+
+    let assetId;
+    let exists = true;
 
     while (exists) {
       const randomId = Math.floor(1000 + Math.random() * 9000).toString();
@@ -116,8 +124,8 @@
     const assetId = await generateAssetId(type);
 
     const assetData = {
-      assetId: assetId,
-      type: type,
+      assetId,
+      type,
       model: document.getElementById("model").value,
       serialNumber: document.getElementById("serialNumber").value,
       purchaseDate: document.getElementById("purchaseDate").value,
