@@ -23,25 +23,25 @@ const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 const assetsCollection = collection(db, "assets");
 
-// ✅ Function to generate unique 4-digit assetId
-async function generateAssetId() {
+// ✅ Function to generate prefixed and unique assetId
+async function generateAssetId(assetType) {
   let assetId;
   let exists = true;
 
-  // Mapping of type to prefix
-  const typePrefix = {
+  // Prefix map
+  const prefixMap = {
     laptop: "L",
     desktop: "D",
     monitor: "M",
     printer: "P"
   };
 
-  const prefix = typePrefix[assetType.toLowerCase()] || "X"; // fallback "X" for unknown types
+  const prefix = prefixMap[assetType.toLowerCase()] || "X";
 
   while (exists) {
-    assetId = Math.floor(1000 + Math.random() * 9000).toString();
+    const randomId = Math.floor(1000 + Math.random() * 9000).toString();
     assetId = `${prefix}-${randomId}`;
-    
+
     const q = query(assetsCollection, where("assetId", "==", assetId));
     const snapshot = await getDocs(q);
     exists = !snapshot.empty;
@@ -53,15 +53,13 @@ async function generateAssetId() {
 // ✅ Form submission handler
 document.getElementById("assetForm").addEventListener("submit", async (e) => {
   e.preventDefault();
-  
-  // 🔑 custom ID
- const type = document.getElementById("assetType").value;
-const assetId = await generateAssetId(type);
 
+  const type = document.getElementById("assetType").value;
+  const assetId = await generateAssetId(type); // use type as input
 
   const assetData = {
     assetId,
-    type: document.getElementById("assetType").value,
+    type,
     model: document.getElementById("model").value,
     serialNumber: document.getElementById("serialNumber").value,
     purchaseDate: document.getElementById("purchaseDate").value,
