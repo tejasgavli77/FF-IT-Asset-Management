@@ -33,17 +33,17 @@ async function loadAssets() {
     row.classList.add('border-b');
 
     row.innerHTML = `
-      <td class="border px-4 py-2">${assetId}</td>
-      <td class="py-2 px-4">${asset.type || 'N/A'}</td>
-      <td class="py-2 px-4">${asset.model || 'N/A'}</td>
-      <td class="py-2 px-4">${asset.serialNumber || 'N/A'}</td>
-      <td class="py-2 px-4">${asset.status || 'N/A'}</td>
-      <td class="py-2 px-4 space-x-2">
-        <button onclick="editAsset('${docSnap.id}')" class="text-blue-500 hover:text-blue-700"><i class="bi bi-pencil-square"></i></button>
-        <button onclick="viewHistory('${docSnap.id}')" class="text-purple-500 hover:text-purple-700"><i class="bi bi-clock-history"></i></button>
-        <button onclick="confirmReturn('${docSnap.id}')" class="text-green-500 hover:text-green-700"><i class="bi bi-arrow-counterclockwise"></i></button>
-        <button onclick="confirmDelete('${docSnap.id}')" class="text-red-500 hover:text-red-700"><i class="bi bi-trash"></i></button>
-      </td>
+      <td class="border px-4 py-2">${docSnap.id}</td>
+  <td class="border px-4 py-2">${asset.type || 'N/A'}</td>
+  <td class="border px-4 py-2">${asset.model || 'N/A'}</td>
+  <td class="border px-4 py-2">${asset.serialNumber || 'N/A'}</td>
+  <td class="border px-4 py-2">${asset.status || 'N/A'}</td>
+  <td class="border px-4 py-2 space-x-2 text-center">
+    <button onclick="editAsset('${docSnap.id}')" class="text-blue-500 hover:text-blue-700" title="Edit"><i class="bi bi-pencil-square"></i></button>
+    <button onclick="openAllocateModal('${docSnap.id}')" class="text-green-500 hover:text-green-700" title="Allocate"><i class="bi bi-arrow-left-right"></i></button>
+    <button onclick="returnAsset('${docSnap.id}')" class="text-yellow-500 hover:text-yellow-700" title="Return"><i class="bi bi-arrow-counterclockwise"></i></button>
+    <button onclick="confirmDelete('${docSnap.id}')" class="text-red-500 hover:text-red-700" title="Delete"><i class="bi bi-trash"></i></button>
+  </td>
     `;
 
     tableBody.appendChild(row);
