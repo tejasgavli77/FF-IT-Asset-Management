@@ -1,93 +1,69 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
-import { getFirestore, collection, addDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+import {
+  getFirestore,
+  collection,
+  addDoc,
+  query,
+  where,
+  getDocs
+} from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
-// Firebase config
+// ✅ Firebase config
 const firebaseConfig = {
   apiKey: "AIzaSyAspahfUUGnBzh0mh6U53evGQzWQP956xQ",
   authDomain: "ffassetmanager.firebaseapp.com",
+  databaseURL: "https://ffassetmanager-default-rtdb.asia-southeast1.firebasedatabase.app",
   projectId: "ffassetmanager",
   storageBucket: "ffassetmanager.appspot.com",
   messagingSenderId: "803858971008",
   appId: "1:803858971008:web:72d69ddce6cbc85010a965"
 };
 
-// Initialize Firebase
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 const assetsCollection = collection(db, "assets");
 
-// Handle form submit
-document.addEventListener('DOMContentLoaded', function() {
-  const form = document.getElementById('addAssetForm');
+// ✅ Function to generate unique 4-digit assetId
+async function generateAssetId() {
+  let assetId;
+  let exists = true;
 
-  if (!form) {
-    console.error("Form with id 'addAssetForm' not found!");
-    return;
+  while (exists) {
+    assetId = Math.floor(1000 + Math.random() * 9000).toString();
+    const q = query(assetsCollection, where("assetId", "==", assetId));
+    const snapshot = await getDocs(q);
+    exists = !snapshot.empty;
   }
 
-  form.addEventListener('submit', async (e) => {
-    e.preventDefault();
+  return assetId;
+}
 
-const assetData = {
-  assetId: assetId,
-  type: document.getElementById('assetType').value,
-  model: document.getElementById('model').value,
-  serialNumber: document.getElementById('serialNumber').value,
-  purchaseDate: document.getElementById('purchaseDate').value,
-  status: 'available',
-  history: [{
-    date: new Date().toISOString(),
-    action: 'Asset Added',
-    details: 'Initial registration'
-  }]
-};
+// ✅ Form submission handler
+document.getElementById("assetForm").addEventListener("submit", async (e) => {
+  e.preventDefault();
 
-    
-    //const assetType = document.getElementById('assetType').value.trim();
-  //  const assetModel = document.getElementById('assetModel').value.trim();
-  //  const assetSerialNumber = document.getElementById('assetSerialNumber').value.trim();
-  //  const purchaseDate = document.getElementById('purchaseDate')?.value.trim() || "";
-  //  const status = "available";
+  const assetId = await generateAssetId(); // 🔑 custom ID
 
-    //const randomAssetId = Math.floor(1000 + Math.random() * 9000);
-// Generate 4-digit random Asset ID
-const generateAssetId = () => {
-  return Math.floor(1000 + Math.random() * 9000).toString();
-};
-
-const assetId = generateAssetId();
-    
-    // ✅ Before adding, show in console
-    console.log("Saving asset:", {
-      assetId: randomAssetId,
-      type: assetType,
-      model: assetModel,
-      serialNumber: assetSerialNumber,
-      purchaseDate: purchaseDate,
-      status: status,
-      action: "Asset Added",
+  const assetData = {
+    assetId,
+    type: document.getElementById("assetType").value,
+    model: document.getElementById("model").value,
+    serialNumber: document.getElementById("serialNumber").value,
+    purchaseDate: document.getElementById("purchaseDate").value,
+    status: "available",
+    history: [{
       date: new Date().toISOString(),
+      action: "Asset Added",
       details: "Initial registration"
-    });
+    }]
+  };
 
-    try {
-      await addDoc(assetsCollection, {
-        assetId: randomAssetId,
-        type: assetType,
-        model: assetModel,
-        serialNumber: assetSerialNumber,
-        purchaseDate: purchaseDate,
-        status: status,
-        action: "Asset Added",
-        date: new Date().toISOString(),
-        details: "Initial registration"
-      });
-
-      alert('Asset added successfully!');
-      window.location.reload();
-    } catch (error) {
-      console.error("Error adding asset:", error);
-      alert('Failed to add asset.');
-    }
-  });
+  try {
+    await addDoc(assetsCollection, assetData);
+    alert("✅ Asset added successfully!");
+    document.getElementById("assetForm").reset();
+  } catch (error) {
+    console.error("❌ Error adding asset: ", error);
+    alert("Failed to add asset.");
+  }
 });
