@@ -75,7 +75,7 @@
         const asset = docSnap.data();
         const row = document.createElement("tr");
         row.innerHTML = `
-          <td class="border px-4 py-2">${docSnap.id}</td>
+          <td class="border px-4 py-2">${asset.assetId || 'N/A'}</td>
           <td class="border px-4 py-2">${asset.type || 'N/A'}</td>
           <td class="border px-4 py-2">${asset.model || 'N/A'}</td>
           <td class="border px-4 py-2">${asset.serialNumber || 'N/A'}</td>
