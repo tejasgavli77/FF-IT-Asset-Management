@@ -53,8 +53,11 @@ async function generateAssetId() {
 // ✅ Form submission handler
 document.getElementById("assetForm").addEventListener("submit", async (e) => {
   e.preventDefault();
+  
+  // 🔑 custom ID
+ const type = document.getElementById("assetType").value;
+const assetId = await generateAssetId(type);
 
-  const assetId = await generateAssetId(); // 🔑 custom ID
 
   const assetData = {
     assetId,
