@@ -91,18 +91,17 @@
 
   // ✅ Generate prefixed 4-digit Asset ID
   async function generateAssetId(assetType) {
-    let prefix = "";
-    if (assetType === "laptop") prefix = "L";
-    else if (assetType === "desktop") prefix = "D";
-    else if (assetType === "monitor") prefix = "M";
-    else if (assetType === "printer") prefix = "P";
-    else prefix = "X";
+    let prefixMap = {
+      laptop: "L",
+      desktop: "D",
+      monitor: "M",
+      printer: "P"
+    };
+    let prefix = prefixMap[assetType.toLowerCase()] || "X";
 
-    let assetId;
-    let exists = true;
-
+    let assetId, exists = true;
     while (exists) {
-      const randomId = Math.floor(1000 + Math.random() * 9000);
+      const randomId = Math.floor(1000 + Math.random() * 9000); // 4-digit number
       assetId = `${prefix}-${randomId}`;
       const q = query(assetsCollection, where("assetId", "==", assetId));
       const snapshot = await getDocs(q);
@@ -137,7 +136,7 @@
 
     try {
       await addDoc(assetsCollection, assetData);
-      alert("✅ Asset added successfully!");
+      alert(`✅ Asset ${assetId} added successfully!`);
       assetForm.reset();
     } catch (error) {
       console.error("❌ Error adding asset:", error);
