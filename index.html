@@ -143,7 +143,6 @@
     }
     document.getElementById('allocationForm').addEventListener('submit', async (e) => {
   e.preventDefault();
-
   const assetId = document.getElementById('assetId').value;
   const assignTo = document.getElementById('assignTo').value;
   const asset = assets.find(a => a.assetId === assetId);
@@ -174,7 +173,7 @@
         data: {
           currentOwner: assignTo,
           status: 'allocated',
-          history: [...(asset.history || []), historyEntry]
+          history: [...(asset.history || []), historyEntry]  // Fallback if no history
         }
       })
     });
@@ -187,14 +186,57 @@
       e.target.reset();
     } else {
       alert("❌ Allocation failed: " + (result.message || 'Unknown error'));
+      console.error(result);
     }
   } catch (error) {
     console.error('❌ Server error during allocation:', error);
-    alert("❌ Server error during allocation.");
+    alert("❌ Server error during allocation. See console for details.");
   }
   hideLoading();
-});
+    });
 
+    document.getElementById('allocationForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const assetId = document.getElementById('assetId').value;
+      const assignTo = document.getElementById('assignTo').value;
+      const asset = assets.find(a => a.assetId === assetId);
+      if (!asset) return;
+
+      const historyEntry = {
+        date: new Date().toISOString(),
+        action: 'Allocated',
+        details: `Assigned to ${assignTo}`
+      };
+
+      showLoading();
+      try {
+        const response = await fetch('https://r0c8kgwocscg8gsokogwwsw4.zetaverse.one/mongodb', {
+          method: 'POST',
+          headers: {
+            'Authorization': 'Bearer lIiCWmvARYT4JgMnUbY3CDkQtMK2',
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({
+            appSlug,
+            action: 'update',
+            collection: 'assets',
+            conditions: { assetId },
+            data: {
+             currentOwner: assignTo,
+             status: 'allocated',
+             history: [...asset.history, historyEntry]
+            }
+          })
+        });
+        if ((await response.json()).success) {
+          await loadAssets();
+          e.target.reset();
+        }
+      } catch (error) {
+        console.error('Error allocating asset:', error);
+      }
+      hideLoading();
+    });
 
     function updateAssetDropdown() {
       const dropdown = document.getElementById('assetId');
