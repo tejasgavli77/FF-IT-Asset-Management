@@ -1,5 +1,5 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
-import { getFirestore, getDocs, collection, doc, setDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+import { getFirestore, getDocs, collection, doc, updateDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
 // Firebase config
 const firebaseConfig = {
@@ -66,7 +66,7 @@ async function allocateAsset() {
 
   try {
     const assetRef = doc(db, "assets", assetId);
-    await setDoc(assetRef, {
+    await updateDoc(assetRef, {
       status: "Allocated",
       AllocatedTo: userName,
       allocationDate: allocationDate,
