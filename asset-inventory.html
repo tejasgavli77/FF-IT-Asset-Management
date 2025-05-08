@@ -53,6 +53,7 @@
             <th class="border px-4 py-2">Serial Number</th>
             <th class="border px-4 py-2">Allocated To</th>
             <th class="border px-4 py-2">Allocation Date</th>
+            <th class="border px-4 py-2">Purchase Date</th>
             <th class="border px-4 py-2">Status</th>
             <th class="border px-4 py-2">Actions</th>
           </tr>
@@ -107,6 +108,7 @@
           <td class="border px-4 py-2">${asset.serialNumber || 'N/A'}</td>
           <td class="border px-4 py-2">${asset.AllocatedTo || '-'}</td>
           <td class="border px-4 py-2">${asset.allocationDate || '-'}</td>
+          <td class="border px-4 py-2">${asset.purchaseDate || 'N/A'}</td>
           <td class="border px-4 py-2">${asset.status || 'N/A'}</td>
           <td class="border px-4 py-2 space-x-2 text-center">
             <button class="edit-btn text-blue-500 hover:text-blue-700" data-id="${asset.id}" title="Edit"><i class="bi bi-pencil-square"></i></button>
