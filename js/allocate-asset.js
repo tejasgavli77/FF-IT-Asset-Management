@@ -18,6 +18,11 @@ const assetsCollection = collection(db, "assets");
 
 document.addEventListener('DOMContentLoaded', async function () {
   const assetDropdown = document.getElementById('assetSelect');
+
+  // Get assetId from URL
+const urlParams = new URLSearchParams(window.location.search);
+const preselectedAssetId = urlParams.get('assetId');
+
   assetDropdown.innerHTML = `<option value="">-- Select an Asset --</option>`;
 
   try {
@@ -30,7 +35,14 @@ document.addEventListener('DOMContentLoaded', async function () {
         const option = document.createElement("option");
         option.value = docSnap.id; // ✅ Use Firestore document ID here
         option.textContent = `${asset.assetId} | ${asset.type} | ${asset.model} | ${asset.serialNumber}`;
-        assetDropdown.appendChild(option);
+
+// ✅ Pre-select the asset if its ID matches the one from the URL
+if (docSnap.id === preselectedAssetId) {
+  option.selected = true;
+}
+
+assetDropdown.appendChild(option);
+
       }
     });
 
