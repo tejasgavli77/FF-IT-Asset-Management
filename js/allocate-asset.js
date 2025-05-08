@@ -1,4 +1,4 @@
-import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js"; 
 import { getFirestore, getDocs, collection, doc, updateDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
 // Firebase config
@@ -28,10 +28,10 @@ document.addEventListener('DOMContentLoaded', async function () {
 
       if (asset.status && asset.status.toLowerCase() === 'available') {
         const option = document.createElement("option");
-option.value = asset.assetId;
-option.textContent = `${asset.assetId} | ${asset.type} | ${asset.model} | ${asset.serialNumber}`;
-assetSelect.appendChild(option);
-}
+        option.value = docSnap.id; // ✅ Use Firestore document ID here
+        option.textContent = `${asset.assetId} | ${asset.type} | ${asset.model} | ${asset.serialNumber}`;
+        assetDropdown.appendChild(option);
+      }
     });
 
     if (assetDropdown.options.length === 1) {
@@ -51,21 +51,21 @@ assetSelect.appendChild(option);
 
 // Allocate Asset function with confirmation popup
 async function allocateAsset() {
-  const assetId = document.getElementById("assetSelect").value;
+  const assetDocId = document.getElementById("assetSelect").value; // This is now doc ID
   const userName = document.getElementById("userName").value;
   const allocationDate = document.getElementById("allocationDate").value;
 
-  if (!assetId || !userName || !allocationDate) {
+  if (!assetDocId || !userName || !allocationDate) {
     showToast("Please fill in all fields.", "error");
     return;
   }
 
   // Show confirmation dialog before proceeding
   const confirmation = confirm("Are you sure you want to assign this asset?");
-  if (!confirmation) return;  // If the user cancels, stop the allocation process
+  if (!confirmation) return;
 
   try {
-    const assetRef = doc(db, "assets", assetId);
+    const assetRef = doc(db, "assets", assetDocId); // ✅ Use doc ID here
     await updateDoc(assetRef, {
       status: "Allocated",
       AllocatedTo: userName,
@@ -73,7 +73,9 @@ async function allocateAsset() {
     });
 
     showToast("Asset successfully Allocated!", "success");
-    document.getElementById("allocateForm").reset(); // Reset form after success
+    document.getElementById("allocateForm").reset();
+    // Optionally, reload the page to update dropdown
+    setTimeout(() => location.reload(), 1000);
   } catch (error) {
     console.error("Error allocating asset: ", error);
     showToast("Error allocating asset.", "error");
