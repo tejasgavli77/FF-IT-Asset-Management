@@ -170,13 +170,18 @@
       }
     }
 
-    async function returnAsset(id) {
-      if (confirm("Mark this asset as Available?")) {
-        await updateDoc(doc(db, "assets", id), { status: "Available" });
-        alert("Asset returned!");
-        loadAssets();
-      }
-    }
+    async function returnAsset(assetId) {
+  if (confirm("Mark this asset as Available?")) {
+    await updateDoc(doc(db, "assets", assetId), {
+      status: "Available",
+      AllocatedTo: "",            // Clear name
+      allocationDate: ""          // Clear date
+    });
+    alert("Asset returned successfully!");
+    loadAssets();
+  }
+}
+
 
     async function editAsset(id) {
       const assetDoc = await getDoc(doc(db, "assets", id));
