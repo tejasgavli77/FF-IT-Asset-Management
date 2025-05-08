@@ -204,8 +204,8 @@
     }
 
     function openAllocateModal(id) {
-      alert("Open Allocate Modal for asset: " + id);
-    }
+  window.location.href = `allocate-asset.html?assetId=${id}`;
+}
 
     document.addEventListener("DOMContentLoaded", loadAssets);
   </script>
