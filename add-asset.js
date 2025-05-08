@@ -63,7 +63,7 @@ document.getElementById("assetForm").addEventListener("submit", async (e) => {
     model: document.getElementById("model").value,
     serialNumber: document.getElementById("serialNumber").value,
     purchaseDate: document.getElementById("purchaseDate").value,
-    status: "available",
+    status: "Available",
     history: [{
       date: new Date().toISOString(),
       action: "Asset Added",
