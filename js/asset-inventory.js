@@ -26,8 +26,18 @@ async function loadAssets() {
 
   const snapshot = await getDocs(assetsCollection);
 
-  snapshot.forEach(docSnap => {
-    const asset = docSnap.data();
+  allAssets = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+renderTable(allAssets);
+
+  document.getElementById('searchInput').addEventListener('input', applyFilters);
+document.getElementById('statusFilter').addEventListener('change', applyFilters);
+document.getElementById('resetFilters').addEventListener('click', () => {
+  document.getElementById('searchInput').value = '';
+  document.getElementById('statusFilter').value = '';
+  renderTable(allAssets);
+});
+
+
     const assetId = asset.assetId || 'N/A'; // Show Asset ID or fallback N/A
     console.log("Loaded Asset: ", assetId);  // Debugging: Check Asset ID in console
 
@@ -103,5 +113,44 @@ window.viewHistory = viewHistory;
 window.closeEditModal = closeEditModal;
 
 // Load assets on page load
-document.addEventListener('DOMContentLoaded', loadAssets);
+ document.addEventListener('DOMContentLoaded', loadAssets);
+
+function applyFilters() {
+  const searchTerm = document.getElementById('searchInput').value.toLowerCase();
+  const status = document.getElementById('statusFilter').value.toLowerCase();
+
+  const filtered = allAssets.filter(asset => {
+    const matchesSearch = asset.assetId?.toLowerCase().includes(searchTerm) ||
+                          asset.model?.toLowerCase().includes(searchTerm);
+
+    const matchesStatus = !status || asset.status?.toLowerCase() === status;
+
+    return matchesSearch && matchesStatus;
+  });
+
+  renderTable(filtered);
+}
+
+function renderTable(assets) {
+  const tableBody = document.querySelector("#assetTable tbody");
+  tableBody.innerHTML = '';
+
+  assets.forEach(asset => {
+    const row = document.createElement("tr");
+
+    row.innerHTML = `
+      <td>${asset.assetId}</td>
+      <td>${asset.type}</td>
+      <td>${asset.model}</td>
+      <td>${asset.serialNumber}</td>
+      <td>
+        <span class="px-2 py-1 rounded text-white ${
+          asset.status?.toLowerCase() === 'available' ? 'bg-green-500' : 'bg-red-500'
+        }">${asset.status?.charAt(0).toUpperCase() + asset.status?.slice(1)}</span>
+      </td>
+    `;
+
+    tableBody.appendChild(row);
+  });
+}
 
