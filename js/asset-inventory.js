@@ -62,7 +62,7 @@ async function confirmDelete(assetId) {
 // Return Asset
 async function confirmReturn(assetId) {
   if (confirm("Mark this asset as Available?")) {
-    await updateDoc(doc(db, "assets", assetId), { status: "available" });
+    await updateDoc(doc(db, "assets", assetId), { status: "Available" });
     alert("Asset returned successfully!");
     loadAssets();
   }
