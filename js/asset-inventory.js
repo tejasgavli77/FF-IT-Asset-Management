@@ -21,21 +21,26 @@ const assetsCollection = collection(db, "assets");
 
 // Load assets into inventory table
 async function loadAssets() {
-  const tableBody = document.getElementById('assetTableBody');
-  tableBody.innerHTML = '';
-
   const snapshot = await getDocs(assetsCollection);
-
   allAssets = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-renderTable(allAssets);
 
-  document.getElementById('searchInput').addEventListener('input', applyFilters);
-document.getElementById('statusFilter').addEventListener('change', applyFilters);
-document.getElementById('resetFilters').addEventListener('click', () => {
-  document.getElementById('searchInput').value = '';
-  document.getElementById('statusFilter').value = '';
-  renderTable(allAssets);
-});
+  renderTable(allAssets); // Initial render
+
+  // Attach event listeners (only once)
+  const searchInput = document.getElementById('searchInput');
+  const statusFilter = document.getElementById('statusFilter');
+  const resetBtn = document.getElementById('resetFilters');
+
+  if (searchInput && statusFilter && resetBtn) {
+    searchInput.addEventListener('input', applyFilters);
+    statusFilter.addEventListener('change', applyFilters);
+    resetBtn.addEventListener('click', () => {
+      searchInput.value = '';
+      statusFilter.value = '';
+      renderTable(allAssets);
+    });
+  }
+}
 
 
     const assetId = asset.assetId || 'N/A'; // Show Asset ID or fallback N/A
