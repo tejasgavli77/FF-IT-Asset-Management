@@ -29,7 +29,6 @@ async function generateAssetId(assetType) {
   let assetId;
   let exists = true;
 
-  // Prefix map
   const prefixMap = {
     laptop: "L",
     desktop: "D",
@@ -39,8 +38,16 @@ async function generateAssetId(assetType) {
     headset: "H"
   };
 
-  const cleanedType = assetType?.trim().toLowerCase(); // 💡 Clean and normalize
+  // ✅ Normalize assetType properly
+  const cleanedType = typeof assetType === 'string'
+    ? assetType.trim().toLowerCase()
+    : '';
+
+  console.log("generateAssetId() cleaned type:", cleanedType);
+
   const prefix = prefixMap[cleanedType] || "X";
+
+  console.log("Mapped prefix:", prefix);
 
   while (exists) {
     const randomId = Math.floor(1000 + Math.random() * 9000).toString();
@@ -53,6 +60,7 @@ async function generateAssetId(assetType) {
 
   return assetId;
 }
+
   
 // ✅ Form submission handler
 document.getElementById("assetForm").addEventListener("submit", async (e) => {
