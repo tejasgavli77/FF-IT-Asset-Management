@@ -69,19 +69,32 @@ async function generateAssetId(assetType) {
 
   
 // ✅ Form submission handler
+
 document.getElementById("assetForm").addEventListener("submit", async (e) => {
   e.preventDefault();
 
   const typeField = document.getElementById("assetType");
-  console.log("Type field exists?", !!typeField);
-  console.log("Selected Option:", typeField.options[typeField.selectedIndex].text);
-  console.log("Selected Value:", typeField.value); // <--- should be "mouse" or "headset"
-  console.log("Selected Asset Type (from form):", type); // ✅ Correct log
-  const assetId = await generateAssetId(typeField.value);
-  
+
+  // 🔍 LOG FULL SELECT DETAILS
+  console.log("📌 SELECT element:", typeField);
+  console.log("📌 Selected option index:", typeField.selectedIndex);
+  console.log("📌 Selected text:", typeField.options[typeField.selectedIndex]?.text);
+  console.log("📌 Selected value:", typeField.value);
+
+  const selectedValue = typeField.value;
+
+  // 🚨 Add check before generating ID
+  if (!selectedValue) {
+    console.error("❌ assetType is empty or undefined!");
+    alert("Please select a valid asset type.");
+    return;
+  }
+
+  const assetId = await generateAssetId(selectedValue); // ✅ Now pass correct, logged value
+
   const assetData = {
     assetId,
-    type,
+    type: selectedValue,
     model: document.getElementById("model").value,
     serialNumber: document.getElementById("serialNumber").value,
     purchaseDate: document.getElementById("purchaseDate").value,
@@ -102,4 +115,3 @@ document.getElementById("assetForm").addEventListener("submit", async (e) => {
     alert("Failed to add asset.");
   }
 });
-
