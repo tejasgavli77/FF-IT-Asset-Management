@@ -33,7 +33,9 @@ async function generateAssetId(assetType) {
     laptop: "L",
     desktop: "D",
     monitor: "M",
-    printer: "P"
+    printer: "P",
+    mouse: "Mo",
+    headset: "H'
   };
 
   const prefix = prefixMap[assetType.toLowerCase()] || "X";
