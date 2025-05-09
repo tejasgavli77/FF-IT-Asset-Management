@@ -97,21 +97,26 @@
       laptop: "L",
       desktop: "D",
       monitor: "M",
-      printer: "P"
+      printer: "P",
+      mouse: "Mo",      
+      headset: "H"
+      
     };
-    let prefix = prefixMap[assetType.toLowerCase()] || "X";
-    console.log("Resolved prefix:", prefix);
-    let assetId, exists = true;
-    while (exists) {
-      const randomId = Math.floor(1000 + Math.random() * 9000); // 4-digit number
-      assetId = `${prefix}-${randomId}`;
-      const q = query(assetsCollection, where("assetId", "==", assetId));
-      const snapshot = await getDocs(q);
-      exists = !snapshot.empty;
-    }
+    const cleanedType = assetType?.trim().toLowerCase();
+  const prefix = prefixMap[cleanedType] || "X";
+  console.log("Resolved prefix:", prefix);
 
-    return assetId;
+  let assetId, exists = true;
+  while (exists) {
+    const randomId = Math.floor(1000 + Math.random() * 9000); // 4-digit number
+    assetId = `${prefix}-${randomId}`;
+    const q = query(assetsCollection, where("assetId", "==", assetId));
+    const snapshot = await getDocs(q);
+    exists = !snapshot.empty;
   }
+
+  return assetId;
+}
 
   // ✅ Form submission
   const assetForm = document.getElementById("assetForm");
