@@ -59,8 +59,8 @@ document.getElementById("assetForm").addEventListener("submit", async (e) => {
   e.preventDefault();
 
   const type = document.getElementById("assetType").value;
-  console.log("Selected Asset Type:", assetType);
-  const assetId = await generateAssetId(type); // use type as input
+  console.log("Selected Asset Type:", type); // ✅ FIXED LINE
+  const assetId = await generateAssetId(type); // now correctly passes "Mouse", etc.
 
   const assetData = {
     assetId,
