@@ -28,17 +28,18 @@ async function generateAssetId(assetType) {
   let assetId;
   let exists = true;
 
-  // Prefix map
+  // Corrected prefix map
   const prefixMap = {
     laptop: "L",
     desktop: "D",
     monitor: "M",
     printer: "P",
-    mouse: "Mo",
-    headset: "H'
+    mouse: "Mo",      // Use "M" if you want to keep it single-letter
+    headset: "H"
   };
 
-  const prefix = prefixMap[assetType.toLowerCase()] || "X";
+  // Sanitize asset type and fetch prefix, fallback to "X"
+  const prefix = prefixMap[assetType?.toLowerCase()] || "X";
 
   while (exists) {
     const randomId = Math.floor(1000 + Math.random() * 9000).toString();
