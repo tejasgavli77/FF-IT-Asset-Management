@@ -26,8 +26,18 @@ const assetsCollection = collection(db, "assets");
 // ✅ Function to generate prefixed and unique assetId
 
 async function generateAssetId(assetType) {
-  let assetId;
-  let exists = true;
+  console.log("DEBUG START ---------------------");
+
+  console.log("Raw assetType received:", assetType);
+  if (typeof assetType !== 'string') {
+    console.warn("❌ assetType is not a string:", assetType);
+  }
+
+  const cleanedType = typeof assetType === 'string'
+    ? assetType.trim().toLowerCase()
+    : '';
+
+  console.log("Cleaned assetType:", cleanedType);
 
   const prefixMap = {
     laptop: "L",
@@ -38,16 +48,12 @@ async function generateAssetId(assetType) {
     headset: "H"
   };
 
-  // ✅ Normalize assetType properly
-  const cleanedType = typeof assetType === 'string'
-    ? assetType.trim().toLowerCase()
-    : '';
-
-  console.log("generateAssetId() cleaned type:", cleanedType);
-
   const prefix = prefixMap[cleanedType] || "X";
+  console.log("Resolved prefix:", prefix);
+  console.log("DEBUG END ---------------------");
 
-  console.log("Mapped prefix:", prefix);
+  // ... rest of your loop
+
 
   while (exists) {
     const randomId = Math.floor(1000 + Math.random() * 9000).toString();
@@ -66,10 +72,13 @@ async function generateAssetId(assetType) {
 document.getElementById("assetForm").addEventListener("submit", async (e) => {
   e.preventDefault();
 
-  const type = document.getElementById("assetType").value;
+  const typeField = document.getElementById("assetType");
+  console.log("Type field exists?", !!typeField);
+  console.log("Selected Option:", typeField.options[typeField.selectedIndex].text);
+  console.log("Selected Value:", typeField.value); // <--- should be "mouse" or "headset"
   console.log("Selected Asset Type (from form):", type); // ✅ Correct log
-  const assetId = await generateAssetId(type); // ✅ Pass correct variable
-
+  const assetId = await generateAssetId(typeField.value);
+  
   const assetData = {
     assetId,
     type,
