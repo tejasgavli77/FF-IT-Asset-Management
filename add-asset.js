@@ -67,10 +67,8 @@ document.getElementById("assetForm").addEventListener("submit", async (e) => {
   e.preventDefault();
 
   const type = document.getElementById("assetType").value;
-  console.log("Selected Asset Type:", type); // ✅ FIXED LINE
-  const assetId = await generateAssetId(type); // now correctly passes "Mouse", etc.
-  console.log("generateAssetId() called with:", assetType);
-
+  console.log("Selected Asset Type (from form):", type); // ✅ Correct log
+  const assetId = await generateAssetId(type); // ✅ Pass correct variable
 
   const assetData = {
     assetId,
@@ -95,3 +93,4 @@ document.getElementById("assetForm").addEventListener("submit", async (e) => {
     alert("Failed to add asset.");
   }
 });
+
