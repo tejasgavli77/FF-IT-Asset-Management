@@ -24,22 +24,23 @@ const db = getFirestore(app);
 const assetsCollection = collection(db, "assets");
 
 // ✅ Function to generate prefixed and unique assetId
+
 async function generateAssetId(assetType) {
   let assetId;
   let exists = true;
 
-  // Corrected prefix map
+  // Prefix map
   const prefixMap = {
     laptop: "L",
     desktop: "D",
-    monitor: "M",
+    monitor: "Mn",
     printer: "P",
-    mouse: "Mo",      // Use "M" if you want to keep it single-letter
+    mouse: "Mo",
     headset: "H"
   };
 
-  // Sanitize asset type and fetch prefix, fallback to "X"
-  const prefix = prefixMap[assetType?.toLowerCase()] || "X";
+  const cleanedType = assetType?.trim().toLowerCase(); // 💡 Clean and normalize
+  const prefix = prefixMap[cleanedType] || "X";
 
   while (exists) {
     const randomId = Math.floor(1000 + Math.random() * 9000).toString();
@@ -52,7 +53,7 @@ async function generateAssetId(assetType) {
 
   return assetId;
 }
-
+  
 // ✅ Form submission handler
 document.getElementById("assetForm").addEventListener("submit", async (e) => {
   e.preventDefault();
