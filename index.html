@@ -54,6 +54,23 @@
   <script>
     let currentPage = 1;
     const rowsPerPage = 10;
+    let assets = [];
+
+    // ✅ Function to simulate loading data and trigger pagination
+    async function loadAssets() {
+      // Simulate data fetch (replace this with your real fetch if needed)
+      assets = Array.from({ length: 14 }).map((_, i) => ({
+        assetId: `ASSET-${i + 1}`,
+        type: 'laptop',
+        model: `Model-${i + 1}`,
+        currentOwner: i % 2 === 0 ? `User${i + 1}` : '',
+        status: i % 3 === 0 ? 'allocated' : 'available',
+        history: []
+      }));
+
+      // ✅ Trigger pagination
+      renderAssetList();
+    }
 
     function renderAssetList() {
       const tbody = document.getElementById('assetList');
@@ -73,14 +90,14 @@
             <span class="px-2 py-1 rounded ${asset.status === 'available' ? 'bg-green-100 text-green-800' : 'bg-yellow-100 text-yellow-800'}">${asset.status}</span>
           </td>
           <td class="px-4 py-2 flex space-x-2">
-            <button onclick="showHistory('${asset.assetId}')" class="text-blue-500 hover:text-blue-700" title="View History">
+            <button class="text-blue-500 hover:text-blue-700" title="View History">
               <i class="bi bi-clock-history"></i>
             </button>
             ${asset.status === 'allocated' ? `
-              <button onclick="returnAsset('${asset.assetId}')" class="text-red-500 hover:text-red-700" title="Return Asset">
+              <button class="text-red-500 hover:text-red-700" title="Return Asset">
                 <i class="bi bi-box-arrow-in-left"></i>
               </button>` : ''}
-            <button onclick="deleteAsset('${asset.assetId}')" class="text-gray-500 hover:text-gray-700" title="Delete Asset">
+            <button class="text-gray-500 hover:text-gray-700" title="Delete Asset">
               <i class="bi bi-trash"></i>
             </button>
           </td>
@@ -110,6 +127,9 @@
       currentPage = page;
       renderAssetList();
     }
+
+    // ✅ Init
+    loadAssets();
   </script>
 </body>
 </html>
