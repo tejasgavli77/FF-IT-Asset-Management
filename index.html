@@ -79,10 +79,12 @@
     </div>
 
     <!-- Asset List -->
-    <div class="bg-white rounded-lg shadow-md p-6 overflow-x-auto">
-      <h2 class="text-xl font-semibold mb-4">Asset Inventory</h2>
-      <div class="overflow-x-auto">
-        <table class="min-w-full table-auto whitespace-nowrap">
+<div class="bg-white rounded-lg shadow-md p-4">
+  <h2 class="text-xl font-semibold mb-4">Asset Inventory</h2>
+  <div class="overflow-x-auto">
+    <div class="min-w-[900px] w-full">
+      <table class="table-auto w-full text-sm whitespace-nowrap">
+
           <thead>
             <tr class="bg-gray-100">
               <th class="px-4 py-2">Asset ID</th>
@@ -95,8 +97,10 @@
           </thead>
           <tbody id="assetList"></tbody>
         </table>
-      </div>
     </div>
+  </div>
+</div>
+
 
     <!-- Asset History Modal -->
     <div id="historyModal" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center">
