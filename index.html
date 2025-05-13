@@ -58,15 +58,32 @@
 
     // ✅ Function to simulate loading data and trigger pagination
     async function loadAssets() {
-      // Simulate data fetch (replace this with your real fetch if needed)
-      assets = Array.from({ length: 14 }).map((_, i) => ({
-        assetId: `ASSET-${i + 1}`,
-        type: 'laptop',
-        model: `Model-${i + 1}`,
-        currentOwner: i % 2 === 0 ? `User${i + 1}` : '',
-        status: i % 3 === 0 ? 'allocated' : 'available',
-        history: []
-      }));
+  showLoading();
+  try {
+    const response = await fetch('https://your-zeta-or-firebase-url', {
+      method: 'POST',
+      headers: {
+        'Authorization': 'Bearer YOUR-TOKEN',
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        appSlug: 'your-app-id',
+        action: 'read',
+        collection: 'assets'
+      })
+    });
+
+    const result = await response.json();
+    if (result.success) {
+      assets = result.result; // ✅ Use your real data here
+      renderAssetList();
+    }
+  } catch (err) {
+    console.error("❌ Failed to load real data:", err);
+  }
+  hideLoading();
+}
+   
 
       // ✅ Trigger pagination
       renderAssetList();
