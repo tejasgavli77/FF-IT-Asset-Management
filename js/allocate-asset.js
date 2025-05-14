@@ -19,12 +19,13 @@ const assetsCollection = collection(db, "assets");
 document.addEventListener('DOMContentLoaded', async function () {
   const assetDropdown = document.getElementById('assetSelect');
   const urlParams = new URLSearchParams(window.location.search);
-  const preselectedAssetId = urlParams.get('assetId'); // e.g., L-123
+  const preselectedAssetId = urlParams.get('assetId'); // This is "L-123" or similar
 
   assetDropdown.innerHTML = `<option value="">-- Select an Asset --</option>`;
 
   try {
     const snapshot = await getDocs(assetsCollection);
+    let docIdToSelect = null;
 
     snapshot.forEach(docSnap => {
       const asset = docSnap.data();
@@ -34,14 +35,19 @@ document.addEventListener('DOMContentLoaded', async function () {
         option.value = docSnap.id;
         option.textContent = `${asset.assetId} | ${asset.type} | ${asset.model} | ${asset.serialNumber}`;
 
-        // ✅ Preselect based on asset.assetId in textContent
+        // Check if asset.assetId matches assetId from URL
         if (asset.assetId === preselectedAssetId) {
-          option.selected = true;
+          docIdToSelect = docSnap.id;
         }
 
         assetDropdown.appendChild(option);
       }
     });
+
+    // After populating all, set selected based on mapped doc ID
+    if (docIdToSelect) {
+      assetDropdown.value = docIdToSelect;
+    }
 
     if (assetDropdown.options.length === 1) {
       assetDropdown.innerHTML = '<option value="">No available assets</option>';
@@ -51,12 +57,12 @@ document.addEventListener('DOMContentLoaded', async function () {
     alert("Failed to load available assets.");
   }
 
-  // Assign Asset button listener
   const assignButton = document.getElementById('assignBtn');
   if (assignButton) {
     assignButton.addEventListener('click', allocateAsset);
   }
 });
+
 
 
 // Allocate Asset function
