@@ -19,23 +19,22 @@ const assetsCollection = collection(db, "assets");
 document.addEventListener('DOMContentLoaded', async function () {
   const assetDropdown = document.getElementById('assetSelect');
   const urlParams = new URLSearchParams(window.location.search);
-  const preselectedAssetId = urlParams.get('assetId'); // This is "L-123" or similar
+  const preselectedAssetId = urlParams.get('assetId'); // e.g., "L-5347"
 
   assetDropdown.innerHTML = `<option value="">-- Select an Asset --</option>`;
 
   try {
-    const snapshot = await getDocs(assetsCollection);
+    const snapshot = await getDocs(collection(db, "assets"));
     let docIdToSelect = null;
 
     snapshot.forEach(docSnap => {
       const asset = docSnap.data();
 
-      if (asset.status && asset.status.toLowerCase() === 'available') {
+      if (asset.status?.toLowerCase() === "available") {
         const option = document.createElement("option");
         option.value = docSnap.id;
         option.textContent = `${asset.assetId} | ${asset.type} | ${asset.model} | ${asset.serialNumber}`;
 
-        // Check if asset.assetId matches assetId from URL
         if (asset.assetId === preselectedAssetId) {
           docIdToSelect = docSnap.id;
         }
@@ -44,24 +43,20 @@ document.addEventListener('DOMContentLoaded', async function () {
       }
     });
 
-    // After populating all, set selected based on mapped doc ID
     if (docIdToSelect) {
       assetDropdown.value = docIdToSelect;
     }
-
-    if (assetDropdown.options.length === 1) {
-      assetDropdown.innerHTML = '<option value="">No available assets</option>';
-    }
   } catch (error) {
-    console.error("Error fetching assets:", error);
-    alert("Failed to load available assets.");
+    console.error("Error loading assets:", error);
+    alert("❌ Failed to load available assets.");
   }
 
-  const assignButton = document.getElementById('assignBtn');
+  const assignButton = document.getElementById("assignBtn");
   if (assignButton) {
     assignButton.addEventListener('click', allocateAsset);
   }
 });
+
 
 
 
