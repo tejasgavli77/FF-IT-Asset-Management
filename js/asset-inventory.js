@@ -141,11 +141,16 @@ async function confirmDelete(assetId) {
 
 async function returnAsset(assetId) {
   if (confirm("Mark this asset as Available?")) {
-    await updateDoc(doc(db, "assets", assetId), { status: "Available" });
+    await updateDoc(doc(db, "assets", assetId), {
+      status: "Available",
+      AllocatedTo: "",            // ✅ Clear user name
+      allocationDate: ""          // ✅ Clear allocation date
+    });
     alert("Asset returned successfully!");
-    loadAssets();
+    loadAssets(); // Refresh table
   }
 }
+
 
 async function editAsset(assetId) {
   const assetDoc = await getDoc(doc(db, "assets", assetId));
