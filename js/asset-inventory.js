@@ -69,18 +69,12 @@ function applyFilters() {
 
 // Render with pagination
 function renderTable(data) {
-  const tableBody = document.getElementById("tableBody");
-  const pagination = document.getElementById("pagination");
-
-  const start = (currentPage - 1) * rowsPerPage;
-  const end = start + rowsPerPage;
-  const pageItems = data.slice(start, end);
-
   tableBody.innerHTML = "";
-  pageItems.forEach((asset, index) => {
+  data.forEach((asset, index) => {
     const row = document.createElement("tr");
+
     row.innerHTML = `
-      <td class="border px-4 py-2">${start + index + 1}</td>
+      <td class="border px-4 py-2">${index + 1}</td>
       <td class="border px-4 py-2">${asset.assetId || "N/A"}</td>
       <td class="border px-4 py-2">${asset.type || "N/A"}</td>
       <td class="border px-4 py-2">${asset.model || "N/A"}</td>
@@ -90,24 +84,24 @@ function renderTable(data) {
       <td class="border px-4 py-2">${asset.purchaseDate || "N/A"}</td>
       <td class="border px-4 py-2">
         <span class="px-2 py-1 rounded text-white ${
-          asset.status?.toLowerCase() === "available"
-            ? "bg-green-500"
-            : "bg-red-500"
+          asset.status?.toLowerCase() === "available" ? "bg-green-500" : "bg-red-500"
         }">${asset.status || "N/A"}</span>
       </td>
       <td class="border px-4 py-2 space-x-2 text-center">
         <button class="edit-btn text-blue-500 hover:text-blue-700" data-id="${asset.id}" title="Edit"><i class="bi bi-pencil-square"></i></button>
-        <button class="allocate-btn text-green-500 hover:text-green-700" data-assetid="${asset.assetid}" title="Allocate"><i class="bi bi-arrow-left-right"></i></button>
+        <button class="allocate-btn text-green-500 hover:text-green-700" data-assetid="${asset.assetId}" title="Allocate"><i class="bi bi-arrow-left-right"></i></button>
         <button class="return-btn text-yellow-500 hover:text-yellow-700" data-id="${asset.id}" title="Return"><i class="bi bi-arrow-counterclockwise"></i></button>
         <button class="delete-btn text-red-500 hover:text-red-700" data-id="${asset.id}" title="Delete"><i class="bi bi-trash"></i></button>
       </td>
     `;
+
     tableBody.appendChild(row);
   });
 
-  renderPagination(data);
   bindEvents();
 }
+
+   
 
 // Pagination controls
 function renderPagination(data) {
