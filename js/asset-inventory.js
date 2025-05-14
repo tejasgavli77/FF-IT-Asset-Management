@@ -180,18 +180,20 @@ window.location.href = `allocate-asset.html?assetId=${id}`;
 
 // Rebind action buttons
 function bindEvents() {
-  document.querySelectorAll(".delete-btn").forEach(btn => {
-    btn.addEventListener("click", () => confirmDelete(btn.dataset.id));
-  });
-  document.querySelectorAll(".return-btn").forEach(btn => {
-    btn.addEventListener("click", () => returnAsset(btn.dataset.id));
-  });
-  document.querySelectorAll(".edit-btn").forEach(btn => {
-    btn.addEventListener("click", () => editAsset(btn.dataset.id));
-  });
-  document.querySelectorAll(".allocate-btn").forEach(btn => {
-    btn.addEventListener("click", () => openAllocateModal(btn.dataset.id));
-  });
+  document.querySelectorAll(".edit-btn").forEach(btn =>
+    btn.addEventListener("click", () => editAsset(btn.dataset.id))
+  );
+  document.querySelectorAll(".allocate-btn").forEach(btn =>
+    btn.addEventListener("click", () => openAllocateModal(btn.dataset.assetid))
+  );
+  document.querySelectorAll(".return-btn").forEach(btn =>
+    btn.addEventListener("click", () => returnAsset(btn.dataset.id))
+  );
+  document.querySelectorAll(".delete-btn").forEach(btn =>
+    btn.addEventListener("click", () => confirmDelete(btn.dataset.id))
+  );
 }
 
-document.addEventListener("DOMContentLoaded", loadAssets);
+window.openAllocateModal = (assetId) => {
+  window.location.href = `allocate-asset.html?assetId=${assetId}`;
+};
