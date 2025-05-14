@@ -27,6 +27,8 @@ const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 const assetsCollection = collection(db, "assets");
 
+const tableBody = document.getElementById("inventoryTableBody");
+
 // Load assets
 async function loadAssets() {
   const snapshot = await getDocs(assetsCollection);
@@ -70,11 +72,15 @@ function applyFilters() {
 // Render with pagination
 function renderTable(data) {
   tableBody.innerHTML = "";
-  data.forEach((asset, index) => {
+
+  const start = (currentPage - 1) * rowsPerPage;
+  const paginatedData = data.slice(start, start + rowsPerPage);
+
+  paginatedData.forEach((asset, index) => {
     const row = document.createElement("tr");
 
     row.innerHTML = `
-      <td class="border px-4 py-2">${index + 1}</td>
+      <td class="border px-4 py-2">${start + index + 1}</td>
       <td class="border px-4 py-2">${asset.assetId || "N/A"}</td>
       <td class="border px-4 py-2">${asset.type || "N/A"}</td>
       <td class="border px-4 py-2">${asset.model || "N/A"}</td>
@@ -98,10 +104,9 @@ function renderTable(data) {
     tableBody.appendChild(row);
   });
 
+  renderPagination(data);
   bindEvents();
 }
-
-   
 
 // Pagination controls
 function renderPagination(data) {
@@ -137,14 +142,13 @@ async function returnAsset(assetId) {
   if (confirm("Mark this asset as Available?")) {
     await updateDoc(doc(db, "assets", assetId), {
       status: "Available",
-      AllocatedTo: "",            // ✅ Clear user name
-      allocationDate: ""          // ✅ Clear allocation date
+      AllocatedTo: "",
+      allocationDate: ""
     });
     alert("Asset returned successfully!");
-    loadAssets(); // Refresh table
+    loadAssets();
   }
 }
-
 
 async function editAsset(assetId) {
   const assetDoc = await getDoc(doc(db, "assets", assetId));
@@ -169,16 +173,14 @@ function viewHistory(assetId) {
   alert("View History feature coming soon! (Asset ID: " + assetId + ")");
 }
 
-// Make global
 window.confirmDelete = confirmDelete;
 window.returnAsset = returnAsset;
 window.editAsset = editAsset;
 window.viewHistory = viewHistory;
-window.openAllocateModal = (id) => {
-window.location.href = `allocate-asset.html?assetId=${id}`;
+window.openAllocateModal = (assetId) => {
+  window.location.href = `allocate-asset.html?assetId=${assetId}`;
 };
 
-// Rebind action buttons
 function bindEvents() {
   document.querySelectorAll(".edit-btn").forEach(btn =>
     btn.addEventListener("click", () => editAsset(btn.dataset.id))
@@ -194,6 +196,4 @@ function bindEvents() {
   );
 }
 
-window.openAllocateModal = (assetId) => {
-  window.location.href = `allocate-asset.html?assetId=${assetId}`;
-};
+document.addEventListener("DOMContentLoaded", loadAssets);
