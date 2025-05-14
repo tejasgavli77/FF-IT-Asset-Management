@@ -97,7 +97,7 @@ function renderTable(data) {
       </td>
       <td class="border px-4 py-2 space-x-2 text-center">
         <button class="edit-btn text-blue-500 hover:text-blue-700" data-id="${asset.id}" title="Edit"><i class="bi bi-pencil-square"></i></button>
-        <button class="allocate-btn text-green-500 hover:text-green-700" data-id="${asset.id}" title="Allocate"><i class="bi bi-arrow-left-right"></i></button>
+        <button class="allocate-btn text-green-500 hover:text-green-700" data-assetid="${asset.assetid}" title="Allocate"><i class="bi bi-arrow-left-right"></i></button>
         <button class="return-btn text-yellow-500 hover:text-yellow-700" data-id="${asset.id}" title="Return"><i class="bi bi-arrow-counterclockwise"></i></button>
         <button class="delete-btn text-red-500 hover:text-red-700" data-id="${asset.id}" title="Delete"><i class="bi bi-trash"></i></button>
       </td>
