@@ -10,6 +10,9 @@ import {
   getDoc
 } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
+document.addEventListener("DOMContentLoaded", () => {
+  const tableBody = document.getElementById("tableBody");
+
 let allAssets = [];
 let currentPage = 1;
 const rowsPerPage = 25;
