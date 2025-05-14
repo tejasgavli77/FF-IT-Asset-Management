@@ -176,7 +176,7 @@ window.returnAsset = returnAsset;
 window.editAsset = editAsset;
 window.viewHistory = viewHistory;
 window.openAllocateModal = (id) => {
-  alert("Allocate modal for asset ID: " + id);
+window.location.href = `allocate-asset.html?assetId=${id}`;
 };
 
 // Rebind action buttons
