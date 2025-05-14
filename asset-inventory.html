@@ -2,16 +2,16 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Asset Inventory | IT Asset Management</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Asset Inventory | FF Inventory</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css" rel="stylesheet" />
 </head>
-<body class="flex h-screen bg-gray-100">
+<body class="flex bg-gray-100">
+
   <!-- Sidebar -->
-  <aside class="w-48 bg-white shadow-md px-4 py-4">
+  <aside class="w-60 bg-white shadow-md px-4 py-6">
     <h2 class="text-2xl font-bold mb-6 text-center text-blue-600">FF Inventory</h2>
-    <h2 class="text-2xl font-bold mb-4">Asset Inventory</h2>
     <nav class="space-y-4">
       <a href="add-asset.html" class="flex items-center gap-2 text-gray-700 hover:text-blue-600">
         <i class="bi bi-plus-circle"></i> Add Asset
@@ -26,199 +26,47 @@
   </aside>
 
   <!-- Main Content -->
-  <main class="flex-1 p-6 overflow-y-auto">
-    <header class="mb-6">
+  <main class="flex-1 p-6 overflow-x-auto">
+    <div class="flex justify-between items-center mb-6">
       <h1 class="text-3xl font-semibold text-gray-800">Asset Inventory</h1>
-    </header>
+    </div>
 
     <!-- Filters -->
-    <div class="flex flex-wrap gap-4 mb-4">
-      <input type="text" id="searchInput" placeholder="Search by Asset ID or Model" class="border px-3 py-2 rounded w-64">
-      <select id="statusFilter" class="border px-3 py-2 rounded">
-        <option value="">All Statuses</option>
-        <option value="Available">Available</option>
-        <option value="Allocated">Allocated</option>
+    <div class="mb-4 flex flex-col md:flex-row gap-4">
+      <input type="text" id="searchInput" placeholder="Search by ID, Type, or Model"
+             class="p-2 border rounded w-full md:w-1/3"/>
+      <select id="statusFilter" class="p-2 border rounded w-full md:w-1/5">
+        <option value="">All Status</option>
+        <option value="available">Available</option>
+        <option value="allocated">Allocated</option>
       </select>
-      <button id="resetFilters" class="bg-gray-200 px-3 py-2 rounded hover:bg-gray-300">Reset</button>
+      <button id="resetFilters" class="bg-gray-500 text-white px-4 py-2 rounded hover:bg-gray-600">
+        Reset Filters
+      </button>
     </div>
 
     <!-- Inventory Table -->
-    <div class="bg-white rounded-lg shadow-md p-6">
-      <table class="min-w-full table-auto">
-        <thead class="bg-gray-200 text-gray-700 font-semibold">
-          <tr>
-            <th class="border px-4 py-2">#</th>
-            <th class="border px-4 py-2">Asset ID</th>
-            <th class="border px-4 py-2">Type</th>
-            <th class="border px-4 py-2">Model</th>
-            <th class="border px-4 py-2">Serial Number</th>
-            <th class="border px-4 py-2">Allocated To</th>
-            <th class="border px-4 py-2">Allocation Date</th>
-            <th class="border px-4 py-2">Purchase Date</th>
-            <th class="border px-4 py-2">Status</th>
-            <th class="border px-4 py-2">Actions</th>
+    <div class="bg-white rounded-lg shadow-md p-4 overflow-x-auto">
+      <table class="min-w-full table-auto text-sm whitespace-nowrap">
+        <thead>
+          <tr class="bg-gray-100">
+            <th class="px-4 py-2 text-left">Asset ID</th>
+            <th class="px-4 py-2 text-left">Type</th>
+            <th class="px-4 py-2 text-left">Model</th>
+            <th class="px-4 py-2 text-left">Serial No.</th>
+            <th class="px-4 py-2 text-left">Status</th>
+            <th class="px-4 py-2 text-left">Actions</th>
           </tr>
         </thead>
-        <tbody id="inventoryTableBody"></tbody>
+        <tbody id="assetTableBody"></tbody>
       </table>
+
+      <!-- ✅ Pagination container -->
+      <div id="pagination" class="mt-4"></div>
     </div>
   </main>
 
-  <!-- Firebase + Script -->
-  <script type="module">
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
-    import { getFirestore, collection, getDocs, deleteDoc, doc, updateDoc, getDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
-
-    const firebaseConfig = {
-      apiKey: "AIzaSyAspahfUUGnBzh0mh6U53evGQzWQP956xQ",
-      authDomain: "ffassetmanager.firebaseapp.com",
-      projectId: "ffassetmanager",
-      storageBucket: "ffassetmanager.appspot.com",
-      messagingSenderId: "803858971008",
-      appId: "1:803858971008:web:72d69ddce6cbc85010a965"
-    };
-
-    const app = initializeApp(firebaseConfig);
-    const db = getFirestore(app);
-    const assetsCollection = collection(db, "assets");
-
-    const tableBody = document.getElementById("inventoryTableBody");
-    const searchInput = document.getElementById("searchInput");
-    const statusFilter = document.getElementById("statusFilter");
-    const resetButton = document.getElementById("resetFilters");
-
-    let allAssets = [];
-
-    async function loadAssets() {
-      const snapshot = await getDocs(assetsCollection);
-      allAssets = [];
-      snapshot.forEach(docSnap => {
-        allAssets.push({ id: docSnap.id, ...docSnap.data() });
-      });
-      renderTable(allAssets);
-    }
-
-    function renderTable(data) {
-  tableBody.innerHTML = "";
-  data.forEach((asset, index) => {
-    const row = document.createElement("tr");
-
-    row.innerHTML = `
-      <td class="border px-4 py-2">${index + 1}</td> <!-- ✅ Serial number -->
-      <td class="border px-4 py-2">${asset.assetId || "N/A"}</td>
-      <td class="border px-4 py-2">${asset.type || "N/A"}</td>
-      <td class="border px-4 py-2">${asset.model || "N/A"}</td>
-      <td class="border px-4 py-2">${asset.serialNumber || "N/A"}</td>
-      <td class="border px-4 py-2">${asset.AllocatedTo || "-"}</td>
-      <td class="border px-4 py-2">${asset.allocationDate || "-"}</td>
-      <td class="border px-4 py-2">${asset.purchaseDate || "N/A"}</td>
-      <td class="border px-4 py-2">
-        <span class="px-2 py-1 rounded text-white ${
-          asset.status?.toLowerCase() === "Available".toLowerCase()
-            ? "bg-green-500"
-            : "bg-red-500"
-        }">${asset.status || "N/A"}</span>
-      </td>
-      <td class="border px-4 py-2 space-x-2 text-center">
-        <button class="edit-btn text-blue-500 hover:text-blue-700" data-id="${asset.id}" title="Edit"><i class="bi bi-pencil-square"></i></button>
-        <button class="allocate-btn text-green-500 hover:text-green-700" data-id="${asset.id}" title="Allocate"><i class="bi bi-arrow-left-right"></i></button>
-        <button class="return-btn text-yellow-500 hover:text-yellow-700" data-id="${asset.id}" title="Return"><i class="bi bi-arrow-counterclockwise"></i></button>
-        <button class="delete-btn text-red-500 hover:text-red-700" data-id="${asset.id}" title="Delete"><i class="bi bi-trash"></i></button>
-      </td>
-    `;
-
-    tableBody.appendChild(row);
-  });
-
-  bindEvents(); // ✅ This ensures all existing buttons still work
-}
-
-    function applyFilters() {
-      const searchValue = searchInput.value.toLowerCase();
-      const statusValue = statusFilter.value.toLowerCase();
-
-      const filtered = allAssets.filter(asset => {
-        const matchesSearch =
-          (asset.assetId && asset.assetId.toLowerCase().includes(searchValue)) ||
-          (asset.model && asset.model.toLowerCase().includes(searchValue));
-
-        const matchesStatus =
-          !statusValue || (asset.status && asset.status.toLowerCase() === statusValue);
-
-        return matchesSearch && matchesStatus;
-      });
-
-      renderTable(filtered);
-    }
-
-    resetButton.addEventListener("click", () => {
-      searchInput.value = "";
-      statusFilter.value = "";
-      renderTable(allAssets);
-    });
-
-    searchInput.addEventListener("input", applyFilters);
-    statusFilter.addEventListener("change", applyFilters);
-
-    function bindEvents() {
-      document.querySelectorAll(".edit-btn").forEach(btn =>
-        btn.addEventListener("click", () => editAsset(btn.dataset.id))
-      );
-      document.querySelectorAll(".allocate-btn").forEach(btn =>
-        btn.addEventListener("click", () => openAllocateModal(btn.dataset.id))
-      );
-      document.querySelectorAll(".return-btn").forEach(btn =>
-        btn.addEventListener("click", () => returnAsset(btn.dataset.id))
-      );
-      document.querySelectorAll(".delete-btn").forEach(btn =>
-        btn.addEventListener("click", () => confirmDelete(btn.dataset.id))
-      );
-    }
-
-    async function confirmDelete(id) {
-      if (confirm("Are you sure you want to delete this asset?")) {
-        await deleteDoc(doc(db, "assets", id));
-        alert("Deleted successfully!");
-        loadAssets();
-      }
-    }
-
-    async function returnAsset(assetId) {
-  if (confirm("Mark this asset as Available?")) {
-    await updateDoc(doc(db, "assets", assetId), {
-      status: "Available",
-      AllocatedTo: "",            // Clear name
-      allocationDate: ""          // Clear date
-    });
-    alert("Asset returned successfully!");
-    loadAssets();
-  }
-}
-
-
-    async function editAsset(id) {
-      const assetDoc = await getDoc(doc(db, "assets", id));
-      const data = assetDoc.data();
-      const newName = prompt("Edit Asset Name:", data.name || "");
-      const newType = prompt("Edit Type:", data.type || "");
-      const newModel = prompt("Edit Model:", data.model || "");
-
-      if (newName !== null && newType !== null && newModel !== null) {
-        await updateDoc(doc(db, "assets", id), {
-          name: newName,
-          type: newType,
-          model: newModel,
-        });
-        alert("Updated successfully!");
-        loadAssets();
-      }
-    }
-
-    function openAllocateModal(id) {
-  window.location.href = `allocate-asset.html?assetId=${id}`;
-}
-
-    document.addEventListener("DOMContentLoaded", loadAssets);
-  </script>
+  <!-- JS Logic -->
+  <script type="module" src="js/asset-inventory.js"></script>
 </body>
 </html>
