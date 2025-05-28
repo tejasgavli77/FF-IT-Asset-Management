@@ -1,3 +1,4 @@
+// Firebase imports
 import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
 import {
   getFirestore,
@@ -7,6 +8,7 @@ import {
   doc
 } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
+// Firebase config
 const firebaseConfig = {
   apiKey: "AIzaSyAspahfUUGnBzh0mh6U53evGQzWQP956xQ",
   authDomain: "ffassetmanager.firebaseapp.com",
@@ -16,91 +18,97 @@ const firebaseConfig = {
   appId: "1:803858971008:web:72d69ddce6cbc85010a965"
 };
 
+// Init Firebase
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 const assetsCollection = collection(db, "assets");
 
-let allAssets = [];
-let groupedUsers = [];
+document.addEventListener("DOMContentLoaded", loadUserAssets);
 
-const userTableBody = document.getElementById("userTableBody");
-const searchUser = document.getElementById("searchUser");
-
-async function loadAssets() {
+async function loadUserAssets() {
   const snapshot = await getDocs(assetsCollection);
-  allAssets = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+  const allAssets = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
 
-  groupedUsers = groupAssetsByUser(allAssets);
-  renderUserTable(groupedUsers);
-}
-
-function groupAssetsByUser(assets) {
   const userMap = {};
-
-  assets.forEach(asset => {
+  allAssets.forEach(asset => {
     const user = asset.AllocatedTo?.trim();
-    if (asset.status === "Allocated" && user) {
+    if (user) {
       if (!userMap[user]) userMap[user] = [];
       userMap[user].push(asset);
     }
   });
 
-  return Object.entries(userMap).map(([user, assets], i) => ({
-    index: i + 1,
-    user,
-    assets
-  }));
+  renderUserTable(userMap);
+  bindSearch(userMap);
 }
 
-function renderUserTable(users) {
-  userTableBody.innerHTML = users.map(({ index, user, assets }) => `
-    <tr class="border-b">
-      <td class="border px-4 py-2">${index}</td>
-      <td class="border px-4 py-2">${user}</td>
-      <td class="border px-4 py-2">${assets.length}</td>
-      <td class="border px-4 py-2">
-        <ul class="list-disc pl-4">
-          ${assets.map(asset => `<li>${asset.assetId} (${asset.model || ""})</li>`).join("")}
-        </ul>
-      </td>
+function renderUserTable(userMap) {
+  const tbody = document.getElementById("userAssetTableBody");
+  tbody.innerHTML = "";
+
+  const users = Object.keys(userMap);
+  users.forEach((user, index) => {
+    const assets = userMap[user];
+    const assetList = assets.map(a => `<li>${a.assetId} (${a.model || "N/A"})</li>`).join("");
+
+    const row = document.createElement("tr");
+    row.innerHTML = `
+      <td class="border px-4 py-2">${index + 1}</td>
+      <td class="border px-4 py-2 font-medium">${user}</td>
+      <td class="border px-4 py-2 text-center">${assets.length}</td>
+      <td class="border px-4 py-2"><ul class="list-disc pl-4">${assetList}</ul></td>
       <td class="border px-4 py-2 space-x-2 text-center">
-        <button class="bg-yellow-500 hover:bg-yellow-600 text-white px-3 py-1 rounded"
-          onclick="returnAllAssets('${user}')">Return All</button>
-        <button class="bg-green-500 hover:bg-green-600 text-white px-3 py-1 rounded"
-          onclick="assignNew('${user}')">Assign New</button>
+        <button class="bg-yellow-500 text-white px-2 py-1 rounded hover:bg-yellow-600 return-btn" data-user="${user}">Return All</button>
+        <button class="bg-green-500 text-white px-2 py-1 rounded hover:bg-green-600 assign-btn" data-user="${user}">Assign New</button>
       </td>
-    </tr>
-  `).join("");
+    `;
+    tbody.appendChild(row);
+  });
+
+  bindActionButtons(userMap);
 }
 
-window.returnAllAssets = async function (user) {
-  if (!confirm(`Return all assets assigned to ${user}?`)) return;
+function bindSearch(userMap) {
+  const searchInput = document.getElementById("userSearchInput");
+  if (!searchInput) return;
 
-  const updates = allAssets
-    .filter(asset => asset.AllocatedTo === user)
-    .map(asset => updateDoc(doc(db, "assets", asset.id), {
-      status: "Available",
-      AllocatedTo: "",
-      allocationDate: ""
-    }));
+  searchInput.addEventListener("input", () => {
+    const searchTerm = searchInput.value.toLowerCase();
+    const filtered = {};
+    for (const user in userMap) {
+      if (user.toLowerCase().includes(searchTerm)) {
+        filtered[user] = userMap[user];
+      }
+    }
+    renderUserTable(filtered);
+  });
+}
 
-  await Promise.all(updates);
-  alert("Assets returned successfully.");
-  loadAssets();
-};
+function bindActionButtons(userMap) {
+  document.querySelectorAll(".return-btn").forEach(btn => {
+    btn.addEventListener("click", async () => {
+      const user = btn.dataset.user;
+      const confirmReturn = confirm(`Return all assets assigned to ${user}?`);
+      if (!confirmReturn) return;
 
-window.assignNew = function (user) {
-  const encoded = encodeURIComponent(user);
-  window.location.href = `allocate-asset.html?user=${encoded}`;
-};
+      const promises = userMap[user].map(asset =>
+        updateDoc(doc(db, "assets", asset.id), {
+          status: "Available",
+          AllocatedTo: "",
+          allocationDate: ""
+        })
+      );
 
-searchUser.addEventListener("input", () => {
-  const term = searchUser.value.toLowerCase();
-  const filtered = groupedUsers.filter(u =>
-    u.user.toLowerCase().includes(term)
-  );
-  renderUserTable(filtered);
-});
+      await Promise.all(promises);
+      alert(`Assets returned for ${user}`);
+      loadUserAssets();
+    });
+  });
 
-document.addEventListener("DOMContentLoaded", loadAssets);
-
+  document.querySelectorAll(".assign-btn").forEach(btn => {
+    btn.addEventListener("click", () => {
+      const user = btn.dataset.user;
+      window.location.href = `allocate-asset.html?user=${encodeURIComponent(user)}`;
+    });
+  });
+}
