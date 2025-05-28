@@ -1,4 +1,3 @@
-// Firebase imports
 import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
 import {
   getFirestore,
@@ -10,6 +9,7 @@ import {
   where
 } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
+// Firebase config
 const firebaseConfig = {
   apiKey: "AIzaSyAspahfUUGnBzh0mh6U53evGQzWQP956xQ",
   authDomain: "ffassetmanager.firebaseapp.com",
@@ -21,83 +21,102 @@ const firebaseConfig = {
 
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
+const assetRef = collection(db, "assets");
 
-const tableBody = document.getElementById("userAssetTableBody");
-const searchInput = document.getElementById("searchInput");
-
-let userMap = {};
+let allAssets = [];
 
 async function loadUserAssets() {
-  const snapshot = await getDocs(query(collection(db, "assets"), where("status", "==", "Allocated")));
-  const assets = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+  const snapshot = await getDocs(query(assetRef, where("AllocatedTo", "!=", "")));
+  allAssets = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
 
-  userMap = {};
-  assets.forEach(asset => {
-    const owner = asset.AllocatedTo || "Unknown";
-    if (!userMap[owner]) userMap[owner] = [];
-    userMap[owner].push(asset);
-  });
-
-  renderUserTable(userMap);
+  renderUserTable(allAssets);
 }
 
 function renderUserTable(data) {
-  tableBody.innerHTML = "";
-  Object.keys(data).forEach((user, index) => {
-    const assets = data[user];
-    const assetDetails = assets.map(asset => `
-      <div class="flex justify-between items-center border-b py-1">
-        <span class="text-gray-700 text-sm">${asset.assetId} - ${asset.model}</span>
-        <button class="text-xs text-red-600 hover:underline" onclick="returnSingleAsset('${asset.id}', '${user}')">Return</button>
+  const grouped = {};
+  data.forEach(asset => {
+    const user = asset.AllocatedTo || "Unknown";
+    if (!grouped[user]) grouped[user] = [];
+    grouped[user].push(asset);
+  });
+
+  const tbody = document.getElementById("userAssetTableBody");
+  tbody.innerHTML = "";
+
+  Object.entries(grouped).forEach(([user, assets]) => {
+    const row = document.createElement("tr");
+
+    const assetList = assets.map(asset => `
+      <div class="flex justify-between items-center bg-gray-100 p-2 mb-1 rounded">
+        <span>${asset.assetId} (${asset.model})</span>
+        <button onclick="returnSingleAsset('${asset.id}')" class="text-yellow-600 hover:text-yellow-800" title="Return"><i class="bi bi-arrow-counterclockwise"></i></button>
       </div>
     `).join("");
 
-    const row = document.createElement("tr");
     row.innerHTML = `
-      <td class="border px-4 py-2">${index + 1}</td>
-      <td class="border px-4 py-2 font-semibold">${user}</td>
-      <td class="border px-4 py-2">${assets.length}</td>
-      <td class="border px-4 py-2">${assetDetails}</td>
-      <td class="border px-4 py-2 text-center">
-        <button class="text-sm bg-blue-500 text-white px-3 py-1 rounded hover:bg-blue-600" onclick="returnAll('${user}')">Return All</button>
+      <td class="border px-4 py-2 align-top font-semibold">${user}</td>
+      <td class="border px-4 py-2">
+        ${assetList}
+      </td>
+      <td class="border px-4 py-2 align-top">
+        <button onclick="returnAllAssets('${user}')" class="bg-red-500 text-white px-3 py-1 rounded hover:bg-red-600 text-sm">Return All</button>
       </td>
     `;
-    tableBody.appendChild(row);
+    tbody.appendChild(row);
   });
 }
 
-function searchUsers() {
-  const term = searchInput.value.toLowerCase();
-  const filtered = {};
-  Object.keys(userMap).forEach(user => {
-    if (user.toLowerCase().includes(term)) filtered[user] = userMap[user];
-  });
-  renderUserTable(filtered);
-}
+async function returnAllAssets(user) {
+  const userAssets = allAssets.filter(asset => asset.AllocatedTo === user);
+  const confirmMsg = `Return all ${userAssets.length} asset(s) assigned to ${user}?`;
+  if (!confirm(confirmMsg)) return;
 
-searchInput.addEventListener("input", searchUsers);
-
-window.returnAll = async function (user) {
-  const assets = userMap[user];
-  for (const asset of assets) {
+  for (let asset of userAssets) {
     await updateDoc(doc(db, "assets", asset.id), {
       status: "Available",
       AllocatedTo: "",
       allocationDate: ""
     });
   }
-  alert(`All assets returned for ${user}`);
-  loadUserAssets();
-};
 
-window.returnSingleAsset = async function (assetId, user) {
+  alert("All assets returned for " + user);
+  loadUserAssets();
+}
+
+window.returnAllAssets = returnAllAssets;
+
+async function returnSingleAsset(assetId) {
+  if (!confirm("Return this asset to inventory?")) return;
+
   await updateDoc(doc(db, "assets", assetId), {
     status: "Available",
     AllocatedTo: "",
     allocationDate: ""
   });
-  alert(`Asset returned for ${user}`);
-  loadUserAssets();
-};
 
-loadUserAssets();
+  alert("Asset returned successfully.");
+  loadUserAssets();
+}
+
+window.returnSingleAsset = returnSingleAsset;
+
+// Search
+document.addEventListener("DOMContentLoaded", () => {
+  loadUserAssets();
+
+  const searchInput = document.getElementById("searchUser");
+  const resetBtn = document.getElementById("resetSearch");
+
+  searchInput.addEventListener("input", () => {
+    const keyword = searchInput.value.toLowerCase();
+    const filtered = allAssets.filter(asset =>
+      asset.AllocatedTo?.toLowerCase().includes(keyword)
+    );
+    renderUserTable(filtered);
+  });
+
+  resetBtn.addEventListener("click", () => {
+    searchInput.value = "";
+    renderUserTable(allAssets);
+  });
+});
