@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>User Asset Overview</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css" rel="stylesheet" />
@@ -30,25 +30,22 @@
 
   <!-- Main Content -->
   <main class="flex-1 p-6 overflow-y-auto">
-    <header class="mb-6">
-      <h1 class="text-3xl font-semibold text-gray-800">User Asset Overview</h1>
-    </header>
+    <h1 class="text-3xl font-semibold mb-6 text-gray-800">User Asset Overview</h1>
 
-    <!-- Search Bar -->
-    <div class="mb-4">
-      <input type="text" id="userSearch" placeholder="Search by User Name" class="border px-3 py-2 rounded w-96">
-    </div>
+    <!-- Search -->
+    <input type="text" id="searchUser" placeholder="Search by User Name"
+           class="border px-3 py-2 rounded mb-4 w-full max-w-md" />
 
-    <!-- User List Table -->
-    <div class="bg-white rounded-lg shadow-md p-6">
+    <!-- Table -->
+    <div class="bg-white rounded-lg shadow p-4">
       <table class="min-w-full table-auto text-sm">
-        <thead class="bg-gray-200 text-gray-700 font-semibold">
+        <thead class="bg-gray-100">
           <tr>
-            <th class="border px-4 py-2">#</th>
-            <th class="border px-4 py-2">User</th>
-            <th class="border px-4 py-2">Total Assets</th>
-            <th class="border px-4 py-2">Asset Details</th>
-            <th class="border px-4 py-2">Actions</th>
+            <th class="px-4 py-2 border">#</th>
+            <th class="px-4 py-2 border">User</th>
+            <th class="px-4 py-2 border">Total Assets</th>
+            <th class="px-4 py-2 border">Asset Details</th>
+            <th class="px-4 py-2 border">Actions</th>
           </tr>
         </thead>
         <tbody id="userTableBody"></tbody>
@@ -56,7 +53,7 @@
     </div>
   </main>
 
-  <!-- JavaScript -->
-  <script type="module" src="js/user-assets.js"></script>
+  <!-- Script -->
+  <script type="module" src="js/user-asset-overview.js"></script>
 </body>
 </html>
