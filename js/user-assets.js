@@ -3,7 +3,7 @@ import {
   getFirestore,
   collection,
   getDocs,
-  updateDoc,
+  updateDoc
   doc
 } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
