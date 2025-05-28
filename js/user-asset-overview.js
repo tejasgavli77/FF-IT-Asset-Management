@@ -43,21 +43,25 @@ function renderUserTable(data) {
   const tbody = document.getElementById("userAssetTableBody");
   tbody.innerHTML = "";
 
+  let index = 1;
+
   Object.entries(grouped).forEach(([user, assets]) => {
     const row = document.createElement("tr");
 
     const assetList = assets.map(asset => `
       <div class="flex justify-between items-center bg-gray-100 p-2 mb-1 rounded">
         <span>${asset.assetId} (${asset.model})</span>
-        <button onclick="returnSingleAsset('${asset.id}')" class="text-yellow-600 hover:text-yellow-800" title="Return"><i class="bi bi-arrow-counterclockwise"></i></button>
+        <button onclick="returnSingleAsset('${asset.id}')" class="text-yellow-600 hover:text-yellow-800" title="Return">
+          <i class="bi bi-arrow-counterclockwise"></i>
+        </button>
       </div>
     `).join("");
 
     row.innerHTML = `
+      <td class="border px-4 py-2 align-top">${index++}</td>
       <td class="border px-4 py-2 align-top font-semibold">${user}</td>
-      <td class="border px-4 py-2">
-        ${assetList}
-      </td>
+      <td class="border px-4 py-2 align-top text-center">${assets.length}</td>
+      <td class="border px-4 py-2">${assetList}</td>
       <td class="border px-4 py-2 align-top">
         <button onclick="returnAllAssets('${user}')" class="bg-red-500 text-white px-3 py-1 rounded hover:bg-red-600 text-sm">Return All</button>
       </td>
@@ -100,11 +104,11 @@ async function returnSingleAsset(assetId) {
 
 window.returnSingleAsset = returnSingleAsset;
 
-// Search
+// Search functionality
 document.addEventListener("DOMContentLoaded", () => {
   loadUserAssets();
 
-  const searchInput = document.getElementById("searchUser");
+  const searchInput = document.getElementById("searchInput");
   const resetBtn = document.getElementById("resetSearch");
 
   searchInput.addEventListener("input", () => {
