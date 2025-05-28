@@ -5,10 +5,11 @@ import {
   collection,
   getDocs,
   updateDoc,
-  doc
+  doc,
+  query,
+  where
 } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
-// Firebase config
 const firebaseConfig = {
   apiKey: "AIzaSyAspahfUUGnBzh0mh6U53evGQzWQP956xQ",
   authDomain: "ffassetmanager.firebaseapp.com",
@@ -18,97 +19,85 @@ const firebaseConfig = {
   appId: "1:803858971008:web:72d69ddce6cbc85010a965"
 };
 
-// Init Firebase
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
-const assetsCollection = collection(db, "assets");
 
-document.addEventListener("DOMContentLoaded", loadUserAssets);
+const tableBody = document.getElementById("userAssetTableBody");
+const searchInput = document.getElementById("searchInput");
+
+let userMap = {};
 
 async function loadUserAssets() {
-  const snapshot = await getDocs(assetsCollection);
-  const allAssets = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+  const snapshot = await getDocs(query(collection(db, "assets"), where("status", "==", "Allocated")));
+  const assets = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
 
-  const userMap = {};
-  allAssets.forEach(asset => {
-    const user = asset.AllocatedTo?.trim();
-    if (user) {
-      if (!userMap[user]) userMap[user] = [];
-      userMap[user].push(asset);
-    }
+  userMap = {};
+  assets.forEach(asset => {
+    const owner = asset.AllocatedTo || "Unknown";
+    if (!userMap[owner]) userMap[owner] = [];
+    userMap[owner].push(asset);
   });
 
   renderUserTable(userMap);
-  bindSearch(userMap);
 }
 
-function renderUserTable(userMap) {
-  const tbody = document.getElementById("userAssetTableBody");
-  tbody.innerHTML = "";
-
-  const users = Object.keys(userMap);
-  users.forEach((user, index) => {
-    const assets = userMap[user];
-    const assetList = assets.map(a => `<li>${a.assetId} (${a.model || "N/A"})</li>`).join("");
+function renderUserTable(data) {
+  tableBody.innerHTML = "";
+  Object.keys(data).forEach((user, index) => {
+    const assets = data[user];
+    const assetDetails = assets.map(asset => `
+      <div class="flex justify-between items-center border-b py-1">
+        <span class="text-gray-700 text-sm">${asset.assetId} - ${asset.model}</span>
+        <button class="text-xs text-red-600 hover:underline" onclick="returnSingleAsset('${asset.id}', '${user}')">Return</button>
+      </div>
+    `).join("");
 
     const row = document.createElement("tr");
     row.innerHTML = `
       <td class="border px-4 py-2">${index + 1}</td>
-      <td class="border px-4 py-2 font-medium">${user}</td>
-      <td class="border px-4 py-2 text-center">${assets.length}</td>
-      <td class="border px-4 py-2"><ul class="list-disc pl-4">${assetList}</ul></td>
-      <td class="border px-4 py-2 space-x-2 text-center">
-        <button class="bg-yellow-500 text-white px-2 py-1 rounded hover:bg-yellow-600 return-btn" data-user="${user}">Return All</button>
-        <button class="bg-green-500 text-white px-2 py-1 rounded hover:bg-green-600 assign-btn" data-user="${user}">Assign New</button>
+      <td class="border px-4 py-2 font-semibold">${user}</td>
+      <td class="border px-4 py-2">${assets.length}</td>
+      <td class="border px-4 py-2">${assetDetails}</td>
+      <td class="border px-4 py-2 text-center">
+        <button class="text-sm bg-blue-500 text-white px-3 py-1 rounded hover:bg-blue-600" onclick="returnAll('${user}')">Return All</button>
       </td>
     `;
-    tbody.appendChild(row);
-  });
-
-  bindActionButtons(userMap);
-}
-
-function bindSearch(userMap) {
-  const searchInput = document.getElementById("userSearchInput");
-  if (!searchInput) return;
-
-  searchInput.addEventListener("input", () => {
-    const searchTerm = searchInput.value.toLowerCase();
-    const filtered = {};
-    for (const user in userMap) {
-      if (user.toLowerCase().includes(searchTerm)) {
-        filtered[user] = userMap[user];
-      }
-    }
-    renderUserTable(filtered);
+    tableBody.appendChild(row);
   });
 }
 
-function bindActionButtons(userMap) {
-  document.querySelectorAll(".return-btn").forEach(btn => {
-    btn.addEventListener("click", async () => {
-      const user = btn.dataset.user;
-      const confirmReturn = confirm(`Return all assets assigned to ${user}?`);
-      if (!confirmReturn) return;
+function searchUsers() {
+  const term = searchInput.value.toLowerCase();
+  const filtered = {};
+  Object.keys(userMap).forEach(user => {
+    if (user.toLowerCase().includes(term)) filtered[user] = userMap[user];
+  });
+  renderUserTable(filtered);
+}
 
-      const promises = userMap[user].map(asset =>
-        updateDoc(doc(db, "assets", asset.id), {
-          status: "Available",
-          AllocatedTo: "",
-          allocationDate: ""
-        })
-      );
+searchInput.addEventListener("input", searchUsers);
 
-      await Promise.all(promises);
-      alert(`Assets returned for ${user}`);
-      loadUserAssets();
+window.returnAll = async function (user) {
+  const assets = userMap[user];
+  for (const asset of assets) {
+    await updateDoc(doc(db, "assets", asset.id), {
+      status: "Available",
+      AllocatedTo: "",
+      allocationDate: ""
     });
-  });
+  }
+  alert(`All assets returned for ${user}`);
+  loadUserAssets();
+};
 
-  document.querySelectorAll(".assign-btn").forEach(btn => {
-    btn.addEventListener("click", () => {
-      const user = btn.dataset.user;
-      window.location.href = `allocate-asset.html?user=${encodeURIComponent(user)}`;
-    });
+window.returnSingleAsset = async function (assetId, user) {
+  await updateDoc(doc(db, "assets", assetId), {
+    status: "Available",
+    AllocatedTo: "",
+    allocationDate: ""
   });
-}
+  alert(`Asset returned for ${user}`);
+  loadUserAssets();
+};
+
+loadUserAssets();
