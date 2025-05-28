@@ -1,4 +1,3 @@
-// js/user-assets.js
 import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
 import {
   getFirestore,
@@ -21,79 +20,87 @@ const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 const assetsCollection = collection(db, "assets");
 
-const tableBody = document.getElementById("userTableBody");
-const userSearch = document.getElementById("userSearch");
+let allAssets = [];
+let groupedUsers = [];
 
-let groupedAssets = {}; // { username: [asset, asset, ...] }
+const userTableBody = document.getElementById("userTableBody");
+const searchUser = document.getElementById("searchUser");
 
 async function loadAssets() {
   const snapshot = await getDocs(assetsCollection);
-  const allAssets = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+  allAssets = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
 
-  // Group by user
-  groupedAssets = {};
-  allAssets.forEach(asset => {
-    if (asset.status === "Allocated" && asset.AllocatedTo) {
-      if (!groupedAssets[asset.AllocatedTo]) groupedAssets[asset.AllocatedTo] = [];
-      groupedAssets[asset.AllocatedTo].push(asset);
+  groupedUsers = groupAssetsByUser(allAssets);
+  renderUserTable(groupedUsers);
+}
+
+function groupAssetsByUser(assets) {
+  const userMap = {};
+
+  assets.forEach(asset => {
+    const user = asset.AllocatedTo?.trim();
+    if (asset.status === "Allocated" && user) {
+      if (!userMap[user]) userMap[user] = [];
+      userMap[user].push(asset);
     }
   });
 
-  renderTable(groupedAssets);
+  return Object.entries(userMap).map(([user, assets], i) => ({
+    index: i + 1,
+    user,
+    assets
+  }));
 }
 
-function renderTable(grouped) {
-  const searchValue = userSearch.value.toLowerCase();
-  tableBody.innerHTML = "";
-
-  const users = Object.keys(grouped).filter(user =>
-    user.toLowerCase().includes(searchValue)
-  );
-
-  users.forEach((user, index) => {
-    const assets = grouped[user];
-    const assetList = assets.map(a => `<li>${a.assetId} (${a.model})</li>`).join("");
-
-    const row = document.createElement("tr");
-    row.innerHTML = `
-      <td class="border px-4 py-2">${index + 1}</td>
+function renderUserTable(users) {
+  userTableBody.innerHTML = users.map(({ index, user, assets }) => `
+    <tr class="border-b">
+      <td class="border px-4 py-2">${index}</td>
       <td class="border px-4 py-2">${user}</td>
       <td class="border px-4 py-2">${assets.length}</td>
       <td class="border px-4 py-2">
-        <ul class="list-disc pl-4">${assetList}</ul>
+        <ul class="list-disc pl-4">
+          ${assets.map(asset => `<li>${asset.assetId} (${asset.model || ""})</li>`).join("")}
+        </ul>
       </td>
-      <td class="border px-4 py-2">
-        <button class="bg-yellow-500 text-white px-2 py-1 rounded text-sm hover:bg-yellow-600" onclick="returnAssets('${user}')">Return All</button>
-        <button class="bg-green-500 text-white px-2 py-1 rounded text-sm hover:bg-green-600 ml-2" onclick="allocateNew('${user}')">Assign New</button>
+      <td class="border px-4 py-2 space-x-2 text-center">
+        <button class="bg-yellow-500 hover:bg-yellow-600 text-white px-3 py-1 rounded"
+          onclick="returnAllAssets('${user}')">Return All</button>
+        <button class="bg-green-500 hover:bg-green-600 text-white px-3 py-1 rounded"
+          onclick="assignNew('${user}')">Assign New</button>
       </td>
-    `;
-
-    tableBody.appendChild(row);
-  });
+    </tr>
+  `).join("");
 }
 
-// Search live filter
-userSearch.addEventListener("input", () => renderTable(groupedAssets));
+window.returnAllAssets = async function (user) {
+  if (!confirm(`Return all assets assigned to ${user}?`)) return;
 
-// Return all assets of a user
-window.returnAssets = async (user) => {
-  if (!confirm(`Return all assets from ${user}?`)) return;
-  const promises = groupedAssets[user].map(asset =>
-    updateDoc(doc(db, "assets", asset.id), {
+  const updates = allAssets
+    .filter(asset => asset.AllocatedTo === user)
+    .map(asset => updateDoc(doc(db, "assets", asset.id), {
       status: "Available",
       AllocatedTo: "",
       allocationDate: ""
-    })
-  );
-  await Promise.all(promises);
-  alert("Assets returned.");
+    }));
+
+  await Promise.all(updates);
+  alert("Assets returned successfully.");
   loadAssets();
 };
 
-// Redirect to Allocate page with user prefilled
-window.allocateNew = (user) => {
-  window.location.href = `allocate-asset.html?user=${encodeURIComponent(user)}`;
+window.assignNew = function (user) {
+  const encoded = encodeURIComponent(user);
+  window.location.href = `allocate-asset.html?user=${encoded}`;
 };
 
-// Init
-loadAssets();
+searchUser.addEventListener("input", () => {
+  const term = searchUser.value.toLowerCase();
+  const filtered = groupedUsers.filter(u =>
+    u.user.toLowerCase().includes(term)
+  );
+  renderUserTable(filtered);
+});
+
+document.addEventListener("DOMContentLoaded", loadAssets);
+
