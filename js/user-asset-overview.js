@@ -24,6 +24,9 @@ const db = getFirestore(app);
 const assetRef = collection(db, "assets");
 
 let allAssets = [];
+let currentPage = 1;
+const usersPerPage = 10;
+let groupedUsers = {};
 
 async function loadUserAssets() {
   const snapshot = await getDocs(query(assetRef, where("AllocatedTo", "!=", "")));
@@ -33,19 +36,31 @@ async function loadUserAssets() {
 }
 
 function renderUserTable(data) {
-  const grouped = {};
+  groupedUsers = {};
   data.forEach(asset => {
     const user = asset.AllocatedTo || "Unknown";
-    if (!grouped[user]) grouped[user] = [];
-    grouped[user].push(asset);
+    if (!groupedUsers[user]) groupedUsers[user] = [];
+    groupedUsers[user].push(asset);
   });
 
+  renderPaginatedUsers(currentPage);
+}
+
+function renderPaginatedUsers(page) {
   const tbody = document.getElementById("userAssetTableBody");
   tbody.innerHTML = "";
 
-  let index = 1;
+  const users = Object.keys(groupedUsers);
+  const totalPages = Math.ceil(users.length / usersPerPage);
+  currentPage = Math.max(1, Math.min(page, totalPages));
 
-  Object.entries(grouped).forEach(([user, assets]) => {
+  const start = (currentPage - 1) * usersPerPage;
+  const end = start + usersPerPage;
+  const usersToDisplay = users.slice(start, end);
+
+  let index = start + 1;
+  usersToDisplay.forEach(user => {
+    const assets = groupedUsers[user];
     const row = document.createElement("tr");
 
     const assetList = assets.map(asset => `
@@ -68,6 +83,15 @@ function renderUserTable(data) {
     `;
     tbody.appendChild(row);
   });
+
+  // Update pagination controls
+  const pageIndicator = document.getElementById("pageIndicator");
+  const prevBtn = document.getElementById("prevPage");
+  const nextBtn = document.getElementById("nextPage");
+
+  if (pageIndicator) pageIndicator.textContent = `Page ${currentPage} of ${totalPages}`;
+  if (prevBtn) prevBtn.disabled = currentPage === 1;
+  if (nextBtn) nextBtn.disabled = currentPage === totalPages;
 }
 
 async function returnAllAssets(user) {
@@ -104,7 +128,7 @@ async function returnSingleAsset(assetId) {
 
 window.returnSingleAsset = returnSingleAsset;
 
-// Search functionality
+// Search functionality + pagination nav
 document.addEventListener("DOMContentLoaded", () => {
   loadUserAssets();
 
@@ -123,4 +147,19 @@ document.addEventListener("DOMContentLoaded", () => {
     searchInput.value = "";
     renderUserTable(allAssets);
   });
+
+  const prevBtn = document.getElementById("prevPage");
+  const nextBtn = document.getElementById("nextPage");
+
+  if (prevBtn) {
+    prevBtn.addEventListener("click", () => {
+      renderPaginatedUsers(currentPage - 1);
+    });
+  }
+
+  if (nextBtn) {
+    nextBtn.addEventListener("click", () => {
+      renderPaginatedUsers(currentPage + 1);
+    });
+  }
 });
