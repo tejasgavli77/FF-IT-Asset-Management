@@ -69,31 +69,26 @@ document.addEventListener("DOMContentLoaded", () => {
     currentPage = 1;
     renderTable(filtered);
 
-    // Asset List Dropdown
-const assetDropdown = document.getElementById("assetDropdown");
+// Asset Type dropdown
+    function populateAssetDropdown() {
+  const assetDropdown = document.getElementById("assetDropdown");
 
-function populateAssetDropdown() {
-  const uniqueIds = [...new Set(allAssets.map(asset => asset.assetId).filter(Boolean))];
-  assetDropdown.innerHTML = `<option value="">-- All Assets --</option>`;
-  uniqueIds.forEach(id => {
+  // Get unique asset types from allAssets
+  const uniqueTypes = [...new Set(allAssets.map(asset => asset.type).filter(Boolean))];
+
+  console.log("Asset Types for dropdown:", uniqueTypes); // For debug
+
+  // Clear existing options
+  assetDropdown.innerHTML = `<option value="">-- All Types --</option>`;
+
+  // Add each unique type to dropdown
+  uniqueTypes.forEach(type => {
     const option = document.createElement("option");
-    option.value = id;
-    option.textContent = id;
+    option.value = type;
+    option.textContent = type.charAt(0).toUpperCase() + type.slice(1); // Capitalize
     assetDropdown.appendChild(option);
   });
 }
-
-assetDropdown?.addEventListener("change", () => {
-  const selectedId = assetDropdown.value;
-  const filtered = selectedId
-    ? allAssets.filter(asset => asset.assetId === selectedId)
-    : allAssets;
-  currentPage = 1;
-  renderTable(filtered);
-});
-
-    
-  }
 
   // 🖥️ Render assets with pagination
   function renderTable(data) {
