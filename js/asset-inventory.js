@@ -32,22 +32,24 @@ document.addEventListener("DOMContentLoaded", () => {
   const tableBody = document.getElementById("tableBody");
   const searchInput = document.getElementById("searchInput");
   const statusFilter = document.getElementById("statusFilter");
+  const typeFilter = document.getElementById("typeFilter"); // ✅ NEW
   const resetBtn = document.getElementById("resetFilters");
 
   // 🔄 Load Assets
   async function loadAssets() {
     const snapshot = await getDocs(assetsCollection);
     allAssets = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-    populateAssetDropdown();
     renderTable(allAssets);
 
     // Add filters if elements exist
     if (searchInput && statusFilter && resetBtn) {
       searchInput.addEventListener("input", applyFilters);
       statusFilter.addEventListener("change", applyFilters);
+      typeFilter?.addEventListener("change", applyFilters); // ✅ NEW
       resetBtn.addEventListener("click", () => {
         searchInput.value = "";
         statusFilter.value = "";
+        if (typeFilter) typeFilter.value = ""; // ✅ NEW
         currentPage = 1;
         renderTable(allAssets);
       });
@@ -58,38 +60,20 @@ document.addEventListener("DOMContentLoaded", () => {
   function applyFilters() {
     const searchTerm = searchInput.value.toLowerCase();
     const status = statusFilter.value.toLowerCase();
+    const type = typeFilter?.value.toLowerCase(); // ✅ NEW
 
     const filtered = allAssets.filter(asset => {
       const matchesSearch =
         asset.assetId?.toLowerCase().includes(searchTerm) ||
         asset.model?.toLowerCase().includes(searchTerm);
       const matchesStatus = !status || asset.status?.toLowerCase() === status;
-      return matchesSearch && matchesStatus;
+      const matchesType = !type || asset.type?.toLowerCase() === type; // ✅ NEW
+      return matchesSearch && matchesStatus && matchesType; // ✅ UPDATED
     });
 
     currentPage = 1;
     renderTable(filtered);
-
-// Asset Type dropdown
-    function populateAssetDropdown() {
-  const assetDropdown = document.getElementById("assetDropdown");
-
-  // Get unique asset types from allAssets
-  const uniqueTypes = [...new Set(allAssets.map(asset => asset.type).filter(Boolean))];
-
-  console.log("Asset Types for dropdown:", uniqueTypes); // For debug
-
-  // Clear existing options
-  assetDropdown.innerHTML = `<option value="">-- All Types --</option>`;
-
-  // Add each unique type to dropdown
-  uniqueTypes.forEach(type => {
-    const option = document.createElement("option");
-    option.value = type;
-    option.textContent = type.charAt(0).toUpperCase() + type.slice(1); // Capitalize
-    assetDropdown.appendChild(option);
-  });
-}
+  }
 
   // 🖥️ Render assets with pagination
   function renderTable(data) {
