@@ -38,6 +38,7 @@ document.addEventListener("DOMContentLoaded", () => {
   async function loadAssets() {
     const snapshot = await getDocs(assetsCollection);
     allAssets = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+    populateAssetDropdown();
     renderTable(allAssets);
 
     // Add filters if elements exist
