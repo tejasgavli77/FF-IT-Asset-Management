@@ -68,6 +68,31 @@ document.addEventListener("DOMContentLoaded", () => {
 
     currentPage = 1;
     renderTable(filtered);
+
+    // Asset List Dropdown
+const assetDropdown = document.getElementById("assetDropdown");
+
+function populateAssetDropdown() {
+  const uniqueIds = [...new Set(allAssets.map(asset => asset.assetId).filter(Boolean))];
+  assetDropdown.innerHTML = `<option value="">-- All Assets --</option>`;
+  uniqueIds.forEach(id => {
+    const option = document.createElement("option");
+    option.value = id;
+    option.textContent = id;
+    assetDropdown.appendChild(option);
+  });
+}
+
+assetDropdown?.addEventListener("change", () => {
+  const selectedId = assetDropdown.value;
+  const filtered = selectedId
+    ? allAssets.filter(asset => asset.assetId === selectedId)
+    : allAssets;
+  currentPage = 1;
+  renderTable(filtered);
+});
+
+    
   }
 
   // 🖥️ Render assets with pagination
