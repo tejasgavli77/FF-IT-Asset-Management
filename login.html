@@ -1,50 +1,22 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <title>Login - FF Asset Inventory</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Login</title>
+  <script defer src="auth.js"></script>
 </head>
 <body>
-  <h2>Login</h2>
+  <h2>IT Asset Management - Login</h2>
   <form id="loginForm">
-    <label for="email">Email:</label>
-    <input type="email" id="email" required />
-    <br/>
+    <label for="username">Username:</label>
+    <input type="text" id="username" required><br>
+
     <label for="password">Password:</label>
-    <input type="password" id="password" required />
-    <br/>
+    <input type="password" id="password" required><br>
+
     <button type="submit">Login</button>
   </form>
-
-  <script type="module">
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-app.js";
-    import { getAuth, signInWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-auth.js";
-
-    const firebaseConfig = {
-    apiKey: "AIzaSyAspahfUUGnBzh0mh6U53evGQzWQP956xQ",
-    authDomain: "ffassetmanager.firebaseapp.com",
-    projectId: "ffassetmanager",
-    storageBucket: "ffassetmanager.appspot.com",
-    messagingSenderId: "803858971008",
-    appId: "1:803858971008:web:72d69ddce6cbc85010a965"
-  };
-
-    const app = initializeApp(firebaseConfig);
-    const auth = getAuth(app);
-
-    document.getElementById('loginForm').addEventListener('submit', (e) => {
-      e.preventDefault();
-      const email = document.getElementById('email').value;
-      const password = document.getElementById('password').value;
-
-      signInWithEmailAndPassword(auth, email, password)
-        .then(() => {
-          window.location.href = "add-asset.html";
-        })
-        .catch((error) => {
-          alert("Login failed: " + error.message);
-        });
-    });
-  </script>
+  <p id="error" style="color:red;"></p>
 </body>
 </html>
