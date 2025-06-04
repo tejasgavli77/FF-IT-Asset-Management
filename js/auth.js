@@ -3,20 +3,22 @@
 const USERNAME = "Asset Admin";
 const PASSWORD = "@dm!nAsseT";
 
-// Run on login page
+// ✅ Login function (called from login.html)
 function login() {
   const user = document.getElementById("username").value.trim();
   const pass = document.getElementById("password").value.trim();
+  const error = document.getElementById("error");
 
   if (user === USERNAME && pass === PASSWORD) {
     localStorage.setItem("isLoggedIn", "true");
-    window.location.href = "asset-inventory.html"; // Redirect after login
+    window.location.href = "add-asset.html"; // Redirect to your first protected page
   } else {
-    document.getElementById("error").classList.remove("hidden");
+    error.classList.remove("hidden");
+    error.textContent = "Invalid credentials. Please try again.";
   }
 }
 
-// Run on protected pages
+// ✅ Protection check (for secured pages like add-asset.html)
 function checkAuth() {
   const isLoggedIn = localStorage.getItem("isLoggedIn");
   if (isLoggedIn !== "true") {
@@ -24,6 +26,7 @@ function checkAuth() {
   }
 }
 
+// ✅ Logout
 function logout() {
   localStorage.removeItem("isLoggedIn");
   window.location.href = "login.html";
