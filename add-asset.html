@@ -25,6 +25,8 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+  <script src="auth.js"></script>
+  <script>checkAuth();</script>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Add Asset | IT Asset Management</title>
@@ -49,6 +51,7 @@
   <i class="bi bi-people-fill"></i> User Asset Overview
 </a>
     </nav>
+    <button onclick="logout()" class="bg-red-500 text-white px-4 py-2 rounded">Logout</button>
   </aside>
 
   <!-- Main Content -->
