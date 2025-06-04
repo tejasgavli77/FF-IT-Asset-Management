@@ -4,18 +4,97 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Login</title>
-  <script src="auth.js" defer></script>
-  <script>
+
+  <!-- Firebase Auth -->
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+    import { getAuth, signInWithEmailAndPassword, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyAspahfUUGnBzh0mh6U53evGQzWQP956xQ",
+      authDomain: "ffassetmanager.firebaseapp.com",
+      projectId: "ffassetmanager",
+      storageBucket: "ffassetmanager.appspot.com",
+      messagingSenderId: "803858971008",
+      appId: "1:803858971008:web:72d69ddce6cbc85010a965"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+
     document.addEventListener("DOMContentLoaded", () => {
-      document.getElementById("loginBtn").addEventListener("click", login);
+      const loginBtn = document.getElementById("loginBtn");
+      const errorDiv = document.getElementById("error");
+
+      loginBtn.addEventListener("click", () => {
+        const usernameInput = document.getElementById("username").value.trim();
+        const passwordInput = document.getElementById("password").value;
+
+        // Hardcoded username mapping to Firebase email
+        const validUsername = "Asset Admin";
+        const firebaseEmail = "admin@ffasset.com"; // Must exist in Firebase Authentication
+
+        if (usernameInput === validUsername) {
+          signInWithEmailAndPassword(auth, firebaseEmail, passwordInput)
+            .then(() => {
+              window.location.href = "add-asset.html"; // ✅ Redirect after login
+            })
+            .catch((error) => {
+              errorDiv.textContent = "Login failed: " + error.message;
+              errorDiv.style.display = "block";
+            });
+        } else {
+          errorDiv.textContent = "Invalid username.";
+          errorDiv.style.display = "block";
+        }
+      });
+
+      // Auto-redirect if already logged in
+      onAuthStateChanged(auth, (user) => {
+        if (user) {
+          window.location.href = "add-asset.html";
+        }
+      });
     });
   </script>
+
   <style>
-    body { font-family: Arial, sans-serif; background-color: #f5f5f5; display: flex; align-items: center; justify-content: center; height: 100vh; }
-    .login-box { background: white; padding: 2rem; border-radius: 8px; box-shadow: 0 0 10px rgba(0,0,0,0.1); }
-    input { width: 100%; padding: 0.5rem; margin-bottom: 1rem; }
-    button { padding: 0.5rem 1rem; background-color: #007bff; color: white; border: none; cursor: pointer; border-radius: 4px; }
-    #error { color: red; margin-top: 10px; }
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #f5f5f5;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
+    }
+    .login-box {
+      background: white;
+      padding: 2rem;
+      border-radius: 8px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.1);
+      width: 300px;
+    }
+    input {
+      width: 100%;
+      padding: 0.5rem;
+      margin-bottom: 1rem;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+    }
+    button {
+      padding: 0.5rem 1rem;
+      background-color: #007bff;
+      color: white;
+      border: none;
+      cursor: pointer;
+      border-radius: 4px;
+      width: 100%;
+    }
+    #error {
+      color: red;
+      margin-top: 10px;
+      display: none;
+    }
   </style>
 </head>
 <body>
@@ -24,8 +103,9 @@
     <input type="text" id="username" placeholder="Username" />
     <input type="password" id="password" placeholder="Password" />
     <button id="loginBtn">Login</button>
-    <div id="error" class="hidden"></div>
+    <div id="error"></div>
   </div>
 </body>
 </html>
+
 
