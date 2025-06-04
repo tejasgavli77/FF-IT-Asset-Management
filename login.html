@@ -1,22 +1,19 @@
+<!-- login.html -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Login</title>
+  <meta charset="UTF-8">
+  <title>Login - Asset Management</title>
   <script defer src="auth.js"></script>
+  <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
 </head>
-<body>
-  <h2>IT Asset Management - Login</h2>
-  <form id="loginForm">
-    <label for="username">Username:</label>
-    <input type="text" id="username" required><br>
-
-    <label for="password">Password:</label>
-    <input type="password" id="password" required><br>
-
-    <button type="submit">Login</button>
-  </form>
-  <p id="error" style="color:red;"></p>
+<body class="flex items-center justify-center h-screen bg-gray-100">
+  <div class="bg-white p-8 rounded shadow-md w-full max-w-sm">
+    <h2 class="text-2xl font-bold mb-4 text-center">Admin Login</h2>
+    <input id="username" type="text" placeholder="Username" class="w-full mb-2 p-2 border rounded" />
+    <input id="password" type="password" placeholder="Password" class="w-full mb-4 p-2 border rounded" />
+    <button onclick="login()" class="w-full bg-blue-500 hover:bg-blue-600 text-white py-2 rounded">Login</button>
+    <p id="error" class="text-red-500 text-sm mt-3 text-center hidden">Invalid credentials</p>
+  </div>
 </body>
 </html>
