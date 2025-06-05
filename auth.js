@@ -20,7 +20,7 @@ window.login = function () {
   const errorDiv = document.getElementById("error");
 
   // Map username to Firebase email
-  const email = usernameInput.toLowerCase() === "asset admin" ? "assetadmin@techstrategy.co" : usernameInput;
+  const email = usernameInput.toLowerCase() === "Asset Admin" ? "it@finalfunnel.com" : usernameInput;
 
   signInWithEmailAndPassword(auth, email, password)
     .then(() => {
