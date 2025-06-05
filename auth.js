@@ -31,14 +31,5 @@ window.login = function () {
       errorDiv.textContent = "Login failed: " + error.message;
       errorDiv.classList.remove("hidden");
 
-      // 🚪 Logout handler
-export function logout() {
-  signOut(auth)
-    .then(() => {
-      window.location.href = "login.html";
-    })
-    .catch((error) => {
-      console.error("Logout failed", error);
-    });
     });
 };
