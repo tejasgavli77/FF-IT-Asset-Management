@@ -7,89 +7,213 @@
   <script src="https://cdn.tailwindcss.com"></script>
   <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css" rel="stylesheet"/>
 
-  <!-- Firebase Auth Check -->
-  <script type="module">
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
-    import { getFirestore, collection, getDocs, doc, updateDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
-    import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+ <!-- Firebase Auth + Allocation Script -->
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+  import {
+    getFirestore,
+    collection,
+    getDocs,
+    doc,
+    updateDoc,
+    arrayUnion
+  } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+  import {
+    getAuth,
+    onAuthStateChanged
+  } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
 
-    const firebaseConfig = {
-      apiKey: "AIzaSyAspahfUUGnBzh0mh6U53evGQzWQP956xQ",
-      authDomain: "ffassetmanager.firebaseapp.com",
-      projectId: "ffassetmanager",
-      storageBucket: "ffassetmanager.appspot.com",
-      messagingSenderId: "803858971008",
-      appId: "1:803858971008:web:72d69ddce6cbc85010a965"
-    };
+  const firebaseConfig = {
+    apiKey: "AIzaSyAspahfUUGnBzh0mh6U53evGQzWQP956xQ",
+    authDomain: "ffassetmanager.firebaseapp.com",
+    projectId: "ffassetmanager",
+    storageBucket: "ffassetmanager.appspot.com",
+    messagingSenderId: "803858971008",
+    appId: "1:803858971008:web:72d69ddce6cbc85010a965"
+  };
 
-    const app = initializeApp(firebaseConfig);
-    const db = getFirestore(app);
-    const auth = getAuth(app);
+  const app = initializeApp(firebaseConfig);
+  const db = getFirestore(app);
+  const auth = getAuth(app);
 
-    // Auth check
-    onAuthStateChanged(auth, user => {
-      if (!user) {
-        window.location.href = "login.html";
+  // 🔐 Auth check
+  onAuthStateChanged(auth, user => {
+    if (!user) {
+      window.location.href = "login.html";
+    }
+  });
+
+  // 🔓 Logout function
+  window.logout = function () {
+    auth.signOut().then(() => {
+      window.location.href = "login.html";
+    });
+  };
+
+  // ⚙️ Main logic
+  document.addEventListener('DOMContentLoaded', async () => {
+    const assetSelect = document.getElementById("assetSelect");
+    const assignBtn = document.getElementById("assignBtn");
+    const logoutBtn = document.getElementById("logoutBtn");
+
+    // Load available assets
+    const snapshot = await getDocs(collection(db, "assets"));
+    snapshot.forEach(docSnap => {
+      const asset = docSnap.data();
+      if (asset.status === "Available") {
+        const option = document.createElement("option");
+        option.value = docSnap.id;
+        option.textContent = `${asset.assetName} (${asset.assetId})`;
+        assetSelect.appendChild(option);
       }
     });
 
-    // Logout function
-    window.logout = function () {
-      auth.signOut().then(() => {
-        window.location.href = "login.html";
-      });
-    };
+    // Assign asset
+    assignBtn.addEventListener("click", async () => {
+      const assetId = assetSelect.value;
+      const userName = document.getElementById("userName").value.trim();
+      const allocationDate = document.getElementById("allocationDate").value;
 
-    // Asset dropdown + allocation logic
-    document.addEventListener('DOMContentLoaded', async () => {
-      const assetSelect = document.getElementById("assetSelect");
-      const assignBtn = document.getElementById("assignBtn");
+      if (!assetId || !userName || !allocationDate) {
+        alert("Please fill in all fields.");
+        return;
+      }
 
-      // Load available assets
-      const querySnapshot = await getDocs(collection(db, "assets"));
-      querySnapshot.forEach(docSnap => {
-        const asset = docSnap.data();
-        if (asset.status === "Available") {
-          const option = document.createElement("option");
-          option.value = docSnap.id;
-          option.textContent = `${asset.assetName} (${asset.assetId})`;
-          assetSelect.appendChild(option);
-        }
-      });
-
-      // Assign asset to user
-      assignBtn.addEventListener("click", async () => {
-        const assetId = assetSelect.value;
-        const userName = document.getElementById("userName").value.trim();
-        const allocationDate = document.getElementById("allocationDate").value;
-
-        if (!assetId || !userName || !allocationDate) {
-          alert("Please fill in all fields.");
-          return;
-        }
-
+      try {
         const assetRef = doc(db, "assets", assetId);
         await updateDoc(assetRef, {
           status: "Allocated",
           allocatedTo: userName,
-          allocationDate: allocationDate
+          allocationDate: allocationDate,
+          history: arrayUnion({
+            action: "Allocated",
+            user: userName,
+            date: allocationDate
+          })
         });
 
-        alert("Asset allocated successfully.");
+        alert("✅ Asset allocated successfully.");
         location.reload();
-      });
-
-      // Logout button hook
-      const logoutBtn = document.getElementById("logoutBtn");
-      if (logoutBtn) {
-        logoutBtn.addEventListener("click", () => {
-          if (typeof window.logout === 'function') {
-            window.logout();
-          }
-        });
+      } catch (error) {
+        console.error("❌ Allocation error:", error);
+        alert("Something went wrong while allocating the asset.");
       }
     });
-  </script>
+
+    // Logout
+    if (logoutBtn) {
+      logoutBtn.addEventListener("click", () => {
+        if (typeof window.logout === "function") {
+          window.logout();
+        }
+      });
+    }
+  });
+</script>
+<!-- Firebase Auth + Allocation Script -->
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+  import {
+    getFirestore,
+    collection,
+    getDocs,
+    doc,
+    updateDoc,
+    arrayUnion
+  } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+  import {
+    getAuth,
+    onAuthStateChanged
+  } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+
+  const firebaseConfig = {
+    apiKey: "AIzaSyAspahfUUGnBzh0mh6U53evGQzWQP956xQ",
+    authDomain: "ffassetmanager.firebaseapp.com",
+    projectId: "ffassetmanager",
+    storageBucket: "ffassetmanager.appspot.com",
+    messagingSenderId: "803858971008",
+    appId: "1:803858971008:web:72d69ddce6cbc85010a965"
+  };
+
+  const app = initializeApp(firebaseConfig);
+  const db = getFirestore(app);
+  const auth = getAuth(app);
+
+  // 🔐 Auth check
+  onAuthStateChanged(auth, user => {
+    if (!user) {
+      window.location.href = "login.html";
+    }
+  });
+
+  // 🔓 Logout function
+  window.logout = function () {
+    auth.signOut().then(() => {
+      window.location.href = "login.html";
+    });
+  };
+
+  // ⚙️ Main logic
+  document.addEventListener('DOMContentLoaded', async () => {
+    const assetSelect = document.getElementById("assetSelect");
+    const assignBtn = document.getElementById("assignBtn");
+    const logoutBtn = document.getElementById("logoutBtn");
+
+    // Load available assets
+    const snapshot = await getDocs(collection(db, "assets"));
+    snapshot.forEach(docSnap => {
+      const asset = docSnap.data();
+      if (asset.status === "Available") {
+        const option = document.createElement("option");
+        option.value = docSnap.id;
+        option.textContent = `${asset.assetName} (${asset.assetId})`;
+        assetSelect.appendChild(option);
+      }
+    });
+
+    // Assign asset
+    assignBtn.addEventListener("click", async () => {
+      const assetId = assetSelect.value;
+      const userName = document.getElementById("userName").value.trim();
+      const allocationDate = document.getElementById("allocationDate").value;
+
+      if (!assetId || !userName || !allocationDate) {
+        alert("Please fill in all fields.");
+        return;
+      }
+
+      try {
+        const assetRef = doc(db, "assets", assetId);
+        await updateDoc(assetRef, {
+          status: "Allocated",
+          allocatedTo: userName,
+          allocationDate: allocationDate,
+          history: arrayUnion({
+            action: "Allocated",
+            user: userName,
+            date: allocationDate
+          })
+        });
+
+        alert("✅ Asset allocated successfully.");
+        location.reload();
+      } catch (error) {
+        console.error("❌ Allocation error:", error);
+        alert("Something went wrong while allocating the asset.");
+      }
+    });
+
+    // Logout
+    if (logoutBtn) {
+      logoutBtn.addEventListener("click", () => {
+        if (typeof window.logout === "function") {
+          window.logout();
+        }
+      });
+    }
+  });
+</script>
+
 </head>
 <body class="flex h-screen bg-gray-100">
 
