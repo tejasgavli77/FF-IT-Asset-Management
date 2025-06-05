@@ -6,61 +6,67 @@
   <title>Login</title>
 
   <!-- Firebase Auth -->
-  <script type="module">
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
-    import { getAuth, signInWithEmailAndPassword, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+ <script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+  import { getAuth, signInWithEmailAndPassword, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
 
-    const firebaseConfig = {
-      apiKey: "AIzaSyAspahfUUGnBzh0mh6U53evGQzWQP956xQ",
-      authDomain: "ffassetmanager.firebaseapp.com",
-      projectId: "ffassetmanager",
-      storageBucket: "ffassetmanager.appspot.com",
-      messagingSenderId: "803858971008",
-      appId: "1:803858971008:web:72d69ddce6cbc85010a965"
-    };
+  const firebaseConfig = {
+    apiKey: "AIzaSyAspahfUUGnBzh0mh6U53evGQzWQP956xQ",
+    authDomain: "ffassetmanager.firebaseapp.com",
+    projectId: "ffassetmanager",
+    storageBucket: "ffassetmanager.appspot.com",
+    messagingSenderId: "803858971008",
+    appId: "1:803858971008:web:72d69ddce6cbc85010a965"
+  };
 
-    const app = initializeApp(firebaseConfig);
-    const auth = getAuth(app);
+  const app = initializeApp(firebaseConfig);
+  const auth = getAuth(app);
 
-    document.addEventListener("DOMContentLoaded", () => {
-      const loginBtn = document.getElementById("loginBtn");
-      const errorDiv = document.getElementById("error");
+  document.addEventListener("DOMContentLoaded", () => {
+    const loginBtn = document.getElementById("loginBtn");
+    const errorDiv = document.getElementById("error");
 
-      loginBtn.addEventListener("click", () => {
-        const usernameInput = document.getElementById("username").value.trim();
-        const passwordInput = document.getElementById("password").value;
+    loginBtn.addEventListener("click", () => {
+      const email = document.getElementById("username").value.trim();
+      const password = document.getElementById("password").value;
 
-        // Fixed mapping to Firebase email
-        const expectedUsername = "Asset Admin";
-        const firebaseEmail = "it@finalfunnl.com"; // The only valid Firebase user
-
-        if (usernameInput === expectedUsername) {
-          signInWithEmailAndPassword(auth, firebaseEmail, passwordInput)
-            .then(() => {
-              window.location.href = "add-asset.html"; // Redirect after successful login
-            })
-            .catch((error) => {
-              if (error.code === 'auth/too-many-requests') {
-                errorDiv.textContent = "Too many attempts. Please wait or reset password.";
-              } else {
-                errorDiv.textContent = "Login failed: " + error.message;
-              }
-              errorDiv.style.display = "block";
-            });
-        } else {
-          errorDiv.textContent = "Invalid username.";
-          errorDiv.style.display = "block";
-        }
-      });
-
-      // If already logged in, redirect to add asset
-      onAuthStateChanged(auth, (user) => {
-        if (user) {
+      signInWithEmailAndPassword(auth, email, password)
+        .then(() => {
           window.location.href = "add-asset.html";
-        }
-      });
+        })
+        .catch((error) => {
+          switch (error.code) {
+            case 'auth/user-not-found':
+              errorDiv.textContent = "No user found with this email.";
+              break;
+            case 'auth/wrong-password':
+              errorDiv.textContent = "Incorrect password.";
+              break;
+            case 'auth/invalid-email':
+              errorDiv.textContent = "Invalid email format.";
+              break;
+            case 'auth/invalid-credential':
+              errorDiv.textContent = "Invalid credentials provided.";
+              break;
+            case 'auth/too-many-requests':
+              errorDiv.textContent = "Too many login attempts. Please try again later.";
+              break;
+            default:
+              errorDiv.textContent = "Login failed: " + error.message;
+          }
+          errorDiv.style.display = "block";
+        });
     });
-  </script>
+
+    // Optional: redirect if already logged in
+    onAuthStateChanged(auth, (user) => {
+      if (user) {
+        window.location.href = "add-asset.html";
+      }
+    });
+  });
+</script>
+
 
   <style>
     body {
