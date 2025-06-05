@@ -94,6 +94,20 @@
         </button>
       </form>
     </div>
+<script type="module">
+  import './auth.js';
+
+  document.addEventListener('DOMContentLoaded', () => {
+    const logoutBtn = document.getElementById("logoutBtn");
+    if (logoutBtn) {
+      logoutBtn.addEventListener("click", () => {
+        window.logout(); // Call logout defined in auth.js
+      });
+    }
+  });
+</script>
+
+    
   </main>
   
 </script>
