@@ -7,213 +7,35 @@
   <script src="https://cdn.tailwindcss.com"></script>
   <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css" rel="stylesheet"/>
 
- <!-- Firebase Auth + Allocation Script -->
-<script type="module">
-  import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
-  import {
-    getFirestore,
-    collection,
-    getDocs,
-    doc,
-    updateDoc,
-    arrayUnion
-  } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
-  import {
-    getAuth,
-    onAuthStateChanged
-  } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+  <!-- ✅ Firebase Auth Check -->
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+    import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
 
-  const firebaseConfig = {
-    apiKey: "AIzaSyAspahfUUGnBzh0mh6U53evGQzWQP956xQ",
-    authDomain: "ffassetmanager.firebaseapp.com",
-    projectId: "ffassetmanager",
-    storageBucket: "ffassetmanager.appspot.com",
-    messagingSenderId: "803858971008",
-    appId: "1:803858971008:web:72d69ddce6cbc85010a965"
-  };
+    const firebaseConfig = {
+      apiKey: "AIzaSyAspahfUUGnBzh0mh6U53evGQzWQP956xQ",
+      authDomain: "ffassetmanager.firebaseapp.com",
+      projectId: "ffassetmanager",
+      storageBucket: "ffassetmanager.appspot.com",
+      messagingSenderId: "803858971008",
+      appId: "1:803858971008:web:72d69ddce6cbc85010a965"
+    };
 
-  const app = initializeApp(firebaseConfig);
-  const db = getFirestore(app);
-  const auth = getAuth(app);
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
 
-  // 🔐 Auth check
-  onAuthStateChanged(auth, user => {
-    if (!user) {
-      window.location.href = "login.html";
-    }
-  });
-
-  // 🔓 Logout function
-  window.logout = function () {
-    auth.signOut().then(() => {
-      window.location.href = "login.html";
-    });
-  };
-
-  // ⚙️ Main logic
-  document.addEventListener('DOMContentLoaded', async () => {
-    const assetSelect = document.getElementById("assetSelect");
-    const assignBtn = document.getElementById("assignBtn");
-    const logoutBtn = document.getElementById("logoutBtn");
-
-    // Load available assets
-    const snapshot = await getDocs(collection(db, "assets"));
-    snapshot.forEach(docSnap => {
-      const asset = docSnap.data();
-      if (asset.status === "Available") {
-        const option = document.createElement("option");
-        option.value = docSnap.id;
-        option.textContent = `${asset.assetName} (${asset.assetId})`;
-        assetSelect.appendChild(option);
+    onAuthStateChanged(auth, user => {
+      if (!user) {
+        window.location.href = "login.html";
       }
     });
 
-    // Assign asset
-    assignBtn.addEventListener("click", async () => {
-      const assetId = assetSelect.value;
-      const userName = document.getElementById("userName").value.trim();
-      const allocationDate = document.getElementById("allocationDate").value;
-
-      if (!assetId || !userName || !allocationDate) {
-        alert("Please fill in all fields.");
-        return;
-      }
-
-      try {
-        const assetRef = doc(db, "assets", assetId);
-        await updateDoc(assetRef, {
-          status: "Allocated",
-          allocatedTo: userName,
-          allocationDate: allocationDate,
-          history: arrayUnion({
-            action: "Allocated",
-            user: userName,
-            date: allocationDate
-          })
-        });
-
-        alert("✅ Asset allocated successfully.");
-        location.reload();
-      } catch (error) {
-        console.error("❌ Allocation error:", error);
-        alert("Something went wrong while allocating the asset.");
-      }
-    });
-
-    // Logout
-    if (logoutBtn) {
-      logoutBtn.addEventListener("click", () => {
-        if (typeof window.logout === "function") {
-          window.logout();
-        }
+    window.logout = function () {
+      auth.signOut().then(() => {
+        window.location.href = "login.html";
       });
-    }
-  });
-</script>
-<!-- Firebase Auth + Allocation Script -->
-<script type="module">
-  import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
-  import {
-    getFirestore,
-    collection,
-    getDocs,
-    doc,
-    updateDoc,
-    arrayUnion
-  } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
-  import {
-    getAuth,
-    onAuthStateChanged
-  } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-
-  const firebaseConfig = {
-    apiKey: "AIzaSyAspahfUUGnBzh0mh6U53evGQzWQP956xQ",
-    authDomain: "ffassetmanager.firebaseapp.com",
-    projectId: "ffassetmanager",
-    storageBucket: "ffassetmanager.appspot.com",
-    messagingSenderId: "803858971008",
-    appId: "1:803858971008:web:72d69ddce6cbc85010a965"
-  };
-
-  const app = initializeApp(firebaseConfig);
-  const db = getFirestore(app);
-  const auth = getAuth(app);
-
-  // 🔐 Auth check
-  onAuthStateChanged(auth, user => {
-    if (!user) {
-      window.location.href = "login.html";
-    }
-  });
-
-  // 🔓 Logout function
-  window.logout = function () {
-    auth.signOut().then(() => {
-      window.location.href = "login.html";
-    });
-  };
-
-  // ⚙️ Main logic
-  document.addEventListener('DOMContentLoaded', async () => {
-    const assetSelect = document.getElementById("assetSelect");
-    const assignBtn = document.getElementById("assignBtn");
-    const logoutBtn = document.getElementById("logoutBtn");
-
-    // Load available assets
-    const snapshot = await getDocs(collection(db, "assets"));
-    snapshot.forEach(docSnap => {
-      const asset = docSnap.data();
-      if (asset.status === "Available") {
-        const option = document.createElement("option");
-        option.value = docSnap.id;
-        option.textContent = `${asset.assetName} (${asset.assetId})`;
-        assetSelect.appendChild(option);
-      }
-    });
-
-    // Assign asset
-    assignBtn.addEventListener("click", async () => {
-      const assetId = assetSelect.value;
-      const userName = document.getElementById("userName").value.trim();
-      const allocationDate = document.getElementById("allocationDate").value;
-
-      if (!assetId || !userName || !allocationDate) {
-        alert("Please fill in all fields.");
-        return;
-      }
-
-      try {
-        const assetRef = doc(db, "assets", assetId);
-        await updateDoc(assetRef, {
-          status: "Allocated",
-          allocatedTo: userName,
-          allocationDate: allocationDate,
-          history: arrayUnion({
-            action: "Allocated",
-            user: userName,
-            date: allocationDate
-          })
-        });
-
-        alert("✅ Asset allocated successfully.");
-        location.reload();
-      } catch (error) {
-        console.error("❌ Allocation error:", error);
-        alert("Something went wrong while allocating the asset.");
-      }
-    });
-
-    // Logout
-    if (logoutBtn) {
-      logoutBtn.addEventListener("click", () => {
-        if (typeof window.logout === "function") {
-          window.logout();
-        }
-      });
-    }
-  });
-</script>
-
+    };
+  </script>
 </head>
 <body class="flex h-screen bg-gray-100">
 
@@ -233,8 +55,10 @@
       <a href="user-asset-overview.html" class="flex items-center gap-2 text-gray-700 hover:text-blue-600">
         <i class="bi bi-people-fill"></i> User Asset Overview
       </a>
+      <button id="logoutBtn" class="flex items-center gap-2 text-red-600 hover:text-red-800">
+        <i class="bi bi-box-arrow-right"></i> Logout
+      </button>
     </nav>
-    <button id="logoutBtn" class="mt-6 bg-red-500 text-white px-4 py-2 rounded w-full">Logout</button>
   </aside>
 
   <!-- Main Content -->
@@ -243,32 +67,123 @@
       <h1 class="text-3xl font-semibold text-gray-800">Allocate Asset</h1>
     </header>
 
-    <!-- Allocation Form Card -->
     <div class="bg-white rounded-lg shadow-md p-6 mb-8">
       <h2 class="text-xl font-semibold mb-4">Assign Asset to User</h2>
       <form id="allocateForm" class="space-y-4">
         <div class="mb-4">
-          <label for="assetSelect" class="block text-sm font-medium text-gray-700 mb-1">Select Asset</label>
+          <label for="asset-id" class="block text-sm font-medium text-gray-700 mb-1">Select Asset</label>
           <select id="assetSelect" class="w-full border border-gray-300 rounded px-3 py-2">
             <option value="">-- Select an Asset --</option>
           </select>
         </div>
-
         <div class="mb-4">
           <label for="userName" class="block text-sm font-medium text-gray-700 mb-1">User Name / Employee ID</label>
           <input type="text" id="userName" class="w-full border border-gray-300 rounded px-3 py-2" required />
         </div>
-
         <div class="mb-4">
           <label for="allocationDate" class="block text-sm font-medium text-gray-700 mb-1">Allocation Date</label>
           <input type="date" id="allocationDate" class="w-full border border-gray-300 rounded px-3 py-2" required />
         </div>
-
         <button type="button" id="assignBtn" class="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded">
           Assign Asset
         </button>
       </form>
     </div>
   </main>
+
+  <!-- Script: Load Assets & Assign -->
+  <script type="module">
+    import {
+      initializeApp
+    } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+    import {
+      getFirestore,
+      collection,
+      getDocs,
+      doc,
+      updateDoc,
+      arrayUnion
+    } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyAspahfUUGnBzh0mh6U53evGQzWQP956xQ",
+      authDomain: "ffassetmanager.firebaseapp.com",
+      projectId: "ffassetmanager",
+      storageBucket: "ffassetmanager.appspot.com",
+      messagingSenderId: "803858971008",
+      appId: "1:803858971008:web:72d69ddce6cbc85010a965"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+
+    document.addEventListener('DOMContentLoaded', async () => {
+      const assetSelect = document.getElementById("assetSelect");
+      const assignBtn = document.getElementById("assignBtn");
+      const logoutBtn = document.getElementById("logoutBtn");
+
+      // Load available assets
+      const querySnapshot = await getDocs(collection(db, "assets"));
+      querySnapshot.forEach(docSnap => {
+        const asset = docSnap.data();
+        if (asset.status === "Available") {
+          const option = document.createElement("option");
+          option.value = docSnap.id;
+          option.textContent = `${asset.assetModel} (${asset.assetId})`; // ✅ Fixed label
+          option.dataset.assetId = asset.assetId;
+          option.dataset.assetModel = asset.assetModel;
+          option.dataset.assetType = asset.assetType;
+          option.dataset.purchaseDate = asset.purchaseDate || "";
+          assetSelect.appendChild(option);
+        }
+      });
+
+      // Assign asset
+      assignBtn.addEventListener("click", async () => {
+        const assetId = assetSelect.value;
+        const selectedOption = assetSelect.options[assetSelect.selectedIndex];
+        const assetModel = selectedOption.dataset.assetModel;
+        const assetType = selectedOption.dataset.assetType;
+        const assetAssetId = selectedOption.dataset.assetId;
+        const purchaseDate = selectedOption.dataset.purchaseDate;
+
+        const userName = document.getElementById("userName").value.trim();
+        const allocationDate = document.getElementById("allocationDate").value;
+
+        if (!assetId || !userName || !allocationDate) {
+          alert("Please fill in all fields.");
+          return;
+        }
+
+        const assetRef = doc(db, "assets", assetId);
+        await updateDoc(assetRef, {
+          allocatedTo: userName,
+          allocationDate: allocationDate,
+          status: "Allocated",
+          assetId: assetAssetId,
+          assetModel: assetModel,
+          assetType: assetType,
+          purchaseDate: purchaseDate,
+          history: arrayUnion({
+            action: "Allocated",
+            user: userName,
+            date: allocationDate
+          })
+        });
+
+        alert("✅ Asset allocated successfully.");
+        location.reload();
+      });
+
+      if (logoutBtn) {
+        logoutBtn.addEventListener("click", () => {
+          if (typeof window.logout === 'function') {
+            window.logout();
+          }
+        });
+      }
+    });
+  </script>
+
 </body>
 </html>
