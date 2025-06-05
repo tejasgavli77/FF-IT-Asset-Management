@@ -1,6 +1,11 @@
 // auth.js
 import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
-import { getAuth, signInWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+import {
+  getAuth,
+  signInWithEmailAndPassword,
+  signOut,
+  onAuthStateChanged
+} from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
 
 const firebaseConfig = {
   apiKey: "AIzaSyAspahfUUGnBzh0mh6U53evGQzWQP956xQ",
@@ -20,7 +25,7 @@ window.login = function () {
   const errorDiv = document.getElementById("error");
 
   // Map username to Firebase email
-  const email = usernameInput.toLowerCase() === "Asset Admin" ? "it@finalfunnel.com" : usernameInput;
+  const email = usernameInput.toLowerCase() === "asset admin" ? "it@finalfunnel.com" : usernameInput;
 
   signInWithEmailAndPassword(auth, email, password)
     .then(() => {
@@ -30,6 +35,24 @@ window.login = function () {
       console.error("Login failed:", error);
       errorDiv.textContent = "Login failed: " + error.message;
       errorDiv.classList.remove("hidden");
+    });
+};
 
+// 🔐 Protect all pages (except login.html)
+onAuthStateChanged(auth, (user) => {
+  const isLoginPage = window.location.pathname.endsWith("login.html");
+  if (!user && !isLoginPage) {
+    window.location.href = "login.html";
+  }
+});
+
+// 🚪 Global logout function (to be called on logout button click)
+window.logout = function () {
+  signOut(auth)
+    .then(() => {
+      window.location.href = "login.html";
+    })
+    .catch((error) => {
+      console.error("Logout failed:", error);
     });
 };
