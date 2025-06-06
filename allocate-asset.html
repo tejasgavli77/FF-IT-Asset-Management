@@ -88,7 +88,7 @@
   // ✅ Hide page until auth is checked
   onAuthStateChanged(auth, user => {
     if (user) {
-      document.body.style.display = "block";
+       document.documentElement.style.visibility = "visible";
     } else {
       window.location.href = "https://techstrategy.co/login.html";
     }
