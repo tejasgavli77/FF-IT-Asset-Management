@@ -38,6 +38,19 @@
       <form id="assetForm" class="space-y-4">
         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div>
+
+<!-- Add New Asset Type -->
+<div>
+  <label class="block text-sm font-medium mb-1">Add New Asset Type</label>
+  <div class="flex gap-2">
+    <input type="text" id="newAssetType" class="w-full p-2 border rounded" placeholder="e.g. Docking Station">
+    <button type="button" id="addAssetTypeBtn" class="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 flex items-center gap-1">
+      <i class="bi bi-plus-circle"></i> Add Type
+    </button>
+  </div>
+</div>
+
+            
             <label class="block text-sm font-medium mb-1">Asset Type</label>
             <select id="assetType" class="w-full p-2 border rounded" required>
               <option value="">Select Type</option>
@@ -175,6 +188,44 @@
         });
       });
     }
+
+// Populate asset types from Firestore collection 'assetTypes'
+async function loadAssetTypes() {
+  const assetTypeSelect = document.getElementById("assetType");
+  assetTypeSelect.innerHTML = `<option value="">Select Type</option>`;
+  const snapshot = await getDocs(collection(db, "assetTypes"));
+  snapshot.forEach(doc => {
+    const type = doc.data().name;
+    const option = document.createElement("option");
+    option.value = type.toLowerCase();
+    option.textContent = type;
+    assetTypeSelect.appendChild(option);
+  });
+}
+
+// Add new asset type to Firestore
+document.getElementById("addAssetTypeBtn").addEventListener("click", async () => {
+  const newType = document.getElementById("newAssetType").value.trim();
+  if (!newType) return alert("Please enter a valid asset type.");
+
+  // Check for duplicate
+  const q = query(collection(db, "assetTypes"), where("name", "==", newType));
+  const existing = await getDocs(q);
+  if (!existing.empty) {
+    alert("This asset type already exists.");
+    return;
+  }
+
+  // Add new type to Firestore
+  await addDoc(collection(db, "assetTypes"), { name: newType });
+  alert("✅ Asset type added.");
+  document.getElementById("newAssetType").value = "";
+  await loadAssetTypes(); // Refresh dropdown
+});
+
+loadAssetTypes(); // Initial load
+
+    
   </script>
 </body>
 </html>
