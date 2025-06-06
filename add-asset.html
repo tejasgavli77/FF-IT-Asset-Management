@@ -155,75 +155,134 @@
   </script>
 
   <!-- Auth Handling (Protect & Logout) -->
+
   <script type="module">
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
-    import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+  import {
+    getFirestore, collection, addDoc, query, where, getDocs
+  } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+  import {
+    getAuth, onAuthStateChanged, signOut
+  } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
 
-    const firebaseConfig = {
-      apiKey: "AIzaSyAspahfUUGnBzh0mh6U53evGQzWQP956xQ",
-      authDomain: "ffassetmanager.firebaseapp.com",
-      projectId: "ffassetmanager",
-      storageBucket: "ffassetmanager.appspot.com",
-      messagingSenderId: "803858971008",
-      appId: "1:803858971008:web:72d69ddce6cbc85010a965"
-    };
+  const firebaseConfig = {
+    apiKey: "AIzaSyAspahfUUGnBzh0mh6U53evGQzWQP956xQ",
+    authDomain: "ffassetmanager.firebaseapp.com",
+    projectId: "ffassetmanager",
+    storageBucket: "ffassetmanager.appspot.com",
+    messagingSenderId: "803858971008",
+    appId: "1:803858971008:web:72d69ddce6cbc85010a965"
+  };
 
-    const app = initializeApp(firebaseConfig);
-    const auth = getAuth(app);
+  const app = initializeApp(firebaseConfig);
+  const db = getFirestore(app);
+  const auth = getAuth(app);
+  const assetsCollection = collection(db, "assets");
 
-    // Redirect if not authenticated
-    onAuthStateChanged(auth, user => {
-      if (!user) window.location.href = "login.html";
-    });
-
-    // Logout logic
-    const logoutBtn = document.getElementById("logoutBtn");
-    if (logoutBtn) {
-      logoutBtn.addEventListener("click", () => {
-        signOut(auth).then(() => {
-          window.location.href = "login.html";
-        }).catch((error) => {
-          alert("Logout failed.");
-          console.error("Logout error:", error);
-        });
-      });
-    }
-
-// Populate asset types from Firestore collection 'assetTypes'
-async function loadAssetTypes() {
-  const assetTypeSelect = document.getElementById("assetType");
-  assetTypeSelect.innerHTML = `<option value="">Select Type</option>`;
-  const snapshot = await getDocs(collection(db, "assetTypes"));
-  snapshot.forEach(doc => {
-    const type = doc.data().name;
-    const option = document.createElement("option");
-    option.value = type.toLowerCase();
-    option.textContent = type;
-    assetTypeSelect.appendChild(option);
+  // 🔒 Protect Page
+  onAuthStateChanged(auth, user => {
+    if (!user) window.location.href = "login.html";
   });
-}
 
-// Add new asset type to Firestore
-document.getElementById("addAssetTypeBtn").addEventListener("click", async () => {
-  const newType = document.getElementById("newAssetType").value.trim();
-  if (!newType) return alert("Please enter a valid asset type.");
+  // 🔓 Logout
+  document.getElementById("logoutBtn").addEventListener("click", () => {
+    signOut(auth).then(() => window.location.href = "login.html")
+      .catch(error => {
+        alert("Logout failed.");
+        console.error("Logout error:", error);
+      });
+  });
 
-  // Check for duplicate
-  const q = query(collection(db, "assetTypes"), where("name", "==", newType));
-  const existing = await getDocs(q);
-  if (!existing.empty) {
-    alert("This asset type already exists.");
-    return;
+  // ⬇️ Load asset types
+  async function loadAssetTypes() {
+    const assetTypeSelect = document.getElementById("assetType");
+    assetTypeSelect.innerHTML = `<option value="">Select Type</option>`;
+    const snapshot = await getDocs(collection(db, "assetTypes"));
+    snapshot.forEach(doc => {
+      const type = doc.data().name;
+      const option = document.createElement("option");
+      option.value = type.toLowerCase();
+      option.textContent = type;
+      assetTypeSelect.appendChild(option);
+    });
   }
 
-  // Add new type to Firestore
-  await addDoc(collection(db, "assetTypes"), { name: newType });
-  alert("✅ Asset type added.");
-  document.getElementById("newAssetType").value = "";
-  await loadAssetTypes(); // Refresh dropdown
-});
+  loadAssetTypes();
 
-loadAssetTypes(); // Initial load
+  // ➕ Add New Type
+  document.getElementById("addAssetTypeBtn").addEventListener("click", async () => {
+    const newType = document.getElementById("newAssetType").value.trim();
+    if (!newType) return alert("Please enter a valid asset type.");
+
+    const q = query(collection(db, "assetTypes"), where("name", "==", newType));
+    const existing = await getDocs(q);
+    if (!existing.empty) {
+      alert("This asset type already exists.");
+      return;
+    }
+
+    await addDoc(collection(db, "assetTypes"), { name: newType });
+    alert("✅ Asset type added.");
+    document.getElementById("newAssetType").value = "";
+    await loadAssetTypes();
+  });
+
+  // 🔢 Asset ID Generator
+  async function generateAssetId(assetType) {
+    const prefixMap = {
+      laptop: "L",
+      desktop: "D",
+      monitor: "M",
+      printer: "P",
+      mouse: "Mo",
+      headset: "H"
+    };
+    const cleanedType = assetType.trim().toLowerCase();
+    const prefix = prefixMap[cleanedType] || "X";
+    let assetId, exists = true;
+
+    while (exists) {
+      const randomId = Math.floor(1000 + Math.random() * 9000);
+      assetId = `${prefix}-${randomId}`;
+      const q = query(assetsCollection, where("assetId", "==", assetId));
+      const snapshot = await getDocs(q);
+      exists = !snapshot.empty;
+    }
+
+    return assetId;
+  }
+
+  // 📝 Add Asset
+  document.getElementById("assetForm").addEventListener("submit", async (e) => {
+    e.preventDefault();
+    const type = document.getElementById("assetType").value;
+    const assetId = await generateAssetId(type);
+
+    const assetData = {
+      assetId,
+      type,
+      model: document.getElementById("model").value,
+      serialNumber: document.getElementById("serialNumber").value,
+      purchaseDate: document.getElementById("purchaseDate").value,
+      status: "Available",
+      history: [{
+        date: new Date().toISOString(),
+        action: "Asset Added",
+        details: "Initial registration"
+      }]
+    };
+
+    try {
+      await addDoc(assetsCollection, assetData);
+      alert(`✅ Asset ${assetId} added successfully!`);
+      document.getElementById("assetForm").reset();
+      await loadAssetTypes(); // optional refresh
+    } catch (error) {
+      console.error("❌ Error adding asset:", error);
+      alert("Failed to add asset.");
+    }
+  });
+</script>
 
     
   </script>
