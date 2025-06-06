@@ -1,31 +1,25 @@
-import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
-import {
-  getFirestore,
-  getDocs,
-  collection,
-  doc,
-  updateDoc,
-} from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js"; 
+import { getFirestore, getDocs, collection, doc, updateDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
-// Firebase Config
+// Firebase config
 const firebaseConfig = {
   apiKey: "AIzaSyAspahfUUGnBzh0mh6U53evGQzWQP956xQ",
   authDomain: "ffassetmanager.firebaseapp.com",
   projectId: "ffassetmanager",
   storageBucket: "ffassetmanager.appspot.com",
   messagingSenderId: "803858971008",
-  appId: "1:803858971008:web:72d69ddce6cbc85010a965",
+  appId: "1:803858971008:web:72d69ddce6cbc85010a965"
 };
 
-// Initialize Firebase
+// Init Firebase
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
+const assetsCollection = collection(db, "assets");
 
-document.addEventListener("DOMContentLoaded", async () => {
-  const assetDropdown = document.getElementById("assetSelect");
-  const assignButton = document.getElementById("assignBtn");
+document.addEventListener('DOMContentLoaded', async function () {
+  const assetDropdown = document.getElementById('assetSelect');
   const urlParams = new URLSearchParams(window.location.search);
-  const preselectedAssetId = urlParams.get("assetId");
+  const preselectedAssetId = urlParams.get('assetId'); // e.g., "L-5347"
 
   assetDropdown.innerHTML = `<option value="">-- Select an Asset --</option>`;
 
@@ -33,13 +27,13 @@ document.addEventListener("DOMContentLoaded", async () => {
     const snapshot = await getDocs(collection(db, "assets"));
     let docIdToSelect = null;
 
-    snapshot.forEach((docSnap) => {
+    snapshot.forEach(docSnap => {
       const asset = docSnap.data();
 
       if (asset.status?.toLowerCase() === "available") {
         const option = document.createElement("option");
         option.value = docSnap.id;
-        option.textContent = `${asset.model || "Unknown"} (${asset.assetId || "N/A"})`;
+        option.textContent = `${asset.assetId} | ${asset.type} | ${asset.model} | ${asset.serialNumber}`;
 
         if (asset.assetId === preselectedAssetId) {
           docIdToSelect = docSnap.id;
@@ -53,15 +47,20 @@ document.addEventListener("DOMContentLoaded", async () => {
       assetDropdown.value = docIdToSelect;
     }
   } catch (error) {
-    console.error("Error loading available assets:", error);
+    console.error("Error loading assets:", error);
     alert("❌ Failed to load available assets.");
   }
 
+  const assignButton = document.getElementById("assignBtn");
   if (assignButton) {
-    assignButton.addEventListener("click", allocateAsset);
+    assignButton.addEventListener('click', allocateAsset);
   }
 });
 
+
+
+
+// Allocate Asset function
 async function allocateAsset() {
   const assetDocId = document.getElementById("assetSelect").value;
   const userName = document.getElementById("userName").value;
@@ -104,8 +103,8 @@ function showToast(message, type) {
   setTimeout(() => toast.remove(), 3000);
 }
 
-// Toast Animation Styles
-const style = document.createElement("style");
+// Toast animation styles
+const style = document.createElement('style');
 style.textContent = `
 @keyframes fadeInOut {
   0% { opacity: 0; transform: translateY(20px); }
