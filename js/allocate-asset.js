@@ -1,59 +1,120 @@
-import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js"; 
-import { getFirestore, getDocs, collection } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+import {
+  getFirestore,
+  getDocs,
+  collection,
+  doc,
+  updateDoc,
+} from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
-// Firebase config
+// Firebase Config
 const firebaseConfig = {
   apiKey: "AIzaSyAspahfUUGnBzh0mh6U53evGQzWQP956xQ",
   authDomain: "ffassetmanager.firebaseapp.com",
   projectId: "ffassetmanager",
   storageBucket: "ffassetmanager.appspot.com",
   messagingSenderId: "803858971008",
-  appId: "1:803858971008:web:72d69ddce6cbc85010a965"
+  appId: "1:803858971008:web:72d69ddce6cbc85010a965",
 };
 
-// Init Firebase
+// Initialize Firebase
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 
-document.addEventListener('DOMContentLoaded', async function () {
-  const tableBody = document.getElementById("assetTableBody");
+document.addEventListener("DOMContentLoaded", async () => {
+  const assetDropdown = document.getElementById("assetSelect");
+  const assignButton = document.getElementById("assignBtn");
+  const urlParams = new URLSearchParams(window.location.search);
+  const preselectedAssetId = urlParams.get("assetId");
+
+  assetDropdown.innerHTML = `<option value="">-- Select an Asset --</option>`;
 
   try {
     const snapshot = await getDocs(collection(db, "assets"));
-    snapshot.forEach(docSnap => {
+    let docIdToSelect = null;
+
+    snapshot.forEach((docSnap) => {
       const asset = docSnap.data();
 
-      const row = document.createElement("tr");
-      row.innerHTML = `
-        <td class="px-4 py-2">${asset.assetId || '-'}</td>
-        <td class="px-4 py-2">${asset.model || '-'}</td>
-        <td class="px-4 py-2">${asset.type || '-'}</td>
-        <td class="px-4 py-2">${asset.serialNumber || '-'}</td>
-        <td class="px-4 py-2">${asset.status || '-'}</td>
-        <td class="px-4 py-2">${asset.purchaseDate || '-'}</td>
-        <td class="px-4 py-2">${asset.AllocatedTo || '-'}</td>
-        <td class="px-4 py-2">${asset.allocationDate || '-'}</td>
-        <td class="px-4 py-2">
-          <button class="text-blue-600 hover:underline allocate-btn" data-asset-id="${asset.assetId}">
-            Allocate
-          </button>
-        </td>
-      `;
-      tableBody.appendChild(row);
-    });
+      if (asset.status?.toLowerCase() === "available") {
+        const option = document.createElement("option");
+        option.value = docSnap.id;
+        option.textContent = `${asset.model || "Unknown"} (${asset.assetId || "N/A"})`;
 
-    // Now bind allocate buttons
-    document.querySelectorAll(".allocate-btn").forEach(button => {
-      button.addEventListener("click", () => {
-        const assetId = button.getAttribute("data-asset-id");
-        if (assetId) {
-          window.location.href = `allocate-asset.html?assetId=${encodeURIComponent(assetId)}`;
+        if (asset.assetId === preselectedAssetId) {
+          docIdToSelect = docSnap.id;
         }
-      });
+
+        assetDropdown.appendChild(option);
+      }
     });
 
+    if (docIdToSelect) {
+      assetDropdown.value = docIdToSelect;
+    }
   } catch (error) {
-    console.error("Error loading assets:", error);
-    alert("❌ Failed to load assets.");
+    console.error("Error loading available assets:", error);
+    alert("❌ Failed to load available assets.");
+  }
+
+  if (assignButton) {
+    assignButton.addEventListener("click", allocateAsset);
   }
 });
+
+async function allocateAsset() {
+  const assetDocId = document.getElementById("assetSelect").value;
+  const userName = document.getElementById("userName").value;
+  const allocationDate = document.getElementById("allocationDate").value;
+
+  if (!assetDocId || !userName || !allocationDate) {
+    showToast("Please fill in all fields.", "error");
+    return;
+  }
+
+  if (!confirm("Are you sure you want to assign this asset?")) return;
+
+  try {
+    const assetRef = doc(db, "assets", assetDocId);
+    await updateDoc(assetRef, {
+      status: "Allocated",
+      AllocatedTo: userName,
+      allocationDate: allocationDate,
+    });
+
+    showToast("✅ Asset successfully Allocated!", "success");
+    document.getElementById("allocateForm").reset();
+    setTimeout(() => location.reload(), 1000);
+  } catch (error) {
+    console.error("Error allocating asset: ", error);
+    showToast("❌ Error allocating asset.", "error");
+  }
+}
+
+// Toast Notification
+function showToast(message, type) {
+  const toast = document.createElement("div");
+  toast.textContent = message;
+  toast.className = `
+    fixed bottom-5 right-5 
+    ${type === "success" ? "bg-green-500" : "bg-red-500"} 
+    text-white px-4 py-2 rounded shadow-lg animate-fade-in-out z-50
+  `;
+  document.body.appendChild(toast);
+  setTimeout(() => toast.remove(), 3000);
+}
+
+// Toast Animation Styles
+const style = document.createElement("style");
+style.textContent = `
+@keyframes fadeInOut {
+  0% { opacity: 0; transform: translateY(20px); }
+  10% { opacity: 1; transform: translateY(0); }
+  90% { opacity: 1; transform: translateY(0); }
+  100% { opacity: 0; transform: translateY(-20px); }
+}
+.animate-fade-in-out {
+  animation: fadeInOut 3s ease-in-out forwards;
+}
+`;
+document.head.appendChild(style);
