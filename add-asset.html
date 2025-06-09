@@ -40,15 +40,28 @@
           <div>
 
 <!-- Add New Asset Type -->
-<div>
-  <label class="block text-sm font-medium mb-1">Add New Asset Type</label>
-  <div class="flex gap-2">
-    <input type="text" id="newAssetType" class="w-full p-2 border rounded" placeholder="e.g. Docking Station">
-    <button type="button" id="addAssetTypeBtn" class="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 flex items-center gap-1">
-      <i class="bi bi-plus-circle"></i> Add Type
+<div class="bg-white p-4 rounded-lg shadow-md max-w-md">
+  <label for="newAssetType" class="block text-sm font-semibold text-gray-700 mb-2">
+    Add New Asset Type
+  </label>
+  <div class="flex items-center gap-3">
+    <input 
+      type="text" 
+      id="newAssetType" 
+      class="flex-grow p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-400" 
+      placeholder="e.g. Docking Station"
+    >
+    <button 
+      type="button" 
+      id="addAssetTypeBtn" 
+      class="flex items-center gap-2 bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 transition-colors"
+    >
+      <i class="bi bi-plus-circle"></i>
+      <span>Add</span>
     </button>
   </div>
 </div>
+
 
             
             <label class="block text-sm font-medium mb-1">Asset Type</label>
