@@ -69,15 +69,28 @@
             <div class="flex flex-col md:flex-row gap-4">
               <div class="w-full md:w-1/2">
                 <label for="assetType" class="block text-sm font-medium mb-1">Asset Type</label>
-                <select id="assetType" class="w-full p-2 border rounded" required>
-                  <option value="">Select Type</option>
-                  <option value="laptop">Laptop</option>
-                  <option value="desktop">Desktop</option>
-                  <option value="monitor">Monitor</option>
-                  <option value="printer">Printer</option>
-                  <option value="mouse">Mouse</option>
-                  <option value="headset">Headset</option>
-                </select>
+                <div class="flex items-center gap-2">
+                  <select id="assetType" class="flex-1 p-2 border rounded" required>
+                    <option value="">Select Type</option>
+                    <option value="laptop">Laptop</option>
+                    <option value="desktop">Desktop</option>
+                    <option value="monitor">Monitor</option>
+                    <option value="printer">Printer</option>
+                    <option value="mouse">Mouse</option>
+                    <option value="headset">Headset</option>
+                  </select>
+                  <button id="manageTypesBtn" type="button" title="Manage custom types"
+                    class="text-blue-600 hover:text-blue-800 text-xl">
+                    <i class="bi bi-gear"></i>
+                  </button>
+                </div>
+              </div>
+              <div class="w-full md:w-1/2">
+                <label class="block text-sm font-medium mb-1">Model</label>
+                <input type="text" id="model" class="w-full p-2 border rounded" required />
+              </div>
+            </div>
+          </div>
 
           <!-- Serial Number -->
           <div>
@@ -90,148 +103,207 @@
             <label class="block text-sm font-medium mb-1">Purchase Date</label>
             <input type="date" id="purchaseDate" class="w-full p-2 border rounded" required />
           </div>
+
         </div>
+
         <button type="submit" class="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600">
           Add Asset
-        </button>     
+        </button>
       </form>
     </div>
   </main>
 
+  <!-- Manage Asset Types Modal -->
+  <div id="manageTypesModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center hidden z-50">
+    <div class="bg-white rounded-lg p-6 w-96">
+      <h3 class="text-lg font-semibold mb-4">Manage Custom Asset Types</h3>
+      <ul id="customTypesList" class="space-y-2 max-h-60 overflow-y-auto">
+        <!-- Populated by JS -->
+      </ul>
+      <div class="mt-4 text-right">
+        <button id="closeManageModal" class="px-4 py-2 bg-gray-300 rounded hover:bg-gray-400">Close</button>
+      </div>
+    </div>
+  </div>
+
   <!-- Firebase Firestore Script -->
-<script type="module">
-  import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
-  import {
-    getFirestore, collection, addDoc, query, where, getDocs
-  } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
-  import {
-    getAuth, onAuthStateChanged, signOut
-  } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+    import {
+      getFirestore, collection, addDoc, query, where, getDocs
+    } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+    import {
+      getAuth, onAuthStateChanged, signOut
+    } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
 
-  document.addEventListener("DOMContentLoaded", async () => {
-    // Firebase Config & Init
-    const firebaseConfig = {
-      apiKey: "AIzaSyAspahfUUGnBzh0mh6U53evGQzWQP956xQ",
-      authDomain: "ffassetmanager.firebaseapp.com",
-      projectId: "ffassetmanager",
-      storageBucket: "ffassetmanager.appspot.com",
-      messagingSenderId: "803858971008",
-      appId: "1:803858971008:web:72d69ddce6cbc85010a965"
-    };
+    document.addEventListener("DOMContentLoaded", async () => {
+      const firebaseConfig = {
+        apiKey: "AIzaSyAspahfUUGnBzh0mh6U53evGQzWQP956xQ",
+        authDomain: "ffassetmanager.firebaseapp.com",
+        projectId: "ffassetmanager",
+        storageBucket: "ffassetmanager.appspot.com",
+        messagingSenderId: "803858971008",
+        appId: "1:803858971008:web:72d69ddce6cbc85010a965"
+      };
 
-    const app = initializeApp(firebaseConfig);
-    const db = getFirestore(app);
-    const auth = getAuth(app);
-    const assetsCollection = collection(db, "assets");
+      const app = initializeApp(firebaseConfig);
+      const db = getFirestore(app);
+      const auth = getAuth(app);
+      const assetsCollection = collection(db, "assets");
 
-    // 🔒 Protect page
-    onAuthStateChanged(auth, user => {
-      if (!user) window.location.href = "login.html";
-    });
-
-    // 🔓 Logout
-    document.getElementById("logoutBtn").addEventListener("click", () => {
-      signOut(auth).then(() => window.location.href = "login.html")
-        .catch(error => {
-          alert("Logout failed.");
-          console.error("Logout error:", error);
-        });
-    });
-
-    // 🔄 Load existing asset types
-    async function loadAssetTypes() {
-      const assetTypeSelect = document.getElementById("assetType");
-      assetTypeSelect.innerHTML = `<option value="">Select Type</option>`;
-      const snapshot = await getDocs(collection(db, "assetTypes"));
-      snapshot.forEach(doc => {
-        const type = doc.data().name;
-        const option = document.createElement("option");
-        option.value = type.toLowerCase();
-        option.textContent = type;
-        assetTypeSelect.appendChild(option);
+      onAuthStateChanged(auth, user => {
+        if (!user) window.location.href = "login.html";
       });
-    }
 
-    await loadAssetTypes(); // Initial load
+      document.getElementById("logoutBtn").addEventListener("click", () => {
+        signOut(auth).then(() => window.location.href = "login.html")
+          .catch(error => {
+            alert("Logout failed.");
+            console.error("Logout error:", error);
+          });
+      });
 
-    // ➕ Add new asset type
-    document.getElementById("addAssetTypeBtn").addEventListener("click", async () => {
-      const newTypeInput = document.getElementById("newAssetType");
-      const newType = newTypeInput.value.trim();
-      if (!newType) return alert("Please enter a valid asset type.");
-
-      const q = query(collection(db, "assetTypes"), where("name", "==", newType));
-      const existing = await getDocs(q);
-      if (!existing.empty) {
-        alert("This asset type already exists.");
-        return;
+      async function loadAssetTypes() {
+        const assetTypeSelect = document.getElementById("assetType");
+        assetTypeSelect.innerHTML = `<option value="">Select Type</option>`;
+        const snapshot = await getDocs(collection(db, "assetTypes"));
+        snapshot.forEach(doc => {
+          const type = doc.data().name;
+          const option = document.createElement("option");
+          option.value = type.toLowerCase();
+          option.textContent = type;
+          assetTypeSelect.appendChild(option);
+        });
       }
 
-      await addDoc(collection(db, "assetTypes"), { name: newType });
-      alert("✅ Asset type added.");
-      newTypeInput.value = "";
       await loadAssetTypes();
-    });
 
-    // 🆔 Generate asset ID
-    async function generateAssetId(assetType) {
-      const prefixMap = {
-        laptop: "L",
-        desktop: "D",
-        monitor: "M",
-        printer: "P",
-        mouse: "Mo",
-        headset: "H",
-        pendrive: "PD"
-      };
-      const cleanedType = assetType.trim().toLowerCase();
-      const prefix = prefixMap[cleanedType] || "X";
-      let assetId, exists = true;
+      document.getElementById("addAssetTypeBtn").addEventListener("click", async () => {
+        const newTypeInput = document.getElementById("newAssetType");
+        const newType = newTypeInput.value.trim();
+        if (!newType) return alert("Please enter a valid asset type.");
 
-      while (exists) {
-        const randomId = Math.floor(1000 + Math.random() * 9000);
-        assetId = `${prefix}-${randomId}`;
-        const q = query(assetsCollection, where("assetId", "==", assetId));
-        const snapshot = await getDocs(q);
-        exists = !snapshot.empty;
+        const q = query(collection(db, "assetTypes"), where("name", "==", newType));
+        const existing = await getDocs(q);
+        if (!existing.empty) {
+          alert("This asset type already exists.");
+          return;
+        }
+
+        await addDoc(collection(db, "assetTypes"), { name: newType });
+        alert("✅ Asset type added.");
+        newTypeInput.value = "";
+        await loadAssetTypes();
+      });
+
+      async function generateAssetId(assetType) {
+        const prefixMap = {
+          laptop: "L",
+          desktop: "D",
+          monitor: "M",
+          printer: "P",
+          mouse: "Mo",
+          headset: "H",
+          pendrive: "PD"
+        };
+        const cleanedType = assetType.trim().toLowerCase();
+        const prefix = prefixMap[cleanedType] || "X";
+        let assetId, exists = true;
+
+        while (exists) {
+          const randomId = Math.floor(1000 + Math.random() * 9000);
+          assetId = `${prefix}-${randomId}`;
+          const q = query(assetsCollection, where("assetId", "==", assetId));
+          const snapshot = await getDocs(q);
+          exists = !snapshot.empty;
+        }
+
+        return assetId;
       }
 
-      return assetId;
-    }
+      document.getElementById("assetForm").addEventListener("submit", async (e) => {
+        e.preventDefault();
+        const type = document.getElementById("assetType").value;
+        const assetId = await generateAssetId(type);
 
-    // ➕ Add asset
-    document.getElementById("assetForm").addEventListener("submit", async (e) => {
-      e.preventDefault();
-      const type = document.getElementById("assetType").value;
-      const assetId = await generateAssetId(type);
+        const assetData = {
+          assetId,
+          type,
+          model: document.getElementById("model").value,
+          serialNumber: document.getElementById("serialNumber").value,
+          purchaseDate: document.getElementById("purchaseDate").value,
+          status: "Available",
+          history: [{
+            date: new Date().toISOString(),
+            action: "Asset Added",
+            details: "Initial registration"
+          }]
+        };
 
-      const assetData = {
-        assetId,
-        type,
-        model: document.getElementById("model").value,
-        serialNumber: document.getElementById("serialNumber").value,
-        purchaseDate: document.getElementById("purchaseDate").value,
-        status: "Available",
-        history: [{
-          date: new Date().toISOString(),
-          action: "Asset Added",
-          details: "Initial registration"
-        }]
-      };
-
-      try {
-        await addDoc(assetsCollection, assetData);
-        alert(`✅ Asset ${assetId} added successfully!`);
-        document.getElementById("assetForm").reset();
-        await loadAssetTypes(); // Optional
-      } catch (error) {
-        console.error("❌ Error adding asset:", error);
-        alert("Failed to add asset.");
-      }
+        try {
+          await addDoc(assetsCollection, assetData);
+          alert(`✅ Asset ${assetId} added successfully!`);
+          document.getElementById("assetForm").reset();
+          await loadAssetTypes();
+        } catch (error) {
+          console.error("❌ Error adding asset:", error);
+          alert("Failed to add asset.");
+        }
+      });
     });
-  });
-  
-</script>
+  </script>
+
+  <!-- Gear Button Modal Script (Separate) -->
+  <script>
+    document.addEventListener("DOMContentLoaded", () => {
+      const assetTypeSelect = document.getElementById("assetType");
+      const manageBtn = document.getElementById("manageTypesBtn");
+      const modal = document.getElementById("manageTypesModal");
+      const closeModalBtn = document.getElementById("closeManageModal");
+      const customList = document.getElementById("customTypesList");
+
+      const isDefaultType = (val) =>
+        ["laptop", "desktop", "monitor", "printer", "mouse", "headset"].includes(val.toLowerCase());
+
+      function refreshCustomList() {
+        customList.innerHTML = "";
+        Array.from(assetTypeSelect.options).forEach((opt) => {
+          const val = opt.value;
+          if (!isDefaultType(val) && val !== "") {
+            const li = document.createElement("li");
+            li.className = "flex justify-between items-center border px-3 py-1 rounded";
+            li.innerHTML = `
+              <span>${opt.textContent}</span>
+              <button class="text-red-500 hover:text-red-700" data-value="${val}">
+                <i class="bi bi-trash"></i>
+              </button>`;
+            customList.appendChild(li);
+          }
+        });
+      }
+
+      manageBtn.addEventListener("click", () => {
+        refreshCustomList();
+        modal.classList.remove("hidden");
+      });
+
+      closeModalBtn.addEventListener("click", () => {
+        modal.classList.add("hidden");
+      });
+
+      customList.addEventListener("click", (e) => {
+        const btn = e.target.closest("button[data-value]");
+        if (!btn) return;
+        const valToRemove = btn.dataset.value;
+        Array.from(assetTypeSelect.options).forEach((opt) => {
+          if (opt.value === valToRemove) {
+            opt.remove();
+          }
+        });
+        refreshCustomList();
+      });
+    });
+  </script>
 
 </body>
 </html>
