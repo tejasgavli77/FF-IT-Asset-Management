@@ -258,6 +258,57 @@
       }
     });
   });
+
+  <script>
+  const assetTypeSelect = document.getElementById("assetType");
+  const manageBtn = document.getElementById("manageTypesBtn");
+  const modal = document.getElementById("manageTypesModal");
+  const closeModalBtn = document.getElementById("closeManageModal");
+  const customList = document.getElementById("customTypesList");
+
+  // Filter custom-added options (not default)
+  const isDefaultType = (val) => ['laptop','desktop','monitor','printer','mouse','headset'].includes(val.toLowerCase());
+
+  function refreshCustomList() {
+    customList.innerHTML = '';
+    Array.from(assetTypeSelect.options).forEach(opt => {
+      const val = opt.value;
+      if (!isDefaultType(val)) {
+        const li = document.createElement('li');
+        li.className = 'flex justify-between items-center border px-3 py-1 rounded';
+        li.innerHTML = `
+          <span>${val}</span>
+          <button class="text-red-500 hover:text-red-700" data-value="${val}">
+            <i class="bi bi-trash"></i>
+          </button>`;
+        customList.appendChild(li);
+      }
+    });
+  }
+
+  manageBtn.addEventListener('click', () => {
+    refreshCustomList();
+    modal.classList.remove('hidden');
+  });
+
+  closeModalBtn.addEventListener('click', () => {
+    modal.classList.add('hidden');
+  });
+
+  customList.addEventListener('click', (e) => {
+    const btn = e.target.closest('button[data-value]');
+    if (!btn) return;
+    const valToRemove = btn.dataset.value;
+    Array.from(assetTypeSelect.options).forEach(opt => {
+      if (opt.value === valToRemove) {
+        opt.remove();
+      }
+    });
+    refreshCustomList();
+  });
+</script>
+
+  
 </script>
 
 </body>
