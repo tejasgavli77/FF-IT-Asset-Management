@@ -58,7 +58,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
   // ✅ ADD THIS FUNCTION to load asset types into dropdown
   async function loadAssetTypes() {
-    const typeSnapshot = await getDocs(collection(db, "asset_types"));
+    const typeSnapshot = await getDocs(collection(db, "assetTypes"));
     const typeDropdown = document.getElementById("typeFilter");
 
     // Clear existing options
