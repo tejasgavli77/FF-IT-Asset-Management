@@ -254,41 +254,80 @@
   </script>
 
   <!-- Gear Button Modal Script (Separate) -->
-  <script>
-    customList.addEventListener("click", async (e) => {
-  const btn = e.target.closest("button[data-value]");
-  if (!btn) return;
+<!-- Gear Button Modal Script -->
+<script type="module">
+  import {
+    getFirestore, collection, query, where, getDocs, deleteDoc
+  } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
-  const valToRemove = btn.dataset.value;
-  const confirmDelete = confirm(`Are you sure you want to delete asset type "${valToRemove}"?`);
+  const db = getFirestore(); // this works since the app is already initialized
+  const assetTypeSelect = document.getElementById("assetType");
+  const manageBtn = document.getElementById("manageTypesBtn");
+  const modal = document.getElementById("manageTypesModal");
+  const closeModal = document.getElementById("closeManageModal");
+  const customList = document.getElementById("customTypesList");
 
-  if (!confirmDelete) return;
-
-  try {
-    // Find the document in Firestore
-    const q = query(collection(window.db, "assetTypes"), where("name", "==", valToRemove));
-    const snapshot = await getDocs(q);
-
-    if (!snapshot.empty) {
-      snapshot.forEach(async (docSnap) => {
-        await deleteDoc(docSnap.ref);
-      });
-    }
-
-    // Remove from dropdown
-    Array.from(assetTypeSelect.options).forEach((opt) => {
-      if (opt.value === valToRemove) opt.remove();
+  // Refresh custom asset types list in modal
+  async function refreshCustomList() {
+    customList.innerHTML = "";
+    const snapshot = await getDocs(collection(db, "assetTypes"));
+    snapshot.forEach((doc) => {
+      const type = doc.data().name;
+      const li = document.createElement("li");
+      li.className = "flex justify-between items-center bg-gray-100 px-3 py-2 rounded";
+      li.innerHTML = `
+        <span>${type}</span>
+        <button data-value="${type}" class="text-red-600 hover:text-red-800">
+          <i class="bi bi-trash"></i>
+        </button>
+      `;
+      customList.appendChild(li);
     });
-
-    refreshCustomList();
-    alert(`✅ "${valToRemove}" deleted from custom asset types.`);
-  } catch (error) {
-    console.error("❌ Failed to delete from Firestore:", error);
-    alert("Failed to delete from database.");
   }
-});
 
-  </script>
+  // Open modal and load list
+  manageBtn.addEventListener("click", async () => {
+    await refreshCustomList();
+    modal.classList.remove("hidden");
+  });
+
+  // Close modal
+  closeModal.addEventListener("click", () => {
+    modal.classList.add("hidden");
+  });
+
+  // Handle delete inside modal
+  customList.addEventListener("click", async (e) => {
+    const btn = e.target.closest("button[data-value]");
+    if (!btn) return;
+
+    const valToRemove = btn.dataset.value;
+    const confirmDelete = confirm(`Are you sure you want to delete asset type "${valToRemove}"?`);
+    if (!confirmDelete) return;
+
+    try {
+      // Delete from Firestore
+      const q = query(collection(db, "assetTypes"), where("name", "==", valToRemove));
+      const snapshot = await getDocs(q);
+      if (!snapshot.empty) {
+        snapshot.forEach(async (docSnap) => {
+          await deleteDoc(docSnap.ref);
+        });
+      }
+
+      // Remove from dropdown
+      Array.from(assetTypeSelect.options).forEach((opt) => {
+        if (opt.textContent === valToRemove) opt.remove();
+      });
+
+      await refreshCustomList();
+      alert(`✅ "${valToRemove}" deleted.`);
+    } catch (error) {
+      console.error("❌ Error deleting asset type:", error);
+      alert("Error deleting from database.");
+    }
+  });
+</script>
 
 </body>
 </html>
