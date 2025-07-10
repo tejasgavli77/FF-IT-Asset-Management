@@ -32,7 +32,7 @@ document.addEventListener("DOMContentLoaded", () => {
   const tableBody = document.getElementById("tableBody");
   const searchInput = document.getElementById("searchInput");
   const statusFilter = document.getElementById("statusFilter");
-  const typeFilter = document.getElementById("typeFilter"); // ✅ NEW
+  const typeFilter = document.getElementById("typeFilter");
   const resetBtn = document.getElementById("resetFilters");
 
   // 🔄 Load Assets
@@ -45,30 +45,47 @@ document.addEventListener("DOMContentLoaded", () => {
     if (searchInput && statusFilter && resetBtn) {
       searchInput.addEventListener("input", applyFilters);
       statusFilter.addEventListener("change", applyFilters);
-      typeFilter?.addEventListener("change", applyFilters); // ✅ NEW
+      typeFilter?.addEventListener("change", applyFilters);
       resetBtn.addEventListener("click", () => {
         searchInput.value = "";
         statusFilter.value = "";
-        if (typeFilter) typeFilter.value = ""; // ✅ NEW
+        if (typeFilter) typeFilter.value = "";
         currentPage = 1;
         renderTable(allAssets);
       });
     }
   }
 
+  // ✅ ADD THIS FUNCTION to load asset types into dropdown
+  async function loadAssetTypes() {
+    const typeSnapshot = await getDocs(collection(db, "asset_types"));
+    const typeDropdown = document.getElementById("typeFilter");
+
+    // Clear existing options
+    typeDropdown.innerHTML = `<option value="">All Types</option>`;
+
+    typeSnapshot.forEach((doc) => {
+      const type = doc.data().name;
+      const option = document.createElement("option");
+      option.value = type.toLowerCase();
+      option.textContent = type;
+      typeDropdown.appendChild(option);
+    });
+  }
+
   // 🔍 Filter assets
   function applyFilters() {
     const searchTerm = searchInput.value.toLowerCase();
     const status = statusFilter.value.toLowerCase();
-    const type = typeFilter?.value.toLowerCase(); // ✅ NEW
+    const type = typeFilter?.value.toLowerCase();
 
     const filtered = allAssets.filter(asset => {
       const matchesSearch =
         asset.assetId?.toLowerCase().includes(searchTerm) ||
         asset.model?.toLowerCase().includes(searchTerm);
       const matchesStatus = !status || asset.status?.toLowerCase() === status;
-      const matchesType = !type || asset.type?.toLowerCase() === type; // ✅ NEW
-      return matchesSearch && matchesStatus && matchesType; // ✅ UPDATED
+      const matchesType = !type || asset.type?.toLowerCase() === type;
+      return matchesSearch && matchesStatus && matchesType;
     });
 
     currentPage = 1;
@@ -78,7 +95,6 @@ document.addEventListener("DOMContentLoaded", () => {
   // 🖥️ Render assets with pagination
   function renderTable(data) {
     tableBody.innerHTML = "";
-
     const start = (currentPage - 1) * rowsPerPage;
     const paginatedData = data.slice(start, start + rowsPerPage);
 
@@ -113,7 +129,6 @@ document.addEventListener("DOMContentLoaded", () => {
     bindEvents();
   }
 
-  // 🔄 Pagination UI
   function renderPagination(data) {
     const pagination = document.getElementById("pagination");
     const totalPages = Math.ceil(data.length / rowsPerPage);
@@ -133,7 +148,6 @@ document.addEventListener("DOMContentLoaded", () => {
     renderTable(allAssets);
   };
 
-  // ✅ Actions
   async function confirmDelete(assetId) {
     if (confirm("Are you sure you want to delete this asset?")) {
       await deleteDoc(doc(db, "assets", assetId));
@@ -192,7 +206,6 @@ document.addEventListener("DOMContentLoaded", () => {
     alert("View History feature coming soon! (Asset ID: " + assetId + ")");
   }
 
-  // Global
   window.confirmDelete = confirmDelete;
   window.returnAsset = returnAsset;
   window.editAsset = editAsset;
@@ -203,4 +216,5 @@ document.addEventListener("DOMContentLoaded", () => {
 
   // 🔃 Initial Load
   loadAssets();
+  loadAssetTypes(); // ✅ Call it here
 });
