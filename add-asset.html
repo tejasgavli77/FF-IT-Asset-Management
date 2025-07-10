@@ -78,9 +78,11 @@
                   <option value="mouse">Mouse</option>
                   <option value="headset">Headset</option>
                 </select>
-                <button id="deleteAssetTypeBtn" class="text-red-500 hover:text-red-700" title="Delete selected custom type">
-                         <i class="bi bi-trash"></i>
-                </button>
+                <!-- Manage Button -->
+                <button id="manageTypesBtn" type="button" title="Manage custom types"
+                class="text-blue-600 hover:text-blue-800 text-xl">
+               <i class="bi bi-gear"></i>
+               </button>
               </div>
               <div class="w-full md:w-1/2">
                 <label class="block text-sm font-medium mb-1">Model</label>
@@ -106,6 +108,20 @@
         <button type="submit" class="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600">
           Add Asset
         </button>
+        
+<!-- Manage Asset Types Modal -->
+<div id="manageTypesModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center hidden z-50">
+  <div class="bg-white rounded-lg p-6 w-96">
+    <h3 class="text-lg font-semibold mb-4">Manage Custom Asset Types</h3>
+    <ul id="customTypesList" class="space-y-2 max-h-60 overflow-y-auto">
+      <!-- Populated by JS -->
+    </ul>
+    <div class="mt-4 text-right">
+      <button id="closeManageModal" class="px-4 py-2 bg-gray-300 rounded hover:bg-gray-400">Close</button>
+    </div>
+  </div>
+</div>
+        
       </form>
     </div>
   </main>
