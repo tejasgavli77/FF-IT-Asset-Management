@@ -128,146 +128,145 @@
 
   <!-- Firebase Firestore Script -->
   <script type="module">
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
-    import {
-      getFirestore, collection, addDoc, query, where, getDocs
-    } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
-    import {
-      getAuth, onAuthStateChanged, signOut
-    } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-
-    document.addEventListener("DOMContentLoaded", async () => {
-      const firebaseConfig = {
-        apiKey: "AIzaSyAspahfUUGnBzh0mh6U53evGQzWQP956xQ",
-        authDomain: "ffassetmanager.firebaseapp.com",
-        projectId: "ffassetmanager",
-        storageBucket: "ffassetmanager.appspot.com",
-        messagingSenderId: "803858971008",
-        appId: "1:803858971008:web:72d69ddce6cbc85010a965"
-      };
-
-      const app = initializeApp(firebaseConfig);
-      const db = getFirestore(app);
-      const auth = getAuth(app);
-      const assetsCollection = collection(db, "assets");
-
-      onAuthStateChanged(auth, user => {
-        if (!user) window.location.href = "login.html";
-      });
-
-      document.getElementById("logoutBtn").addEventListener("click", () => {
-        signOut(auth).then(() => window.location.href = "login.html")
-          .catch(error => {
-            alert("Logout failed.");
-            console.error("Logout error:", error);
-          });
-      });
-
-      async function loadAssetTypes() {
-        const assetTypeSelect = document.getElementById("assetType");
-        assetTypeSelect.innerHTML = `<option value="">Select Type</option>`;
-        const snapshot = await getDocs(collection(db, "assetTypes"));
-        snapshot.forEach(doc => {
-          const type = doc.data().name;
-          const option = document.createElement("option");
-          option.value = type.toLowerCase();
-          option.textContent = type;
-          assetTypeSelect.appendChild(option);
-        });
-      }
-
-      await loadAssetTypes();
-
-      document.getElementById("addAssetTypeBtn").addEventListener("click", async () => {
-        const newTypeInput = document.getElementById("newAssetType");
-        const newType = newTypeInput.value.trim();
-        if (!newType) return alert("Please enter a valid asset type.");
-
-        const q = query(collection(db, "assetTypes"), where("name", "==", newType));
-        const existing = await getDocs(q);
-        if (!existing.empty) {
-          alert("This asset type already exists.");
-          return;
-        }
-
-        await addDoc(collection(db, "assetTypes"), { name: newType });
-        alert("✅ Asset type added.");
-        newTypeInput.value = "";
-        await loadAssetTypes();
-      });
-
-      async function generateAssetId(assetType) {
-        const prefixMap = {
-          laptop: "L",
-          desktop: "D",
-          monitor: "M",
-          printer: "P",
-          mouse: "Mo",
-          headset: "H",
-          pendrive: "PD"
-        };
-        const cleanedType = assetType.trim().toLowerCase();
-        const prefix = prefixMap[cleanedType] || "X";
-        let assetId, exists = true;
-
-        while (exists) {
-          const randomId = Math.floor(1000 + Math.random() * 9000);
-          assetId = `${prefix}-${randomId}`;
-          const q = query(assetsCollection, where("assetId", "==", assetId));
-          const snapshot = await getDocs(q);
-          exists = !snapshot.empty;
-        }
-
-        return assetId;
-      }
-
-      document.getElementById("assetForm").addEventListener("submit", async (e) => {
-        e.preventDefault();
-        const type = document.getElementById("assetType").value;
-        const assetId = await generateAssetId(type);
-
-        const assetData = {
-          assetId,
-          type,
-          model: document.getElementById("model").value,
-          serialNumber: document.getElementById("serialNumber").value,
-          purchaseDate: document.getElementById("purchaseDate").value,
-          status: "Available",
-          history: [{
-            date: new Date().toISOString(),
-            action: "Asset Added",
-            details: "Initial registration"
-          }]
-        };
-
-        try {
-          await addDoc(assetsCollection, assetData);
-          alert(`✅ Asset ${assetId} added successfully!`);
-          document.getElementById("assetForm").reset();
-          await loadAssetTypes();
-        } catch (error) {
-          console.error("❌ Error adding asset:", error);
-          alert("Failed to add asset.");
-        }
-      });
-    });
-  </script>
-
-  <!-- Gear Button Modal Script (Separate) -->
-<!-- Gear Button Modal Script -->
-<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
   import {
-    getFirestore, collection, query, where, getDocs, deleteDoc
+    getFirestore, collection, addDoc, query, where, getDocs, deleteDoc
   } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+  import {
+    getAuth, onAuthStateChanged, signOut
+  } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
 
-  const db = getFirestore(); // this works since the app is already initialized
+  const firebaseConfig = {
+    apiKey: "AIzaSyAspahfUUGnBzh0mh6U53evGQzWQP956xQ",
+    authDomain: "ffassetmanager.firebaseapp.com",
+    projectId: "ffassetmanager",
+    storageBucket: "ffassetmanager.appspot.com",
+    messagingSenderId: "803858971008",
+    appId: "1:803858971008:web:72d69ddce6cbc85010a965"
+  };
+
+  const app = initializeApp(firebaseConfig);
+  const db = getFirestore(app);
+  const auth = getAuth(app);
+  const assetsCollection = collection(db, "assets");
+
   const assetTypeSelect = document.getElementById("assetType");
   const manageBtn = document.getElementById("manageTypesBtn");
   const modal = document.getElementById("manageTypesModal");
   const closeModal = document.getElementById("closeManageModal");
   const customList = document.getElementById("customTypesList");
 
-  // Refresh custom asset types list in modal
+  onAuthStateChanged(auth, user => {
+    if (!user) window.location.href = "login.html";
+  });
+
+  document.getElementById("logoutBtn").addEventListener("click", () => {
+    signOut(auth).then(() => window.location.href = "login.html")
+      .catch(error => {
+        alert("Logout failed.");
+        console.error("Logout error:", error);
+      });
+  });
+
+  async function loadAssetTypes() {
+    assetTypeSelect.innerHTML = `<option value="">Select Type</option>`;
+    const snapshot = await getDocs(collection(db, "assetTypes"));
+    snapshot.forEach(doc => {
+      const type = doc.data().name;
+      const option = document.createElement("option");
+      option.value = type.toLowerCase();
+      option.textContent = type;
+      assetTypeSelect.appendChild(option);
+    });
+  }
+
+  await loadAssetTypes();
+
+  document.getElementById("addAssetTypeBtn").addEventListener("click", async () => {
+    const newTypeInput = document.getElementById("newAssetType");
+    const newType = newTypeInput.value.trim();
+    if (!newType) return alert("Please enter a valid asset type.");
+
+    const q = query(collection(db, "assetTypes"), where("name", "==", newType));
+    const existing = await getDocs(q);
+    if (!existing.empty) {
+      alert("This asset type already exists.");
+      return;
+    }
+
+    await addDoc(collection(db, "assetTypes"), { name: newType });
+    alert("✅ Asset type added.");
+    newTypeInput.value = "";
+    await loadAssetTypes();
+  });
+
+  async function generateAssetId(assetType) {
+    const prefixMap = {
+      laptop: "L",
+      desktop: "D",
+      monitor: "M",
+      printer: "P",
+      mouse: "Mo",
+      headset: "H",
+      pendrive: "PD"
+    };
+    const cleanedType = assetType.trim().toLowerCase();
+    const prefix = prefixMap[cleanedType] || "X";
+    let assetId, exists = true;
+
+    while (exists) {
+      const randomId = Math.floor(1000 + Math.random() * 9000);
+      assetId = `${prefix}-${randomId}`;
+      const q = query(assetsCollection, where("assetId", "==", assetId));
+      const snapshot = await getDocs(q);
+      exists = !snapshot.empty;
+    }
+
+    return assetId;
+  }
+
+  document.getElementById("assetForm").addEventListener("submit", async (e) => {
+    e.preventDefault();
+    const type = document.getElementById("assetType").value;
+    const assetId = await generateAssetId(type);
+
+    const assetData = {
+      assetId,
+      type,
+      model: document.getElementById("model").value,
+      serialNumber: document.getElementById("serialNumber").value,
+      purchaseDate: document.getElementById("purchaseDate").value,
+      status: "Available",
+      history: [{
+        date: new Date().toISOString(),
+        action: "Asset Added",
+        details: "Initial registration"
+      }]
+    };
+
+    try {
+      await addDoc(assetsCollection, assetData);
+      alert(`✅ Asset ${assetId} added successfully!`);
+      document.getElementById("assetForm").reset();
+      await loadAssetTypes();
+    } catch (error) {
+      console.error("❌ Error adding asset:", error);
+      alert("Failed to add asset.");
+    }
+  });
+
+  // 🚀 Gear Icon: Show Modal
+  manageBtn.addEventListener("click", async () => {
+    await refreshCustomList();
+    modal.classList.remove("hidden");
+  });
+
+  // ❌ Close Modal
+  closeModal.addEventListener("click", () => {
+    modal.classList.add("hidden");
+  });
+
+  // 🔁 Refresh List in Modal
   async function refreshCustomList() {
     customList.innerHTML = "";
     const snapshot = await getDocs(collection(db, "assetTypes"));
@@ -285,18 +284,7 @@
     });
   }
 
-  // Open modal and load list
-  manageBtn.addEventListener("click", async () => {
-    await refreshCustomList();
-    modal.classList.remove("hidden");
-  });
-
-  // Close modal
-  closeModal.addEventListener("click", () => {
-    modal.classList.add("hidden");
-  });
-
-  // Handle delete inside modal
+  // 🗑️ Delete Asset Type from Modal List
   customList.addEventListener("click", async (e) => {
     const btn = e.target.closest("button[data-value]");
     if (!btn) return;
@@ -306,25 +294,23 @@
     if (!confirmDelete) return;
 
     try {
-      // Delete from Firestore
       const q = query(collection(db, "assetTypes"), where("name", "==", valToRemove));
       const snapshot = await getDocs(q);
-      if (!snapshot.empty) {
-        snapshot.forEach(async (docSnap) => {
-          await deleteDoc(docSnap.ref);
-        });
-      }
+
+      snapshot.forEach(async (docSnap) => {
+        await deleteDoc(docSnap.ref);
+      });
 
       // Remove from dropdown
-      Array.from(assetTypeSelect.options).forEach((opt) => {
+      Array.from(assetTypeSelect.options).forEach(opt => {
         if (opt.textContent === valToRemove) opt.remove();
       });
 
       await refreshCustomList();
-      alert(`✅ "${valToRemove}" deleted.`);
-    } catch (error) {
-      console.error("❌ Error deleting asset type:", error);
-      alert("Error deleting from database.");
+      alert(`✅ "${valToRemove}" deleted successfully.`);
+    } catch (err) {
+      console.error("❌ Failed to delete asset type:", err);
+      alert("Error deleting asset type.");
     }
   });
 </script>
