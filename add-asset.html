@@ -1,4 +1,6 @@
 <!DOCTYPE html>
+<html lang="en">
+<head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Add Asset | IT Asset Management</title>
@@ -35,60 +37,72 @@
 
     <div class="bg-white rounded-lg shadow-md p-6 mb-8">
       <h2 class="text-xl font-semibold mb-4">Asset Information</h2>
+      
       <form id="assetForm" class="space-y-4">
         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <div>
 
-<!-- Add New Asset Type -->
-<div class="bg-white p-4 rounded-lg shadow-md max-w-md">
-  <label for="newAssetType" class="block text-sm font-semibold text-gray-700 mb-2">
-    Add New Asset Type
-  </label>
-  <div class="flex items-center gap-3">
-    <input 
-      type="text" 
-      id="newAssetType" 
-      class="flex-grow p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-400" 
-      placeholder="e.g. Docking Station"
-    >
-    <button 
-      type="button" 
-      id="addAssetTypeBtn" 
-      class="flex items-center gap-2 bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 transition-colors"
-    >
-      <i class="bi bi-plus-circle"></i>
-      <span>Add</span>
-    </button>
-  </div>
-</div>
-
-
-            
-            <label class="block text-sm font-medium mb-1">Asset Type</label>
-            <select id="assetType" class="w-full p-2 border rounded" required>
-              <option value="">Select Type</option>
-              <option value="laptop">Laptop</option>
-              <option value="desktop">Desktop</option>
-              <option value="monitor">Monitor</option>
-              <option value="printer">Printer</option>
-              <option value="mouse">Mouse</option>
-              <option value="headset">Headset</option>
-            </select>
+          <!-- Add New Asset Type -->
+          <div class="col-span-2">
+            <label for="newAssetType" class="block text-sm font-semibold text-gray-700 mb-2">
+              Add New Asset Type
+            </label>
+            <div class="flex flex-col sm:flex-row items-stretch sm:items-center gap-3">
+              <input 
+                type="text" 
+                id="newAssetType" 
+                class="flex-grow p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-400" 
+                placeholder="e.g. Docking Station"
+              >
+              <button 
+                type="button" 
+                id="addAssetTypeBtn" 
+                class="flex items-center gap-2 bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 transition-colors"
+              >
+                <i class="bi bi-plus-circle"></i>
+                <span>Add</span>
+              </button>
+            </div>
           </div>
-          <div>
-            <label class="block text-sm font-medium mb-1">Model</label>
-            <input type="text" id="model" class="w-full p-2 border rounded" required />
+
+          <!-- Asset Type & Model Side-by-Side -->
+          <div class="col-span-2">
+            <div class="flex flex-col md:flex-row gap-4">
+              <div class="w-full md:w-1/2">
+                <label for="assetType" class="block text-sm font-medium mb-1">Asset Type</label>
+                <select id="assetType" class="w-full p-2 border rounded" required>
+                  <option value="">Select Type</option>
+                  <option value="laptop">Laptop</option>
+                  <option value="desktop">Desktop</option>
+                  <option value="monitor">Monitor</option>
+                  <option value="printer">Printer</option>
+                  <option value="mouse">Mouse</option>
+                  <option value="headset">Headset</option>
+                </select>
+              </div>
+              <div class="w-full md:w-1/2">
+                <label class="block text-sm font-medium mb-1">Model</label>
+                <input type="text" id="model" class="w-full p-2 border rounded" required />
+              </div>
+            </div>
           </div>
+
+          <!-- Serial Number -->
           <div>
             <label class="block text-sm font-medium mb-1">Serial Number</label>
             <input type="text" id="serialNumber" class="w-full p-2 border rounded" required />
           </div>
+
+          <!-- Purchase Date -->
           <div>
             <label class="block text-sm font-medium mb-1">Purchase Date</label>
             <input type="date" id="purchaseDate" class="w-full p-2 border rounded" required />
           </div>
+
         </div>
-        <button type="submit" class="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600">Add Asset</button>
+
+        <button type="submit" class="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600">
+          Add Asset
+        </button>
       </form>
     </div>
   </main>
