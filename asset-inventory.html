@@ -111,6 +111,20 @@
   <!-- ✅ JS -->
   <script type="module" src="js/asset-inventory.js"></script>
 
+  <!-- 🔍 History Modal -->
+<div id="historyModal" class="fixed inset-0 bg-black bg-opacity-50 hidden items-center justify-center z-50">
+  <div class="bg-white p-6 rounded w-[90%] max-w-md max-h-[80vh] overflow-y-auto">
+    <h3 class="text-lg font-bold mb-4">Asset History</h3>
+    <ul id="historyList" class="space-y-2 text-sm">
+      <!-- Filled by JS -->
+    </ul>
+    <div class="text-right mt-4">
+      <button onclick="document.getElementById('historyModal').classList.add('hidden')" class="bg-gray-300 px-4 py-2 rounded hover:bg-gray-400">Close</button>
+    </div>
+  </div>
+</div>
+
+
 <!--Logout Fun-->
   <script type="module">
   import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
