@@ -59,7 +59,6 @@ document.addEventListener('DOMContentLoaded', async function () {
 
 
 
-
 // Allocate Asset function
 async function allocateAsset() {
   const assetDocId = document.getElementById("assetSelect").value;
@@ -75,10 +74,23 @@ async function allocateAsset() {
 
   try {
     const assetRef = doc(db, "assets", assetDocId);
+    const assetSnap = await getDocs(assetsCollection);
+    const assetData = (await getDocs(assetsCollection)).docs.find(doc => doc.id === assetDocId)?.data() || {};
+
+    const updatedHistory = [
+      ...(assetData.history || []),
+      {
+        date: new Date().toISOString(),
+        action: "Allocated",
+        details: `Assigned to ${userName}`
+      }
+    ];
+
     await updateDoc(assetRef, {
       status: "Allocated",
       AllocatedTo: userName,
       allocationDate: allocationDate,
+      history: updatedHistory
     });
 
     showToast("✅ Asset successfully Allocated!", "success");
@@ -89,6 +101,7 @@ async function allocateAsset() {
     showToast("❌ Error allocating asset.", "error");
   }
 }
+
 
 // Toast Notification
 function showToast(message, type) {
