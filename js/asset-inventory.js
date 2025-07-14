@@ -214,9 +214,27 @@ function applyFilters() {
     );
   }
 
-  function viewHistory(assetId) {
-    alert("View History feature coming soon! (Asset ID: " + assetId + ")");
+  async function viewHistory(assetId) {
+  const assetDoc = await getDoc(doc(db, "assets", assetId));
+  const asset = assetDoc.data();
+  const history = asset.history || [];
+
+  const historyList = document.getElementById("historyList");
+  historyList.innerHTML = "";
+
+  if (history.length === 0) {
+    historyList.innerHTML = `<li class="text-gray-500">No history available for this asset.</li>`;
+  } else {
+    history.forEach(entry => {
+      const li = document.createElement("li");
+      li.textContent = `${new Date(entry.date).toLocaleString()} — ${entry.action} ${entry.details ? `(${entry.details})` : ""}`;
+      historyList.appendChild(li);
+    });
   }
+
+  document.getElementById("historyModal").classList.remove("hidden");
+}
+
 
   window.confirmDelete = confirmDelete;
   window.returnAsset = returnAsset;
