@@ -209,6 +209,9 @@ function applyFilters() {
     document.querySelectorAll(".delete-btn").forEach(btn =>
       btn.addEventListener("click", () => confirmDelete(btn.dataset.id))
     );
+    document.querySelectorAll(".history-btn").forEach(btn =>
+      btn.addEventListener("click", () => viewHistory(btn.dataset.id))
+    );
   }
 
   function viewHistory(assetId) {
