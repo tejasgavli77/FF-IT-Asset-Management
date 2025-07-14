@@ -85,7 +85,7 @@ function applyFilters() {
       asset.model?.toLowerCase().includes(searchTerm) ||
       asset.serialNumber?.toLowerCase().includes(searchTerm) ||
       asset.type?.toLowerCase().includes(searchTerm) ||
-      asset.allocatedTo?.toLowerCase().includes(searchTerm);
+      asset.AllocatedTo?.toLowerCase().includes(searchTerm);
 
     const matchesStatus = !status || asset.status?.toLowerCase() === status;
     const matchesType = !type || asset.type?.toLowerCase() === type;
