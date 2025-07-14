@@ -165,17 +165,32 @@ function applyFilters() {
     }
   }
 
-  async function returnAsset(assetId) {
-    if (confirm("Mark this asset as Available?")) {
-      await updateDoc(doc(db, "assets", assetId), {
-        status: "Available",
-        AllocatedTo: "",
-        allocationDate: ""
-      });
-      alert("Asset returned successfully!");
-      loadAssets();
-    }
+ async function returnAsset(assetId) {
+  if (confirm("Mark this asset as Available?")) {
+    const assetRef = doc(db, "assets", assetId);
+    const assetSnap = await getDoc(assetRef);
+    const assetData = assetSnap.data();
+
+    const updatedHistory = [
+      ...(assetData.history || []),
+      {
+        date: new Date().toISOString(),
+        action: "Returned",
+        details: `Returned by ${assetData.AllocatedTo || "Unknown"}`
+      }
+    ];
+
+    await updateDoc(assetRef, {
+      status: "Available",
+      AllocatedTo: "",
+      allocationDate: "",
+      history: updatedHistory
+    });
+
+    alert("Asset returned successfully!");
+    loadAssets();
   }
+}
 
   async function editAsset(assetId) {
     const assetDoc = await getDoc(doc(db, "assets", assetId));
