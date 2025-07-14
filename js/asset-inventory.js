@@ -74,23 +74,30 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   // 🔍 Filter assets
-  function applyFilters() {
-    const searchTerm = searchInput.value.toLowerCase();
-    const status = statusFilter.value.toLowerCase();
-    const type = typeFilter?.value.toLowerCase();
+function applyFilters() {
+  const searchTerm = searchInput.value.toLowerCase();
+  const status = statusFilter.value.toLowerCase();
+  const type = typeFilter?.value.toLowerCase();
 
-    const filtered = allAssets.filter(asset => {
-      const matchesSearch =
-        asset.assetId?.toLowerCase().includes(searchTerm) ||
-        asset.model?.toLowerCase().includes(searchTerm);
-      const matchesStatus = !status || asset.status?.toLowerCase() === status;
-      const matchesType = !type || asset.type?.toLowerCase() === type;
-      return matchesSearch && matchesStatus && matchesType;
-    });
+  const filtered = allAssets.filter(asset => {
+    const matchesSearch =
+      asset.assetId?.toLowerCase().includes(searchTerm) ||
+      asset.model?.toLowerCase().includes(searchTerm) ||
+      asset.serialNumber?.toLowerCase().includes(searchTerm) ||
+      asset.type?.toLowerCase().includes(searchTerm) ||
+      asset.allocatedTo?.toLowerCase().includes(searchTerm);
 
-    currentPage = 1;
-    renderTable(filtered);
-  }
+    const matchesStatus = !status || asset.status?.toLowerCase() === status;
+    const matchesType = !type || asset.type?.toLowerCase() === type;
+
+    return matchesSearch && matchesStatus && matchesType;
+  });
+
+  currentPage = 1;
+  renderTable(filtered);
+}
+
+
 
   // 🖥️ Render assets with pagination
   function renderTable(data) {
