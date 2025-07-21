@@ -25,7 +25,7 @@ const assetRef = collection(db, "assets");
 
 let allAssets = [];
 let currentPage = 1;
-const usersPerPage = 10;
+const usersPerPage = 25;
 let groupedUsers = {};
 
 async function loadUserAssets() {
