@@ -83,30 +83,30 @@
 </select>
 
 
-    <!-- Inventory Table -->
-    <div class="bg-white rounded-lg shadow-md p-6">
-      <table class="min-w-full table-auto">
-        <thead class="bg-gray-200 text-gray-700 font-semibold">
-          <tr>
-            <th class="border px-4 py-2">#</th>
-            <th class="border px-4 py-2">Asset ID</th>
-            <th class="border px-4 py-2">Type</th>
-            <th class="border px-4 py-2">Model</th>
-            <th class="border px-4 py-2">Serial Number</th>
-            <th class="border px-4 py-2">Allocated To</th>
-            <th class="border px-4 py-2">Allocation Date</th>
-            <th class="border px-4 py-2">Purchase Date</th>
-            <th class="border px-4 py-2">Status</th>
-            <th class="border px-4 py-2">Actions</th>
-          </tr>
-        </thead>
-        <tbody id="tableBody"></tbody>
-      </table>
+   <!-- Inventory Table -->
+<div class="bg-white rounded-lg shadow-md p-6 overflow-x-auto">
+  <table class="min-w-full table-auto">
+    <thead class="bg-gray-200 text-gray-700 font-semibold">
+      <tr>
+        <th class="border px-4 py-2">#</th>
+        <th class="border px-4 py-2">Asset ID</th>
+        <th class="border px-4 py-2">Type</th>
+        <th class="border px-4 py-2">Model</th>
+        <th class="border px-4 py-2">Serial Number</th>
+        <th class="border px-4 py-2">Allocated To</th>
+        <th class="border px-4 py-2">Allocation Date</th>
+        <th class="border px-4 py-2">Purchase Date</th>
+        <th class="border px-4 py-2">Status</th>
+        <th class="border px-4 py-2">Actions</th>
+      </tr>
+    </thead>
+    <tbody id="tableBody"></tbody>
+  </table>
 
-      <!-- ✅ Pagination Controls -->
-      <div id="pagination" class="mt-4 flex justify-between items-center text-sm"></div>
-    </div>
-  </main>
+  <!-- ✅ Pagination Controls -->
+  <div id="pagination" class="mt-4 flex justify-between items-center text-sm"></div>
+</div>
+
 
   <!-- ✅ JS -->
   <script type="module" src="js/asset-inventory.js"></script>
