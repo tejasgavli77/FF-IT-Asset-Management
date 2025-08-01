@@ -44,8 +44,9 @@ async function generateAssetId(assetType) {
     desktop: "D",
     monitor: "Mn",
     printer: "P",
-    mouse: "Mo",
-    headset: "H"
+    mouse: "Ms",
+    headset: "H",
+    keyboard: "Key"
   };
 
   const prefix = prefixMap[cleanedType] || "X";
