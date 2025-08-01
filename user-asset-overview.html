@@ -1,4 +1,20 @@
-<body class="bg-gray-100" style="zoom: 0.9;">
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>User Asset Overview | IT Asset Management</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css" rel="stylesheet" />
+  <style>
+    /* Zoom only this page slightly smaller */
+    body {
+      zoom: 0.9;
+    }
+  </style>
+</head>
+<body class="bg-gray-100">
+
   <div class="flex min-h-screen">
 
     <!-- Sidebar -->
@@ -29,13 +45,13 @@
 
       <!-- Search Bar -->
       <div class="mb-4 flex gap-2">
-        <input id="searchInput" type="text" placeholder="Search by User Name" class="border px-3 py-2 rounded w-64">
+        <input id="searchInput" type="text" placeholder="Search by User Name" class="border px-3 py-2 rounded w-64" />
         <button id="resetSearch" class="bg-gray-300 hover:bg-gray-400 px-3 py-2 rounded text-sm">Reset</button>
       </div>
 
-      <!-- Table -->
+      <!-- User Table -->
       <div class="bg-white rounded-lg shadow-md p-4 overflow-x-auto">
-        <table class="min-w-full table-auto">
+        <table class="min-w-full table-auto text-sm">
           <thead class="bg-gray-200 text-gray-700 font-semibold">
             <tr>
               <th class="border px-4 py-2">#</th>
@@ -58,9 +74,31 @@
     </main>
   </div>
 
-  <!-- Your Existing Scripts -->
-  <script type="module" src="js/user-asset-overview.js"></script>
+  <!-- Firebase Auth Check -->
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+    import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
 
+    const firebaseConfig = {
+      apiKey: "AIzaSyAspahfUUGnBzh0mh6U53evGQzWQP956xQ",
+      authDomain: "ffassetmanager.firebaseapp.com",
+      projectId: "ffassetmanager",
+      storageBucket: "ffassetmanager.appspot.com",
+      messagingSenderId: "803858971008",
+      appId: "1:803858971008:web:72d69ddce6cbc85010a965"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+
+    onAuthStateChanged(auth, user => {
+      if (!user) {
+        window.location.href = "login.html";
+      }
+    });
+  </script>
+
+  <!-- Logout Script -->
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
     import { getAuth, signOut } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
@@ -88,4 +126,8 @@
       });
     }
   </script>
+
+  <!-- Page Script -->
+  <script type="module" src="js/user-asset-overview.js"></script>
 </body>
+</html>
