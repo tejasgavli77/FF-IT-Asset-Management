@@ -109,15 +109,15 @@ function applyFilters() {
       const row = document.createElement("tr");
 
       row.innerHTML = `
-        <td class="border px-4 py-2">${start + index + 1}</td>
-        <td class="border px-4 py-2">${asset.assetId || "N/A"}</td>
-        <td class="border px-4 py-2">${asset.type || "N/A"}</td>
-        <td class="border px-4 py-2">${asset.model || "N/A"}</td>
-        <td class="border px-4 py-2">${asset.serialNumber || "N/A"}</td>
-        <td class="border px-4 py-2">${asset.AllocatedTo || "-"}</td>
-        <td class="border px-4 py-2">${asset.allocationDate || "-"}</td>
-        <td class="border px-4 py-2">${asset.purchaseDate || "N/A"}</td>
-        <td class="border px-4 py-2">
+        <td class="border px-4 py-2 text-center">${start + index + 1}</td>
+        <td class="border px-4 py-2 text-center">${asset.assetId || "N/A"}</td>
+        <td class="border px-4 py-2 text-center">${asset.type || "N/A"}</td>
+        <td class="border px-4 py-2 text-center">${asset.model || "N/A"}</td>
+        <td class="border px-4 py-2 text-center">${asset.serialNumber || "N/A"}</td>
+        <td class="border px-4 py-2 text-center">${asset.AllocatedTo || "-"}</td>
+        <td class="border px-4 py-2 text-center">${asset.allocationDate || "-"}</td>
+        <td class="border px-4 py-2 text-center">${asset.purchaseDate || "N/A"}</td>
+        <td class="border px-4 py-2 text-center">
           <span class="px-2 py-1 rounded text-white ${
             asset.status?.toLowerCase() === "available" ? "bg-green-500" : "bg-red-500"
           }">${asset.status || "N/A"}</span>
