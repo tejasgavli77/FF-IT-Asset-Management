@@ -83,29 +83,32 @@
 </select>
 
 
-   <!-- Inventory Table -->
-<div class="bg-white rounded-lg shadow-md p-6 overflow-x-auto">
-  <table class="min-w-full table-auto">
-    <thead class="bg-gray-200 text-gray-700 font-semibold">
-      <tr>
-        <th class="border px-4 py-2">#</th>
-        <th class="border px-4 py-2">Asset ID</th>
-        <th class="border px-4 py-2">Type</th>
-        <th class="border px-4 py-2">Model</th>
-        <th class="border px-4 py-2">Serial Number</th>
-        <th class="border px-4 py-2">Allocated To</th>
-        <th class="border px-4 py-2">Allocation Date</th>
-        <th class="border px-4 py-2">Purchase Date</th>
-        <th class="border px-4 py-2">Status</th>
-        <th class="border px-4 py-2">Actions</th>
-      </tr>
-    </thead>
-    <tbody id="tableBody"></tbody>
-  </table>
+<!-- Inventory Table -->
+<div class="bg-white rounded-lg shadow-md p-6">
+  <div class="overflow-x-auto max-w-full">
+    <table class="min-w-full table-auto">
+      <thead class="bg-gray-200 text-gray-700 font-semibold">
+        <tr>
+          <th class="border px-4 py-2 whitespace-nowrap">#</th>
+          <th class="border px-4 py-2 whitespace-nowrap">Asset ID</th>
+          <th class="border px-4 py-2 whitespace-nowrap">Type</th>
+          <th class="border px-4 py-2 whitespace-nowrap">Model</th>
+          <th class="border px-4 py-2 whitespace-nowrap">Serial Number</th>
+          <th class="border px-4 py-2 whitespace-nowrap">Allocated To</th>
+          <th class="border px-4 py-2 whitespace-nowrap">Allocation Date</th>
+          <th class="border px-4 py-2 whitespace-nowrap">Purchase Date</th>
+          <th class="border px-4 py-2 whitespace-nowrap">Status</th>
+          <th class="border px-4 py-2 whitespace-nowrap">Actions</th>
+        </tr>
+      </thead>
+      <tbody id="tableBody"></tbody>
+    </table>
+  </div>
 
   <!-- ✅ Pagination Controls -->
   <div id="pagination" class="mt-4 flex justify-between items-center text-sm"></div>
 </div>
+
 
 
   <!-- ✅ JS -->
