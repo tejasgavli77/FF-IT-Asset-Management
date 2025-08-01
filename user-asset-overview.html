@@ -1,131 +1,91 @@
-<script type="module">
-  import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
-  import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+<body class="min-h-screen bg-gray-100 flex flex-col">
 
-  const firebaseConfig = {
-    apiKey: "AIzaSyAspahfUUGnBzh0mh6U53evGQzWQP956xQ",
-    authDomain: "ffassetmanager.firebaseapp.com",
-    projectId: "ffassetmanager",
-    storageBucket: "ffassetmanager.appspot.com",
-    messagingSenderId: "803858971008",
-    appId: "1:803858971008:web:72d69ddce6cbc85010a965"
-  };
+  <div class="flex flex-1 overflow-hidden">
+    <!-- Sidebar -->
+    <aside class="w-36 bg-white shadow-md px-4 py-4">
+      <h2 class="text-2xl font-bold mb-6 text-center text-blue-600">FF Inventory</h2>
+      <nav class="space-y-4">
+        <a href="add-asset.html" class="flex items-center gap-2 text-gray-700 hover:text-blue-600">
+          <i class="bi bi-plus-circle"></i> Add Asset
+        </a>
+        <a href="allocate-asset.html" class="flex items-center gap-2 text-gray-700 hover:text-blue-600">
+          <i class="bi bi-arrow-left-right"></i> Allocate Asset
+        </a>
+        <a href="asset-inventory.html" class="flex items-center gap-2 text-gray-700 hover:text-blue-600">
+          <i class="bi bi-layers"></i> Asset Inventory
+        </a>
+        <a href="user-asset-overview.html" class="flex items-center gap-2 text-blue-600 font-semibold">
+          <i class="bi bi-people-fill"></i> User Asset Overview
+        </a>
+      </nav>
+      <button id="logoutBtn" class="bg-red-500 text-white px-4 py-2 rounded mt-6 w-full">Logout</button>
+    </aside>
 
-  const app = initializeApp(firebaseConfig);
-  const auth = getAuth(app);
+    <!-- Main Content -->
+    <main class="flex-1 p-6 overflow-y-auto">
+      <header class="mb-6">
+        <h1 class="text-3xl font-semibold text-gray-800">User Asset Overview</h1>
+      </header>
 
-  onAuthStateChanged(auth, user => {
-    if (!user) {
-      window.location.href = "login.html"; // Redirect if not logged in
-    }
-  });
-</script>
+      <!-- Search Bar -->
+      <div class="mb-4 flex gap-2">
+        <input id="searchInput" type="text" placeholder="Search by User Name" class="border px-3 py-2 rounded w-64">
+        <button id="resetSearch" class="bg-gray-300 hover:bg-gray-400 px-3 py-2 rounded text-sm">Reset</button>
+      </div>
 
+      <!-- User Table -->
+      <div class="bg-white rounded-lg shadow-md p-4">
+        <table class="min-w-full table-auto">
+          <thead class="bg-gray-200 text-gray-700 font-semibold">
+            <tr>
+              <th class="border px-4 py-2">#</th>
+              <th class="border px-4 py-2">User</th>
+              <th class="border px-4 py-2">Total Assets</th>
+              <th class="border px-4 py-2">Asset Details</th>
+              <th class="border px-4 py-2">Actions</th>
+            </tr>
+          </thead>
+          <tbody id="userAssetTableBody"></tbody>
+        </table>
 
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>User Asset Overview | IT Asset Management</title>
-  <script src="https://cdn.tailwindcss.com"></script>
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css" rel="stylesheet" />
-    <style>
-    body {
-      zoom: 0.9;
-    }
-  </style>
-</head>
-<body class="flex h-screen bg-gray-100">
-  <!-- Sidebar -->
-  <aside class="w-36 bg-white shadow-md px-4 py-4">
-    <h2 class="text-2xl font-bold mb-6 text-center text-blue-600">FF Inventory</h2>
-    <nav class="space-y-4">
-      <a href="add-asset.html" class="flex items-center gap-2 text-gray-700 hover:text-blue-600">
-        <i class="bi bi-plus-circle"></i> Add Asset
-      </a>
-      <a href="allocate-asset.html" class="flex items-center gap-2 text-gray-700 hover:text-blue-600">
-        <i class="bi bi-arrow-left-right"></i> Allocate Asset
-      </a>
-      <a href="asset-inventory.html" class="flex items-center gap-2 text-gray-700 hover:text-blue-600">
-        <i class="bi bi-layers"></i> Asset Inventory
-      </a>
-      <a href="user-asset-overview.html" class="flex items-center gap-2 text-blue-600 font-semibold">
-        <i class="bi bi-people-fill"></i> User Asset Overview
-      </a>
-       </nav>
-    <button id="logoutBtn" class="bg-red-500 text-white px-4 py-2 rounded mt-6 w-full">Logout</button>
-    </nav>
-  </aside>
+        <!-- Pagination -->
+        <div id="paginationControls" class="flex justify-center items-center space-x-4 mt-4">
+          <button id="prevPage" class="px-4 py-2 bg-gray-300 text-gray-700 rounded hover:bg-gray-400">Prev</button>
+          <span id="pageIndicator" class="text-sm text-gray-700"></span>
+          <button id="nextPage" class="px-4 py-2 bg-gray-300 text-gray-700 rounded hover:bg-gray-400">Next</button>
+        </div>
+      </div>
+    </main>
+  </div>
 
-  <!-- Main Content -->
-  <main class="flex-1 p-6 overflow-y-auto min-h-screen">
-    <header class="mb-6">
-      <h1 class="text-3xl font-semibold text-gray-800">User Asset Overview</h1>
-    </header>
-
-    <!-- Search Bar -->
-    <div class="mb-4 flex gap-2">
-      <input id="searchInput" type="text" placeholder="Search by User Name" class="border px-3 py-2 rounded w-64">
-      <button id="resetSearch" class="bg-gray-300 hover:bg-gray-400 px-3 py-2 rounded text-sm">Reset</button>
-    </div>
-
-    <!-- User Table -->
-<div class="bg-white rounded-lg shadow-md p-4">
-  <table class="min-w-full table-auto">
-    <thead class="bg-gray-200 text-gray-700 font-semibold">
-      <tr>
-        <th class="border px-4 py-2">#</th>
-        <th class="border px-4 py-2">User</th>
-        <th class="border px-4 py-2">Total Assets</th>
-        <th class="border px-4 py-2">Asset Details</th>
-        <th class="border px-4 py-2">Actions</th>
-      </tr>
-    </thead>
-    <tbody id="userAssetTableBody"></tbody>
-  </table>
-
-   <!-- Pagignation -->
-  <div id="paginationControls" class="flex justify-center items-center space-x-4 mt-4">
-  <button id="prevPage" class="px-4 py-2 bg-gray-300 text-gray-700 rounded hover:bg-gray-400">Prev</button>
-  <span id="pageIndicator" class="text-sm text-gray-700"></span>
-  <button id="nextPage" class="px-4 py-2 bg-gray-300 text-gray-700 rounded hover:bg-gray-400">Next</button>
-</div>
-
-
-  <!-- JS Script -->
+  <!-- JS Scripts -->
   <script type="module" src="js/user-asset-overview.js"></script>
-
-    
-
   <script type="module">
-  import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
-  import { getAuth, signOut } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+    import { getAuth, signOut } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
 
-  const firebaseConfig = {
-    apiKey: "AIzaSyAspahfUUGnBzh0mh6U53evGQzWQP956xQ",
-    authDomain: "ffassetmanager.firebaseapp.com",
-    projectId: "ffassetmanager",
-    storageBucket: "ffassetmanager.appspot.com",
-    messagingSenderId: "803858971008",
-    appId: "1:803858971008:web:72d69ddce6cbc85010a965"
-  };
+    const firebaseConfig = {
+      apiKey: "AIzaSyAspahfUUGnBzh0mh6U53evGQzWQP956xQ",
+      authDomain: "ffassetmanager.firebaseapp.com",
+      projectId: "ffassetmanager",
+      storageBucket: "ffassetmanager.appspot.com",
+      messagingSenderId: "803858971008",
+      appId: "1:803858971008:web:72d69ddce6cbc85010a965"
+    };
 
-  const app = initializeApp(firebaseConfig);
-  const auth = getAuth(app);
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
 
-  const logoutBtn = document.getElementById("logoutBtn");
-  if (logoutBtn) {
-    logoutBtn.addEventListener("click", () => {
-      signOut(auth).then(() => {
-        window.location.href = "login.html";
-      }).catch(error => {
-        alert("Logout failed: " + error.message);
+    const logoutBtn = document.getElementById("logoutBtn");
+    if (logoutBtn) {
+      logoutBtn.addEventListener("click", () => {
+        signOut(auth).then(() => {
+          window.location.href = "login.html";
+        }).catch(error => {
+          alert("Logout failed: " + error.message);
+        });
       });
-    });
-  }
-</script>
-
-  
+    }
+  </script>
 </body>
-</html>
+
