@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Asset Summary | IT Asset Management</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css" rel="stylesheet" />
+  <style>
+    body {
+      zoom: 0.9;
+    }
+  </style>
+</head>
+<body class="flex h-screen bg-gray-100">
+  <!-- Sidebar -->
+  <aside class="w-36 bg-white shadow-md px-4 py-4">
+    <h2 class="text-2xl font-bold mb-6 text-center text-blue-600">FF Inventory</h2>
+    <nav class="space-y-4">
+      <a href="add-asset.html" class="flex items-center gap-2 text-gray-700 hover:text-blue-600">
+        <i class="bi bi-plus-circle"></i> Add Asset
+      </a>
+      <a href="allocate-asset.html" class="flex items-center gap-2 text-gray-700 hover:text-blue-600">
+        <i class="bi bi-arrow-left-right"></i> Allocate Asset
+      </a>
+      <a href="asset-inventory.html" class="flex items-center gap-2 text-gray-700 hover:text-blue-600">
+        <i class="bi bi-layers"></i> Asset Inventory
+      </a>
+      <a href="user-asset-overview.html" class="flex items-center gap-2 text-gray-700 hover:text-blue-600">
+        <i class="bi bi-people-fill"></i> User Asset Overview
+      </a>
+      <a href="asset-summary.html" class="flex items-center gap-2 text-blue-600 font-semibold">
+        <i class="bi bi-bar-chart-line-fill"></i> Asset Summary
+      </a>
+    </nav>
+    <button id="logoutBtn" class="bg-red-500 text-white px-4 py-2 rounded mt-6 w-full">Logout</button>
+  </aside>
+
+  <!-- Main Content -->
+  <main class="flex-1 p-6 overflow-y-auto">
+    <header class="mb-6">
+      <h1 class="text-3xl font-semibold text-gray-800">Asset Summary Overview</h1>
+    </header>
+
+    <div class="bg-white rounded-lg shadow-md p-4 overflow-x-auto">
+      <table class="min-w-full table-auto text-sm">
+        <thead class="bg-gray-200 text-gray-700 font-semibold">
+          <tr>
+            <th class="border px-4 py-2 text-left">Model</th>
+            <th class="border px-4 py-2 text-center">Total</th>
+            <th class="border px-4 py-2 text-center">Available</th>
+            <th class="border px-4 py-2 text-center">Allocated</th>
+          </tr>
+        </thead>
+        <tbody id="summaryTableBody" class="text-gray-800"></tbody>
+      </table>
+    </div>
+  </main>
+
+  <!-- Firebase + Auth + Data Logic -->
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+    import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+    import { getFirestore, collection, getDocs } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyAspahfUUGnBzh0mh6U53evGQzWQP956xQ",
+      authDomain: "ffassetmanager.firebaseapp.com",
+      projectId: "ffassetmanager",
+      storageBucket: "ffassetmanager.appspot.com",
+      messagingSenderId: "803858971008",
+      appId: "1:803858971008:web:72d69ddce6cbc85010a965"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db = getFirestore(app);
+
+    onAuthStateChanged(auth, user => {
+      if (!user) window.location.href = "login.html";
+      else loadAssetSummary();
+    });
+
+    async function loadAssetSummary() {
+      const snapshot = await getDocs(collection(db, "assets"));
+      const modelMap = new Map();
+
+      snapshot.forEach(doc => {
+        const data = doc.data();
+        const model = data.model || "Unknown";
+        const status = (data.status || "").toLowerCase();
+
+        if (!modelMap.has(model)) {
+          modelMap.set(model, { total: 0, available: 0, allocated: 0 });
+        }
+
+        const count = modelMap.get(model);
+        count.total++;
+
+        if (status === "available") count.available++;
+        else if (status === "allocated") count.allocated++;
+      });
+
+      const tbody = document.getElementById("summaryTableBody");
+      tbody.innerHTML = "";
+
+      modelMap.forEach((counts, model) => {
+        tbody.innerHTML += `
+          <tr>
+            <td class="border px-4 py-2">${model}</td>
+            <td class="border px-4 py-2 text-center">${counts.total}</td>
+            <td class="border px-4 py-2 text-center">${counts.available}</td>
+            <td class="border px-4 py-2 text-center">${counts.allocated}</td>
+          </tr>`;
+      });
+    }
+
+    // Logout
+    const logoutBtn = document.getElementById("logoutBtn");
+    if (logoutBtn) {
+      logoutBtn.addEventListener("click", () => {
+        signOut(auth).then(() => {
+          window.location.href = "login.html";
+        }).catch(error => {
+          alert("Logout failed: " + error.message);
+        });
+      });
+    }
+  </script>
+</body>
+</html>
