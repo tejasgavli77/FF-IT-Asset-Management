@@ -40,9 +40,6 @@ function populateTypeDropdown(assets) {
     typeFilter.appendChild(option);
   });
 
-  // ✅ Ensure correct width is applied even after DOM update
-typeFilter.classList.add("w-80");
-
   const choices = new Choices("#typeFilter", {
     searchEnabled: true,
     itemSelectText: "",
