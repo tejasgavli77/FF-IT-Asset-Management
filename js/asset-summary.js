@@ -1,5 +1,9 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
-import { getFirestore, collection, getDocs } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+import {
+  getFirestore,
+  getDocs,
+  collection
+} from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
 // Firebase config
 const firebaseConfig = {
@@ -14,76 +18,89 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 
+const summaryTableBody = document.getElementById("summaryTableBody");
 const typeFilter = document.getElementById("typeFilter");
-const summaryBody = document.getElementById("summaryTableBody");
 
-let assets = [];
+let allAssets = [];
 
-async function fetchAssets() {
+async function loadAssets() {
   const querySnapshot = await getDocs(collection(db, "assets"));
-  assets = querySnapshot.docs.map(doc => doc.data());
-  populateTypeDropdown(assets);
-  renderSummary(assets);
+  const assetMap = new Map();
+
+  allAssets = [];
+
+  querySnapshot.forEach(doc => {
+    const asset = doc.data();
+    allAssets.push(asset);
+
+    const type = asset.type || "Unknown";
+
+    if (!assetMap.has(type)) {
+      assetMap.set(type, { total: 0, allocated: 0, available: 0 });
+    }
+
+    const counts = assetMap.get(type);
+    counts.total++;
+    asset.status === "Allocated" ? counts.allocated++ : counts.available++;
+  });
+
+  renderTable(assetMap);
+  populateDropdown(assetMap);
 }
 
-function populateTypeDropdown(assets) {
-  const types = [...new Set(assets.map(asset => asset.type))];
-  types.sort();
+function renderTable(assetMap, filter = "all") {
+  summaryTableBody.innerHTML = "";
+  let index = 1;
 
-  // Clear previous options except "All Types"
-  typeFilter.innerHTML = `<option value="all">All Types</option>`;
+  for (const [type, counts] of assetMap.entries()) {
+    if (filter !== "all" && type !== filter) continue;
 
-  types.forEach(type => {
+    const row = `
+      <tr>
+        <td class="border px-4 py-2 text-center">${index++}</td>
+        <td class="border px-4 py-2">${type}</td>
+        <td class="border px-4 py-2 text-center">${counts.total}</td>
+        <td class="border px-4 py-2 text-center">${counts.allocated}</td>
+        <td class="border px-4 py-2 text-center">${counts.available}</td>
+      </tr>
+    `;
+    summaryTableBody.insertAdjacentHTML("beforeend", row);
+  }
+}
+
+function populateDropdown(assetMap) {
+  assetMap.forEach((_, type) => {
     const option = document.createElement("option");
     option.value = type;
     option.textContent = type;
     typeFilter.appendChild(option);
   });
 
-  const choices = new Choices("#typeFilter", {
-    searchEnabled: true,
-    itemSelectText: "",
-    shouldSort: false,
-  });
-
-  typeFilter.addEventListener("change", () => {
-    const selectedType = typeFilter.value;
-    const filtered = selectedType === "all" ? assets : assets.filter(a => a.type === selectedType);
-    renderSummary(filtered);
-  });
+  // reinit tom-select if needed (but we've done it in HTML)
 }
 
-function renderSummary(data) {
-  summaryBody.innerHTML = "";
+typeFilter.addEventListener("change", () => {
+  const selected = typeFilter.value;
+  const grouped = groupAssetsByType(allAssets);
+  renderTable(grouped, selected);
+});
 
-  const summaryMap = {};
+function groupAssetsByType(assets) {
+  const assetMap = new Map();
 
-  data.forEach(asset => {
+  assets.forEach(asset => {
     const type = asset.type || "Unknown";
-    if (!summaryMap[type]) {
-      summaryMap[type] = { total: 0, allocated: 0, available: 0 };
+
+    if (!assetMap.has(type)) {
+      assetMap.set(type, { total: 0, allocated: 0, available: 0 });
     }
 
-    summaryMap[type].total += 1;
-
-    if (asset.status === "Allocated") {
-      summaryMap[type].allocated += 1;
-    } else {
-      summaryMap[type].available += 1;
-    }
+    const counts = assetMap.get(type);
+    counts.total++;
+    asset.status === "Allocated" ? counts.allocated++ : counts.available++;
   });
 
-  Object.entries(summaryMap).forEach(([type, counts], index) => {
-    const row = document.createElement("tr");
-    row.innerHTML = `
-      <td class="border px-4 py-2">${index + 1}</td>
-      <td class="border px-4 py-2">${type}</td>
-      <td class="border px-4 py-2">${counts.total}</td>
-      <td class="border px-4 py-2">${counts.allocated}</td>
-      <td class="border px-4 py-2">${counts.available}</td>
-    `;
-    summaryBody.appendChild(row);
-  });
+  return assetMap;
 }
 
-fetchAssets();
+loadAssets();
