@@ -1,8 +1,10 @@
-import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+import {
+  initializeApp
+} from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
 import {
   getFirestore,
-  getDocs,
-  collection
+  collection,
+  getDocs
 } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
 // Firebase config
@@ -18,89 +20,79 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 
-const summaryTableBody = document.getElementById("summaryTableBody");
 const typeFilter = document.getElementById("typeFilter");
+const tableBody = document.getElementById("summaryTableBody");
 
 let allAssets = [];
 
-async function loadAssets() {
+async function fetchAssets() {
   const querySnapshot = await getDocs(collection(db, "assets"));
-  const assetMap = new Map();
+  allAssets = querySnapshot.docs.map(doc => doc.data());
+  populateTypeDropdown();
+  renderTable("all");
+}
 
-  allAssets = [];
+// Group assets by type and render table
+function renderTable(selectedType = "all") {
+  const grouped = {};
 
-  querySnapshot.forEach(doc => {
-    const asset = doc.data();
-    allAssets.push(asset);
-
+  allAssets.forEach(asset => {
     const type = asset.type || "Unknown";
+    if (selectedType !== "all" && type !== selectedType) return;
 
-    if (!assetMap.has(type)) {
-      assetMap.set(type, { total: 0, allocated: 0, available: 0 });
+    if (!grouped[type]) {
+      grouped[type] = {
+        total: 0,
+        available: 0,
+        allocated: 0
+      };
     }
 
-    const counts = assetMap.get(type);
-    counts.total++;
-    asset.status === "Allocated" ? counts.allocated++ : counts.available++;
+    grouped[type].total += 1;
+    if (asset.status === "Available") grouped[type].available += 1;
+    if (asset.status === "Allocated") grouped[type].allocated += 1;
   });
 
-  renderTable(assetMap);
-  populateDropdown(assetMap);
-}
+  tableBody.innerHTML = "";
 
-function renderTable(assetMap, filter = "all") {
-  summaryTableBody.innerHTML = "";
-  let index = 1;
-
-  for (const [type, counts] of assetMap.entries()) {
-    if (filter !== "all" && type !== filter) continue;
-
-    const row = `
-      <tr>
-        <td class="border px-4 py-2 text-center">${index++}</td>
-        <td class="border px-4 py-2">${type}</td>
-        <td class="border px-4 py-2 text-center">${counts.total}</td>
-        <td class="border px-4 py-2 text-center">${counts.allocated}</td>
-        <td class="border px-4 py-2 text-center">${counts.available}</td>
-      </tr>
+  Object.entries(grouped).forEach(([type, counts], index) => {
+    const row = document.createElement("tr");
+    row.innerHTML = `
+      <td class="border px-4 py-2">${index + 1}</td>
+      <td class="border px-4 py-2">${type}</td>
+      <td class="border px-4 py-2">${counts.total}</td>
+      <td class="border px-4 py-2">${counts.available}</td>
+      <td class="border px-4 py-2">${counts.allocated}</td>
     `;
-    summaryTableBody.insertAdjacentHTML("beforeend", row);
-  }
+    tableBody.appendChild(row);
+  });
 }
 
-function populateDropdown(assetMap) {
-  assetMap.forEach((_, type) => {
+// Populate dropdown with unique types
+function populateTypeDropdown() {
+  const types = Array.from(new Set(allAssets.map(asset => asset.type || "Unknown")));
+  types.sort();
+
+  typeFilter.innerHTML = `<option value="all">All Types</option>`;
+  types.forEach(type => {
     const option = document.createElement("option");
     option.value = type;
     option.textContent = type;
     typeFilter.appendChild(option);
   });
 
-  // reinit tom-select if needed (but we've done it in HTML)
+  // Enable Choices.js after options are loaded
+  new Choices(typeFilter, {
+    searchEnabled: true,
+    itemSelectText: '',
+    shouldSort: false
+  });
 }
 
+// Handle dropdown change
 typeFilter.addEventListener("change", () => {
   const selected = typeFilter.value;
-  const grouped = groupAssetsByType(allAssets);
-  renderTable(grouped, selected);
+  renderTable(selected);
 });
 
-function groupAssetsByType(assets) {
-  const assetMap = new Map();
-
-  assets.forEach(asset => {
-    const type = asset.type || "Unknown";
-
-    if (!assetMap.has(type)) {
-      assetMap.set(type, { total: 0, allocated: 0, available: 0 });
-    }
-
-    const counts = assetMap.get(type);
-    counts.total++;
-    asset.status === "Allocated" ? counts.allocated++ : counts.available++;
-  });
-
-  return assetMap;
-}
-
-loadAssets();
+fetchAssets();
