@@ -3,39 +3,27 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Asset Summary | IT Asset Management</title>
+  <title>Asset Summary</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css" rel="stylesheet" />
+  <!-- ✅ Tom Select CSS -->
+  <link href="https://cdn.jsdelivr.net/npm/tom-select/dist/css/tom-select.css" rel="stylesheet" />
   <style>
-    body {
-      zoom: 0.9;
-    }
-    /* Explicitly allow wider dropdown */
-    .w-96 {
-      width: 24rem;
-    }
+    body { zoom: 0.9; }
+    .ts-dropdown { max-height: 200px; overflow-y: auto; }
   </style>
 </head>
+
 <body class="flex h-screen bg-gray-100">
   <!-- Sidebar -->
   <aside class="w-36 bg-white shadow-md px-4 py-4">
     <h2 class="text-2xl font-bold mb-6 text-center text-blue-600">FF Inventory</h2>
     <nav class="space-y-4">
-      <a href="add-asset.html" class="flex items-center gap-2 text-gray-700 hover:text-blue-600">
-        <i class="bi bi-plus-circle"></i> Add Asset
-      </a>
-      <a href="allocate-asset.html" class="flex items-center gap-2 text-gray-700 hover:text-blue-600">
-        <i class="bi bi-arrow-left-right"></i> Allocate Asset
-      </a>
-      <a href="asset-inventory.html" class="flex items-center gap-2 text-gray-700 hover:text-blue-600">
-        <i class="bi bi-layers"></i> Asset Inventory
-      </a>
-      <a href="user-asset-overview.html" class="flex items-center gap-2 text-gray-700 hover:text-blue-600">
-        <i class="bi bi-people-fill"></i> User Asset Overview
-      </a>
-      <a href="asset-summary.html" class="flex items-center gap-2 text-blue-600 font-semibold">
-        <i class="bi bi-bar-chart-line-fill"></i> Asset Summary
-      </a>
+      <a href="add-asset.html" class="flex items-center gap-2 text-gray-700 hover:text-blue-600"><i class="bi bi-plus-circle"></i> Add Asset</a>
+      <a href="allocate-asset.html" class="flex items-center gap-2 text-gray-700 hover:text-blue-600"><i class="bi bi-arrow-left-right"></i> Allocate Asset</a>
+      <a href="asset-inventory.html" class="flex items-center gap-2 text-gray-700 hover:text-blue-600"><i class="bi bi-layers"></i> Asset Inventory</a>
+      <a href="user-asset-overview.html" class="flex items-center gap-2 text-gray-700 hover:text-blue-600"><i class="bi bi-people-fill"></i> User Asset Overview</a>
+      <a href="asset-summary.html" class="flex items-center gap-2 text-blue-600 font-semibold"><i class="bi bi-bar-chart-line-fill"></i> Asset Summary</a>
     </nav>
     <button id="logoutBtn" class="bg-red-500 text-white px-4 py-2 rounded mt-6 w-full">Logout</button>
   </aside>
@@ -46,7 +34,7 @@
       <h1 class="text-3xl font-semibold text-gray-800">Asset Summary</h1>
     </header>
 
-    <!-- 🔍 Searchable Asset Type Filter -->
+    <!-- Filter Dropdown -->
     <div class="mb-4 flex items-center gap-4">
       <label for="typeFilter" class="font-medium text-gray-700">Filter by Type:</label>
       <select id="typeFilter" class="w-96 px-3 py-2 border rounded shadow-sm">
@@ -71,6 +59,19 @@
     </div>
   </main>
 
+  <!-- ✅ Tom Select JS -->
+  <script src="https://cdn.jsdelivr.net/npm/tom-select/dist/js/tom-select.complete.min.js"></script>
+
+  <!-- ✅ Custom Logic -->
   <script type="module" src="js/asset-summary.js"></script>
+
+  <script>
+    // Enable searchable dropdown
+    new TomSelect("#typeFilter", {
+      create: false,
+      sortField: { field: "text", direction: "asc" },
+      placeholder: "Select Asset Type"
+    });
+  </script>
 </body>
 </html>
