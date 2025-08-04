@@ -87,14 +87,14 @@
 
       snapshot.forEach(doc => {
         const data = doc.data();
-        const model = data.model || "Unknown";
+        const type = data.type || "Unknown";
         const status = (data.status || "").toLowerCase();
 
-        if (!modelMap.has(model)) {
-          modelMap.set(model, { total: 0, available: 0, allocated: 0 });
+        if (!modelMap.has(type)) {
+  modelMap.set(type, { total: 0, available: 0, allocated: 0 });
         }
 
-        const count = modelMap.get(model);
+      const count = modelMap.get(type);
         count.total++;
 
         if (status === "available") count.available++;
@@ -104,10 +104,10 @@
       const tbody = document.getElementById("summaryTableBody");
       tbody.innerHTML = "";
 
-      modelMap.forEach((counts, model) => {
-        tbody.innerHTML += `
-          <tr>
-            <td class="border px-4 py-2">${model}</td>
+      modelMap.forEach((counts, type) => {
+      tbody.innerHTML += `
+      <tr>
+            <td class="border px-4 py-2">${type}</td>
             <td class="border px-4 py-2 text-center">${counts.total}</td>
             <td class="border px-4 py-2 text-center">${counts.available}</td>
             <td class="border px-4 py-2 text-center">${counts.allocated}</td>
