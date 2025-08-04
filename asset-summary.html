@@ -45,12 +45,12 @@
     </header>
 
     <!-- 🔍 Filter Dropdown -->
-    <div class="mb-4 flex items-center gap-4">
-      <label for="typeFilter" class="font-medium text-gray-700">Filter by Type:</label>
-      <select id="typeFilter" class="w-80 px-3 py-2 border rounded shadow-sm">
-        <option value="all">All Types</option>
-      </select>
-    </div>
+    <!-- 🔍 Filter by Type (Live Search) -->
+<div class="mb-4">
+  <label for="typeFilter" class="font-medium text-gray-700 block mb-1">Filter by Type:</label>
+  <input type="text" id="typeSearch" placeholder="Search or select type..." class="w-72 px-3 py-2 border rounded mb-2" />
+  <select id="typeFilter" size="6" class="w-72 px-3 py-2 border rounded shadow-sm block overflow-y-auto"></select>
+</div>
 
     <!-- 📊 Asset Summary Table -->
     <div class="bg-white rounded-lg shadow-md p-4 overflow-x-auto">
