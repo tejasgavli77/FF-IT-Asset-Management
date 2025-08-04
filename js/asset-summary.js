@@ -34,7 +34,7 @@ function renderTable(filteredType = "all") {
         grouped[type] = { total: 0, allocated: 0, available: 0 };
       }
       grouped[type].total += 1;
-      if (asset.status === "Allocated") {
+      if ((asset.status || "").toLowerCase() === "allocated") {
         grouped[type].allocated += 1;
       } else {
         grouped[type].available += 1;
@@ -61,14 +61,36 @@ function renderTable(filteredType = "all") {
 
     // Populate dropdown (once)
     if (typeFilter.options.length <= 1) {
-      const types = Object.keys(grouped);
-      types.forEach(type => {
-        const option = document.createElement("option");
-        option.value = type;
-        option.textContent = type;
-        typeFilter.appendChild(option);
-      });
-    }
+  const types = Object.keys(grouped);
+  typeFilter.innerHTML = "";
+
+  // Add "All Types" option first
+  const allOption = document.createElement("option");
+  allOption.value = "all";
+  allOption.textContent = "All Types";
+  typeFilter.appendChild(allOption);
+
+  types.forEach(type => {
+    const option = document.createElement("option");
+    option.value = type;
+    option.textContent = type;
+    typeFilter.appendChild(option);
+  });
+
+  // Live filter functionality
+  const typeSearchInput = document.getElementById("typeSearch");
+  typeSearchInput.addEventListener("input", () => {
+    const searchTerm = typeSearchInput.value.toLowerCase();
+    Array.from(typeFilter.options).forEach(option => {
+      const isMatch = option.textContent.toLowerCase().includes(searchTerm);
+      option.style.display = isMatch ? "block" : "none";
+    });
+  });
+
+  // Select first option by default
+  typeFilter.selectedIndex = 0;
+}
+
   });
 }
 
