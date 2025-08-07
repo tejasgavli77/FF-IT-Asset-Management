@@ -97,7 +97,7 @@
     <!-- ✅ Outer wrapper for scaling -->
 <div class="bg-white rounded-lg shadow-md overflow-hidden w-full">
   <div class="overflow-x-auto">
-    <div class="max-h-[75vh] overflow-y-auto">
+    <div class="overflow-y-auto" style="max-height: calc(100vh - 300px);">
       <table class="w-full text-sm">
         <thead class="bg-gray-200 text-gray-700 font-semibold sticky top-0 z-10">
           <tr>
@@ -114,6 +114,12 @@
           </tr>
         </thead>
         <tbody id="tableBody"></tbody>
+        <!-- ✅ Pagination controls -->
+<div id="paginationControls" class="flex justify-end mt-4 gap-2 text-sm pr-2">
+  <button id="prevPage" class="bg-gray-200 px-3 py-1 rounded hover:bg-gray-300">Previous</button>
+  <span id="pageIndicator" class="self-center px-2">Page 1</span>
+  <button id="nextPage" class="bg-gray-200 px-3 py-1 rounded hover:bg-gray-300">Next</button>
+</div>
       </table>
     </div>
   </div>
