@@ -1,71 +1,88 @@
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+  import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+
+  const firebaseConfig = {
+    apiKey: "AIzaSyAspahfUUGnBzh0mh6U53evGQzWQP956xQ",
+    authDomain: "ffassetmanager.firebaseapp.com",
+    projectId: "ffassetmanager",
+    storageBucket: "ffassetmanager.appspot.com",
+    messagingSenderId: "803858971008",
+    appId: "1:803858971008:web:72d69ddce6cbc85010a965"
+  };
+
+  const app = initializeApp(firebaseConfig);
+  const auth = getAuth(app);
+
+  onAuthStateChanged(auth, user => {
+    if (!user) {
+      window.location.href = "login.html"; // Redirect if not logged in
+    }
+  });
+</script>
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Asset Manager</title>
-
-  <!-- Tailwind CSS -->
+  <meta charset="UTF-8" /><meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Asset Inventory</title>
   <script src="https://cdn.tailwindcss.com"></script>
-
-  <!-- TomSelect -->
-  <link href="https://cdn.jsdelivr.net/npm/tom-select/dist/css/tom-select.css" rel="stylesheet" />
-  <script src="https://cdn.jsdelivr.net/npm/tom-select/dist/js/tom-select.complete.min.js"></script>
-
-  <!-- Bootstrap Icons (optional) -->
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" />
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css" rel="stylesheet"/>
+  <link href="https://cdn.jsdelivr.net/npm/tom-select/dist/css/tom-select.css" rel="stylesheet"/>
 </head>
-<body class="bg-gray-50 p-6">
+<body class="flex h-screen bg-gray-100">
+  <!-- Sidebar -->
+  <aside class="w-36 bg-white shadow-md px-4 py-4 hidden lg:block">
+    <h2 class="text-2xl font-bold mb-6 text-center text-blue-600">FF Inventory</h2>
+    <nav class="space-y-4 text-sm">
+      <a href="add-asset.html" class="flex items-center gap-2 px-2 hover:text-blue-600"><i class="bi bi-plus-circle"></i> Add Asset</a>
+      <a href="allocate-asset.html" class="flex items-center gap-2 px-2 hover:text-blue-600"><i class="bi bi-arrow-left-right"></i> Allocate Asset</a>
+      <a href="asset-inventory.html" class="flex items-center gap-2 px-2 font-semibold text-blue-600"><i class="bi bi-layers"></i> Asset Inventory</a>
+      <a href="user-asset-overview.html" class="flex items-center gap-2 px-2 hover:text-blue-600"><i class="bi bi-people-fill"></i> User Overview</a>
+      <a href="asset-summary.html" class="flex items-center gap-2 px-2 hover:text-blue-600"><i class="bi bi-bar-chart-line-fill"></i> Summary</a>
+    </nav>
+    <button id="logoutBtn" class="mt-6 w-full bg-red-500 text-white py-2 rounded hover:bg-red-600">Logout</button>
+  </aside>
 
-  <!-- Filters -->
-  <div class="flex flex-wrap gap-2 items-center mb-4">
-    <input id="searchInput" type="text" placeholder="Search by ID, Model, Serial" class="border px-3 py-2 rounded w-64" />
+  <!-- Main content -->
+  <main class="flex-1 p-6 overflow-y-auto">
+    <header class="mb-4"><h1 class="text-3xl font-semibold text-gray-800">Asset Inventory</h1></header>
 
-    <select id="typeFilter" class="border px-3 py-2 rounded w-48" placeholder="Filter by Type" autocomplete="off"></select>
-
-    <select id="statusFilter" class="border px-3 py-2 rounded w-40">
-      <option value="">All Status</option>
-      <option value="allocated">Allocated</option>
-      <option value="available">Available</option>
-    </select>
-
-    <button id="resetFilters" class="bg-gray-100 px-4 py-2 rounded hover:bg-gray-200">Reset</button>
-  </div>
-
-  <!-- Table -->
-  <div class="overflow-x-auto bg-white rounded shadow">
-    <table class="min-w-full divide-y divide-gray-200">
-      <thead class="bg-gray-100 sticky top-0">
-        <tr>
-          <th class="px-4 py-2 text-left">#</th>
-          <th class="px-4 py-2 text-left">Asset ID</th>
-          <th class="px-4 py-2 text-left">Type</th>
-          <th class="px-4 py-2 text-left">Model</th>
-          <th class="px-4 py-2 text-left">Serial</th>
-          <th class="px-4 py-2 text-left">Allocated To</th>
-          <th class="px-4 py-2 text-left">Allocation Date</th>
-          <th class="px-4 py-2 text-left">Purchase Date</th>
-          <th class="px-4 py-2 text-left">Status</th>
-          <th class="px-4 py-2 text-left">Actions</th>
-        </tr>
-      </thead>
-      <tbody id="tableBody" class="divide-y divide-gray-200"></tbody>
-    </table>
-  </div>
-
-  <!-- Pagination -->
-  <div id="pagination" class="mt-4 flex justify-between items-center"></div>
-
-  <!-- History Modal (Optional if needed) -->
-  <div id="historyModal" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center">
-    <div class="bg-white rounded p-4 w-96 max-h-[80vh] overflow-auto">
-      <h2 class="text-xl font-semibold mb-2">Asset History</h2>
-      <ul id="historyList" class="list-disc list-inside space-y-1"></ul>
-      <button onclick="document.getElementById('historyModal').classList.add('hidden')" class="mt-4 bg-gray-200 px-4 py-2 rounded hover:bg-gray-300">Close</button>
+    <!-- Filters -->
+    <div class="flex flex-wrap gap-2 mb-4">
+      <input id="searchInput" type="text" placeholder="Search by ID, Model..." class="border px-3 py-2 rounded w-72"/>
+      <select id="typeFilter" class="border px-3 py-2 rounded w-48"></select>
+      <select id="statusFilter" class="border px-3 py-2 rounded w-32">
+        <option value="">All Status</option>
+        <option value="available">Available</option>
+        <option value="allocated">Allocated</option>
+      </select>
+      <button id="resetFilters" class="bg-gray-100 px-4 py-2 rounded hover:bg-gray-200">Reset</button>
     </div>
-  </div>
 
-  <!-- Firebase + JS Logic -->
-  <script type="module" src="main.js"></script>
+    <!-- Table -->
+    <div class="bg-white rounded-lg shadow overflow-x-auto">
+      <div class="max-h-[70vh] overflow-y-auto">
+        <table class="min-w-full text-sm">
+          <thead class="bg-gray-200 sticky top-0">
+            <tr>
+              <th class="p-2 border">#</th><th class="p-2 border">Asset ID</th><th class="p-2 border">Type</th>
+              <th class="p-2 border">Model</th><th class="p-2 border">Serial</th><th class="p-2 border">Allocated To</th>
+              <th class="p-2 border">Alloc Date</th><th class="p-2 border">Purchase Date</th><th class="p-2 border">Status</th>
+              <th class="p-2 border">Actions</th>
+            </tr>
+          </thead>
+          <tbody id="tableBody"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- Pagination -->
+    <div id="pagination" class="mt-4 flex justify-around items-center text-sm"></div>
+  </main>
+
+  <script src="https://cdn.jsdelivr.net/npm/tom-select/dist/js/tom-select.complete.min.js"></script>
+  <script type="module" src="asset-inventory.js"></script>
 </body>
 </html>
+
