@@ -21,24 +21,26 @@
   });
 </script>
 
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  
-  <style>
-  html, body {
-    margin: 0;
-    padding: 0;
-    height: 100%;
-  }
-</style>
-
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Asset Inventory | IT Asset Management</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css" rel="stylesheet" />
+  <link href="https://cdn.jsdelivr.net/npm/tom-select@2.2.2/dist/css/tom-select.css" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/tom-select@2.2.2/dist/js/tom-select.complete.min.js"></script>
+  <style>
+    html, body {
+      margin: 0;
+      padding: 0;
+      height: 100%;
+    }
+    .table-wrapper {
+      max-height: calc(100vh - 260px);
+    }
+  </style>
 </head>
 <body class="flex h-screen bg-gray-100">
   <!-- Sidebar -->
@@ -54,16 +56,14 @@
       <a href="asset-inventory.html" class="flex items-center gap-2 text-blue-600 font-semibold">
         <i class="bi bi-layers"></i> Asset Inventory
       </a>
-       <a href="user-asset-overview.html" class="flex items-center gap-2 text-gray-700 hover:text-blue-600">
-       <i class="bi bi-people-fill"></i> User Asset Overview
+      <a href="user-asset-overview.html" class="flex items-center gap-2 text-gray-700 hover:text-blue-600">
+        <i class="bi bi-people-fill"></i> User Asset Overview
       </a>
       <a href="asset-summary.html" class="flex items-center gap-2 text-gray-700 hover:text-blue-600">
-  <i class="bi bi-bar-chart-line-fill"></i> Asset Summary
-</a>
-  <!--Logout-->
-   </nav>
-    <button id="logoutBtn" class="bg-red-500 text-white px-4 py-2 rounded mt-6 w-full">Logout</button> 
+        <i class="bi bi-bar-chart-line-fill"></i> Asset Summary
+      </a>
     </nav>
+    <button id="logoutBtn" class="bg-red-500 text-white px-4 py-2 rounded mt-6 w-full">Logout</button> 
   </aside>
 
   <!-- Main Content -->
@@ -80,98 +80,114 @@
         <option value="Available">Available</option>
         <option value="Allocated">Allocated</option>
       </select>
+      <select id="typeFilter" class="border rounded px-3 py-2 min-w-[200px]">
+        <option value="">All Types</option>
+        <option value="Laptop">Laptop</option>
+        <option value="Monitor">Monitor</option>
+        <option value="Keyboard">Keyboard</option>
+        <option value="Mouse">Mouse</option>
+        <option value="Headset">Headset</option>
+        <option value="Desktop">Desktop</option>  
+      </select>
       <button id="resetFilters" class="bg-gray-200 px-3 py-2 rounded hover:bg-gray-300">Reset</button>
     </div>
-    
-<!-- Filter by Type -->
-<select id="typeFilter" class="border rounded px-2 py-1">
-  <option value="">All Types</option>
-  <option value="Laptop">Laptop</option>
-  <option value="Monitor">Monitor</option>
-  <option value="Keyboard">Keyboard</option>
-  <option value="Mouse">Mouse</option>
-  <option value="Headset">Headset</option>
-  <option value="Desktop">Desktop</option>  
-</select>
 
-    <!-- ✅ Outer wrapper for scaling -->
-<div class="bg-white rounded-lg shadow-md overflow-hidden w-full">
-  <div class="overflow-x-auto">
-    <div class="overflow-y-auto" style="max-height: calc(100vh - 300px);">
-      <table class="w-full text-sm">
-        <thead class="bg-gray-200 text-gray-700 font-semibold sticky top-0 z-10">
-          <tr>
-            <th class="px-2 py-2 border">#</th>
-            <th class="px-2 py-2 border">Asset ID</th>
-            <th class="px-2 py-2 border">Type</th>
-            <th class="px-2 py-2 border">Model</th>
-            <th class="px-2 py-2 border">Serial Number</th>
-            <th class="px-2 py-2 border">Allocated To</th>
-            <th class="px-2 py-2 border">Allocation Date</th>
-            <th class="px-2 py-2 border">Purchase Date</th>
-            <th class="px-2 py-2 border">Status</th>
-            <th class="px-2 py-2 border">Actions</th>
-          </tr>
-        </thead>
-        <tbody id="tableBody"></tbody>
-        <!-- ✅ Pagination controls -->
-<div id="paginationControls" class="flex justify-end mt-4 gap-2 text-sm pr-2">
-  <button id="prevPage" class="bg-gray-200 px-3 py-1 rounded hover:bg-gray-300">Previous</button>
-  <span id="pageIndicator" class="self-center px-2">Page 1</span>
-  <button id="nextPage" class="bg-gray-200 px-3 py-1 rounded hover:bg-gray-300">Next</button>
-</div>
-      </table>
+    <!-- Table -->
+    <div class="bg-white rounded-lg shadow-md overflow-hidden w-full">
+      <div class="overflow-x-auto">
+        <div class="overflow-y-auto table-wrapper">
+          <table class="w-full text-sm">
+            <thead class="bg-gray-200 text-gray-700 font-semibold sticky top-0 z-10">
+              <tr>
+                <th class="px-2 py-2 border">#</th>
+                <th class="px-2 py-2 border">Asset ID</th>
+                <th class="px-2 py-2 border">Type</th>
+                <th class="px-2 py-2 border">Model</th>
+                <th class="px-2 py-2 border">Serial Number</th>
+                <th class="px-2 py-2 border">Allocated To</th>
+                <th class="px-2 py-2 border">Allocation Date</th>
+                <th class="px-2 py-2 border">Purchase Date</th>
+                <th class="px-2 py-2 border">Status</th>
+                <th class="px-2 py-2 border">Actions</th>
+              </tr>
+            </thead>
+            <tbody id="tableBody"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- Pagination -->
+    <div id="paginationControls" class="flex justify-center mt-4 gap-2 text-sm">
+      <button id="prevPage" class="bg-gray-200 px-3 py-1 rounded hover:bg-gray-300">Previous</button>
+      <span id="pageIndicator" class="self-center px-2">Page 1</span>
+      <button id="nextPage" class="bg-gray-200 px-3 py-1 rounded hover:bg-gray-300">Next</button>
+    </div>
+  </main>
+
+  <!-- History Modal -->
+  <div id="historyModal" class="fixed inset-0 bg-black bg-opacity-50 hidden items-center justify-center z-50">
+    <div class="bg-white p-6 rounded w-[90%] max-w-md max-h-[80vh] overflow-y-auto">
+      <h3 class="text-lg font-bold mb-4">Asset History</h3>
+      <ul id="historyList" class="space-y-2 text-sm"></ul>
+      <div class="text-right mt-4">
+        <button onclick="document.getElementById('historyModal').classList.add('hidden')" class="bg-gray-300 px-4 py-2 rounded hover:bg-gray-400">Close</button>
+      </div>
     </div>
   </div>
-</div>
 
-  <!-- ✅ JS -->
+  <!-- Firebase Auth Check -->
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+    import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyAspahfUUGnBzh0mh6U53evGQzWQP956xQ",
+      authDomain: "ffassetmanager.firebaseapp.com",
+      projectId: "ffassetmanager",
+      storageBucket: "ffassetmanager.appspot.com",
+      messagingSenderId: "803858971008",
+      appId: "1:803858971008:web:72d69ddce6cbc85010a965"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+
+    onAuthStateChanged(auth, user => {
+      if (!user) {
+        window.location.href = "login.html";
+      }
+    });
+
+    const logoutBtn = document.getElementById("logoutBtn");
+    if (logoutBtn) {
+      logoutBtn.addEventListener("click", () => {
+        signOut(auth).then(() => {
+          window.location.href = "login.html";
+        }).catch(error => {
+          alert("Logout failed: " + error.message);
+        });
+      });
+    }
+  </script>
+
+  <!-- Asset Inventory Logic -->
   <script type="module" src="js/asset-inventory.js"></script>
 
-  <!-- 🔍 History Modal -->
-<div id="historyModal" class="fixed inset-0 bg-black bg-opacity-50 hidden items-center justify-center z-50">
-  <div class="bg-white p-6 rounded w-[90%] max-w-md max-h-[80vh] overflow-y-auto">
-    <h3 class="text-lg font-bold mb-4">Asset History</h3>
-    <ul id="historyList" class="space-y-2 text-sm">
-      <!-- Filled by JS -->
-    </ul>
-    <div class="text-right mt-4">
-      <button onclick="document.getElementById('historyModal').classList.add('hidden')" class="bg-gray-300 px-4 py-2 rounded hover:bg-gray-400">Close</button>
-    </div>
-  </div>
-</div>
-
-
-<!--Logout Fun-->
-  <script type="module">
-  import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
-  import { getAuth, signOut } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-
-  const firebaseConfig = {
-    apiKey: "AIzaSyAspahfUUGnBzh0mh6U53evGQzWQP956xQ",
-    authDomain: "ffassetmanager.firebaseapp.com",
-    projectId: "ffassetmanager",
-    storageBucket: "ffassetmanager.appspot.com",
-    messagingSenderId: "803858971008",
-    appId: "1:803858971008:web:72d69ddce6cbc85010a965"
-  };
-
-  const app = initializeApp(firebaseConfig);
-  const auth = getAuth(app);
-
-  const logoutBtn = document.getElementById("logoutBtn");
-  if (logoutBtn) {
-    logoutBtn.addEventListener("click", () => {
-      signOut(auth).then(() => {
-        window.location.href = "login.html";
-      }).catch(error => {
-        alert("Logout failed: " + error.message);
+  <!-- Activate Tom Select -->
+  <script>
+    document.addEventListener("DOMContentLoaded", function () {
+      new TomSelect("#typeFilter", {
+        create: false,
+        sortField: {
+          field: "text",
+          direction: "asc"
+        }
       });
     });
-  }
-    
-</script>
-
-  
+  </script>
 </body>
 </html>
+
+
+  
