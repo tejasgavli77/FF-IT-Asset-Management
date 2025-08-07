@@ -1,160 +1,71 @@
-<script type="module">
-  import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
-  import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-
-  const firebaseConfig = {
-    apiKey: "AIzaSyAspahfUUGnBzh0mh6U53evGQzWQP956xQ",
-    authDomain: "ffassetmanager.firebaseapp.com",
-    projectId: "ffassetmanager",
-    storageBucket: "ffassetmanager.appspot.com",
-    messagingSenderId: "803858971008",
-    appId: "1:803858971008:web:72d69ddce6cbc85010a965"
-  };
-
-  const app = initializeApp(firebaseConfig);
-  const auth = getAuth(app);
-
-  onAuthStateChanged(auth, user => {
-    if (!user) {
-      window.location.href = "login.html"; // Redirect if not logged in
-    }
-  });
-</script>
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Asset Inventory | IT Asset Management</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Asset Manager</title>
 
-  <!-- TailwindCSS -->
+  <!-- Tailwind CSS -->
   <script src="https://cdn.tailwindcss.com"></script>
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css" rel="stylesheet" />
-  <link href="https://cdn.jsdelivr.net/npm/tom-select@2.2.2/dist/css/tom-select.css" rel="stylesheet">
-  <style>
-    html, body { margin: 0; padding: 0; height: 100%; }
-    .ts-dropdown { z-index: 50 !important; }
-  </style>
-</head>
-<body class="flex h-screen bg-gray-100">
-
-  <!-- Sidebar -->
-  <aside class="w-36 bg-white shadow-md px-4 py-4">
-    <h2 class="text-2xl font-bold mb-6 text-center text-blue-600">FF Inventory</h2>
-    <nav class="space-y-4">
-      <a href="add-asset.html" class="flex items-center gap-2 text-gray-700 hover:text-blue-600"><i class="bi bi-plus-circle"></i> Add Asset</a>
-      <a href="allocate-asset.html" class="flex items-center gap-2 text-gray-700 hover:text-blue-600"><i class="bi bi-arrow-left-right"></i> Allocate Asset</a>
-      <a href="asset-inventory.html" class="flex items-center gap-2 text-blue-600 font-semibold"><i class="bi bi-layers"></i> Asset Inventory</a>
-      <a href="user-asset-overview.html" class="flex items-center gap-2 text-gray-700 hover:text-blue-600"><i class="bi bi-people-fill"></i> User Asset Overview</a>
-      <a href="asset-summary.html" class="flex items-center gap-2 text-gray-700 hover:text-blue-600"><i class="bi bi-bar-chart-line-fill"></i> Asset Summary</a>
-    </nav>
-    <button id="logoutBtn" class="bg-red-500 text-white px-4 py-2 rounded mt-6 w-full">Logout</button>
-  </aside>
-
-  <!-- Main Content -->
-  <main class="flex-1 p-6 overflow-y-auto w-full">
-    <header class="mb-6">
-      <h1 class="text-3xl font-semibold text-gray-800">Asset Inventory</h1>
-    </header>
-
-    <!-- Filters -->
-    <div class="relative z-20 flex flex-wrap gap-4 mb-4 bg-gray-100 pt-4">
-      <input type="text" id="searchInput" placeholder="Search by Asset ID or Model" class="border px-3 py-2 rounded w-64">
-      <select id="typeFilter" placeholder="Filter by Type" class="border px-3 py-2 rounded w-64"></select>
-      <select id="statusFilter" class="border px-3 py-2 rounded">
-        <option value="">All Statuses</option>
-        <option value="Available">Available</option>
-        <option value="Allocated">Allocated</option>
-      </select>
-      <button id="resetFilters" class="bg-gray-200 px-3 py-2 rounded hover:bg-gray-300">Reset</button>
-    </div>
-
-    <!-- Table -->
-    <div class="bg-white rounded-lg shadow-md overflow-hidden w-full">
-      <div class="overflow-x-auto">
-        <div class="max-h-[75vh] overflow-y-auto z-0">
-          <table class="w-full text-sm">
-            <thead class="bg-gray-200 text-gray-700 font-semibold sticky top-0 z-10">
-              <tr>
-                <th class="px-2 py-2 border">#</th>
-                <th class="px-2 py-2 border">Asset ID</th>
-                <th class="px-2 py-2 border">Type</th>
-                <th class="px-2 py-2 border">Model</th>
-                <th class="px-2 py-2 border">Serial Number</th>
-                <th class="px-2 py-2 border">Allocated To</th>
-                <th class="px-2 py-2 border">Allocation Date</th>
-                <th class="px-2 py-2 border">Purchase Date</th>
-                <th class="px-2 py-2 border">Status</th>
-                <th class="px-2 py-2 border">Actions</th>
-              </tr>
-            </thead>
-            <tbody id="tableBody"></tbody>
-          </table>
-        </div>
-      </div>
-    </div>
-  </main>
 
   <!-- TomSelect -->
-  <script src="https://cdn.jsdelivr.net/npm/tom-select@2.2.2/dist/js/tom-select.complete.min.js"></script>
+  <link href="https://cdn.jsdelivr.net/npm/tom-select/dist/css/tom-select.css" rel="stylesheet" />
+  <script src="https://cdn.jsdelivr.net/npm/tom-select/dist/js/tom-select.complete.min.js"></script>
 
-  <!-- JS Scripts -->
-  <script type="module" src="js/asset-inventory.js"></script>
+  <!-- Bootstrap Icons (optional) -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" />
+</head>
+<body class="bg-gray-50 p-6">
 
-  <!-- History Modal -->
-  <div id="historyModal" class="fixed inset-0 bg-black bg-opacity-50 hidden items-center justify-center z-50">
-    <div class="bg-white p-6 rounded w-[90%] max-w-md max-h-[80vh] overflow-y-auto">
-      <h3 class="text-lg font-bold mb-4">Asset History</h3>
-      <ul id="historyList" class="space-y-2 text-sm"></ul>
-      <div class="text-right mt-4">
-        <button onclick="document.getElementById('historyModal').classList.add('hidden')" class="bg-gray-300 px-4 py-2 rounded hover:bg-gray-400">Close</button>
-      </div>
+  <!-- Filters -->
+  <div class="flex flex-wrap gap-2 items-center mb-4">
+    <input id="searchInput" type="text" placeholder="Search by ID, Model, Serial" class="border px-3 py-2 rounded w-64" />
+
+    <select id="typeFilter" class="border px-3 py-2 rounded w-48" placeholder="Filter by Type" autocomplete="off"></select>
+
+    <select id="statusFilter" class="border px-3 py-2 rounded w-40">
+      <option value="">All Status</option>
+      <option value="allocated">Allocated</option>
+      <option value="available">Available</option>
+    </select>
+
+    <button id="resetFilters" class="bg-gray-100 px-4 py-2 rounded hover:bg-gray-200">Reset</button>
+  </div>
+
+  <!-- Table -->
+  <div class="overflow-x-auto bg-white rounded shadow">
+    <table class="min-w-full divide-y divide-gray-200">
+      <thead class="bg-gray-100 sticky top-0">
+        <tr>
+          <th class="px-4 py-2 text-left">#</th>
+          <th class="px-4 py-2 text-left">Asset ID</th>
+          <th class="px-4 py-2 text-left">Type</th>
+          <th class="px-4 py-2 text-left">Model</th>
+          <th class="px-4 py-2 text-left">Serial</th>
+          <th class="px-4 py-2 text-left">Allocated To</th>
+          <th class="px-4 py-2 text-left">Allocation Date</th>
+          <th class="px-4 py-2 text-left">Purchase Date</th>
+          <th class="px-4 py-2 text-left">Status</th>
+          <th class="px-4 py-2 text-left">Actions</th>
+        </tr>
+      </thead>
+      <tbody id="tableBody" class="divide-y divide-gray-200"></tbody>
+    </table>
+  </div>
+
+  <!-- Pagination -->
+  <div id="pagination" class="mt-4 flex justify-between items-center"></div>
+
+  <!-- History Modal (Optional if needed) -->
+  <div id="historyModal" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center">
+    <div class="bg-white rounded p-4 w-96 max-h-[80vh] overflow-auto">
+      <h2 class="text-xl font-semibold mb-2">Asset History</h2>
+      <ul id="historyList" class="list-disc list-inside space-y-1"></ul>
+      <button onclick="document.getElementById('historyModal').classList.add('hidden')" class="mt-4 bg-gray-200 px-4 py-2 rounded hover:bg-gray-300">Close</button>
     </div>
   </div>
 
-  <!-- Firebase Auth -->
-  <script type="module">
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
-    import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-
-    const firebaseConfig = {
-      apiKey: "AIzaSyAspahfUUGnBzh0mh6U53evGQzWQP956xQ",
-      authDomain: "ffassetmanager.firebaseapp.com",
-      projectId: "ffassetmanager",
-      storageBucket: "ffassetmanager.appspot.com",
-      messagingSenderId: "803858971008",
-      appId: "1:803858971008:web:72d69ddce6cbc85010a965"
-    };
-
-    const app = initializeApp(firebaseConfig);
-    const auth = getAuth(app);
-
-    onAuthStateChanged(auth, user => {
-      if (!user) window.location.href = "login.html";
-    });
-
-    const logoutBtn = document.getElementById("logoutBtn");
-    if (logoutBtn) {
-      logoutBtn.addEventListener("click", () => {
-        signOut(auth).then(() => window.location.href = "login.html")
-        .catch(error => alert("Logout failed: " + error.message));
-      });
-    }
-  </script>
-
-  <!-- TomSelect Setup -->
-  <script>
-    new TomSelect("#typeFilter", {
-      placeholder: "Filter by Type",
-      options: [
-        { value: "Laptop", text: "Laptop" },
-        { value: "Monitor", text: "Monitor" },
-        { value: "Keyboard", text: "Keyboard" },
-        { value: "Mouse", text: "Mouse" },
-        { value: "Headset", text: "Headset" },
-        { value: "Desktop", text: "Desktop" },
-      ]
-    });
-  </script>
+  <!-- Firebase + JS Logic -->
+  <script type="module" src="main.js"></script>
 </body>
 </html>
