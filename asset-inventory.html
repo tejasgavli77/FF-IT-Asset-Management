@@ -1,0 +1,165 @@
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+  import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+
+  const firebaseConfig = {
+    apiKey: "AIzaSyAspahfUUGnBzh0mh6U53evGQzWQP956xQ",
+    authDomain: "ffassetmanager.firebaseapp.com",
+    projectId: "ffassetmanager",
+    storageBucket: "ffassetmanager.appspot.com",
+    messagingSenderId: "803858971008",
+    appId: "1:803858971008:web:72d69ddce6cbc85010a965"
+  };
+
+  const app = initializeApp(firebaseConfig);
+  const auth = getAuth(app);
+
+  onAuthStateChanged(auth, user => {
+    if (!user) {
+      window.location.href = "login.html"; // Redirect if not logged in
+    }
+  });
+</script>
+
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Asset Inventory | IT Asset Management</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css" rel="stylesheet" />
+</head>
+<body class="flex h-screen bg-gray-100">
+  <!-- Sidebar -->
+  <aside class="w-36 bg-white shadow-md px-4 py-4">
+    <h2 class="text-2xl font-bold mb-6 text-center text-blue-600">FF Inventory</h2>
+    <nav class="space-y-4">
+      <a href="add-asset.html" class="flex items-center gap-2 text-gray-700 hover:text-blue-600">
+        <i class="bi bi-plus-circle"></i> Add Asset
+      </a>
+      <a href="allocate-asset.html" class="flex items-center gap-2 text-gray-700 hover:text-blue-600">
+        <i class="bi bi-arrow-left-right"></i> Allocate Asset
+      </a>
+      <a href="asset-inventory.html" class="flex items-center gap-2 text-blue-600 font-semibold">
+        <i class="bi bi-layers"></i> Asset Inventory
+      </a>
+       <a href="user-asset-overview.html" class="flex items-center gap-2 text-gray-700 hover:text-blue-600">
+       <i class="bi bi-people-fill"></i> User Asset Overview
+      </a>
+      <a href="asset-summary.html" class="flex items-center gap-2 text-gray-700 hover:text-blue-600">
+  <i class="bi bi-bar-chart-line-fill"></i> Asset Summary
+</a>
+  <!--Logout-->
+   </nav>
+    <button id="logoutBtn" class="bg-red-500 text-white px-4 py-2 rounded mt-6 w-full">Logout</button> 
+    </nav>
+  </aside>
+
+  <!-- Main Content -->
+  <main class="flex-1 p-6 overflow-y-auto w-full">
+    <header class="mb-6">
+      <h1 class="text-3xl font-semibold text-gray-800">Asset Inventory</h1>
+    </header>
+
+    <!-- Filters -->
+    <div class="flex flex-wrap gap-4 mb-4">
+      <input type="text" id="searchInput" placeholder="Search by Asset ID or Model" class="border px-3 py-2 rounded w-64">
+      <select id="statusFilter" class="border px-3 py-2 rounded">
+        <option value="">All Statuses</option>
+        <option value="Available">Available</option>
+        <option value="Allocated">Allocated</option>
+      </select>
+      <button id="resetFilters" class="bg-gray-200 px-3 py-2 rounded hover:bg-gray-300">Reset</button>
+    </div>
+    
+<!-- Filter by Type -->
+<select id="typeFilter" class="border rounded px-2 py-1">
+  <option value="">All Types</option>
+  <option value="Laptop">Laptop</option>
+  <option value="Monitor">Monitor</option>
+  <option value="Keyboard">Keyboard</option>
+  <option value="Mouse">Mouse</option>
+  <option value="Headset">Headset</option>
+  <option value="Desktop">Desktop</option>  
+</select>
+
+    <!-- ✅ Outer wrapper for scaling -->
+<div style="transform: scale(0.9); transform-origin: top left; width: 111%; overflow-x: auto;">
+
+<!-- Inventory Table -->
+<div class="bg-white rounded-lg shadow-md p-4 overflow-x-auto">
+  <table class="w-full min-w-[1000px] table-fixed text-sm">
+    <thead class="bg-gray-200 text-gray-700 font-semibold">
+      <tr>
+        <th class="w-10 px-2 py-1 border">#</th>
+        <th class="w-22 px-2 py-1 border">Asset ID</th>
+        <th class="w-24 px-2 py-1 border">Type</th>
+        <th class="w-40 px-2 py-1 border">Model</th>
+        <th class="w-40 px-2 py-1 border">Serial Number</th>
+        <th class="w-35 px-2 py-1 border">Allocated To</th>
+        <th class="w-30 px-2 py-1 border">Allocation Date</th>
+        <th class="w-30 px-2 py-1 border">Purchase Date</th>
+        <th class="w-22 px-2 py-1 border">Status</th>
+        <th class="w-25 px-2 py-1 border">Actions</th>
+      </tr>
+    </thead>
+    <tbody id="tableBody"></tbody>
+  </table>
+
+  <!-- ✅ Pagination Controls -->
+  <div id="pagination" class="mt-4 flex justify-between items-center text-sm"></div>
+</div>
+
+
+  <!-- ✅ JS -->
+  <script type="module" src="js/asset-inventory.js"></script>
+
+  <!-- 🔍 History Modal -->
+<div id="historyModal" class="fixed inset-0 bg-black bg-opacity-50 hidden items-center justify-center z-50">
+  <div class="bg-white p-6 rounded w-[90%] max-w-md max-h-[80vh] overflow-y-auto">
+    <h3 class="text-lg font-bold mb-4">Asset History</h3>
+    <ul id="historyList" class="space-y-2 text-sm">
+      <!-- Filled by JS -->
+    </ul>
+    <div class="text-right mt-4">
+      <button onclick="document.getElementById('historyModal').classList.add('hidden')" class="bg-gray-300 px-4 py-2 rounded hover:bg-gray-400">Close</button>
+    </div>
+  </div>
+</div>
+
+
+<!--Logout Fun-->
+  <script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+  import { getAuth, signOut } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+
+  const firebaseConfig = {
+    apiKey: "AIzaSyAspahfUUGnBzh0mh6U53evGQzWQP956xQ",
+    authDomain: "ffassetmanager.firebaseapp.com",
+    projectId: "ffassetmanager",
+    storageBucket: "ffassetmanager.appspot.com",
+    messagingSenderId: "803858971008",
+    appId: "1:803858971008:web:72d69ddce6cbc85010a965"
+  };
+
+  const app = initializeApp(firebaseConfig);
+  const auth = getAuth(app);
+
+  const logoutBtn = document.getElementById("logoutBtn");
+  if (logoutBtn) {
+    logoutBtn.addEventListener("click", () => {
+      signOut(auth).then(() => {
+        window.location.href = "login.html";
+      }).catch(error => {
+        alert("Logout failed: " + error.message);
+      });
+    });
+  }
+    
+</script>
+
+  
+</body>
+</html>
