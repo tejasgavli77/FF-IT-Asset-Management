@@ -27,72 +27,81 @@
   };
 </script>
 
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Asset Inventory</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet">
   <script src="https://cdn.tailwindcss.com"></script>
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" />
-  <link href="https://cdn.jsdelivr.net/npm/tom-select@2.3.1/dist/css/tom-select.css" rel="stylesheet">
 </head>
-<body class="bg-gray-100 flex h-screen">
-  <!-- Sidebar -->
-  <aside class="w-64 bg-gray-800 text-white flex flex-col">
-    <div class="p-6 font-bold text-lg">FF Asset Manager</div>
-    <nav class="flex-1 px-4 space-y-2">
-      <a href="#" class="block px-4 py-2 rounded hover:bg-gray-700">Dashboard</a>
-      <a href="#" class="block px-4 py-2 rounded bg-gray-700">Assets</a>
-    </nav>
-  </aside>
+<body class="bg-gray-100">
+  <div class="flex min-h-screen">
+    <!-- Sidebar -->
+    <aside class="w-64 bg-white p-4 shadow-md hidden md:block">
+      <h2 class="text-xl font-bold mb-4">Menu</h2>
+      <ul>
+        <li><a href="dashboard.html" class="block py-2">Dashboard</a></li>
+        <li><a href="inventory.html" class="block py-2 font-semibold text-blue-600">Asset Inventory</a></li>
+        <li><a href="allocate-asset.html" class="block py-2">Allocate Asset</a></li>
+      </ul>
+    </aside>
 
-  <!-- Main Content -->
-  <main class="flex-1 p-6 overflow-auto">
-    <h1 class="text-2xl font-semibold mb-4">Asset Inventory</h1>
+    <!-- Main Content -->
+    <main class="flex-1 p-6">
+      <h1 class="text-2xl font-bold mb-4">Asset Inventory</h1>
 
-    <!-- Filters -->
-    <div class="flex flex-wrap gap-4 mb-4">
-      <input id="searchInput" type="text" placeholder="Search..." class="border p-2 rounded w-full sm:w-64" />
-      <select id="statusFilter" class="border p-2 rounded w-full sm:w-48">
-        <option value="">All Status</option>
-        <option value="available">Available</option>
-        <option value="allocated">Allocated</option>
-      </select>
-      <select id="typeFilter" class="border p-2 rounded w-full sm:w-64"></select>
-      <button id="resetFilters" class="bg-gray-500 hover:bg-gray-600 text-white px-4 py-2 rounded">
-        Reset Filters
-      </button>
-    </div>
+      <!-- Filters -->
+      <div class="mb-4 flex flex-wrap gap-4">
+        <input id="searchInput" type="text" placeholder="Search..." class="border rounded p-2 w-64">
+        <select id="statusFilter" class="border rounded p-2">
+          <option value="">All Status</option>
+          <option value="Available">Available</option>
+          <option value="Allocated">Allocated</option>
+        </select>
+        <select id="typeFilter" class="border rounded p-2">
+          <option value="">All Types</option>
+        </select>
+        <button id="resetFilters" class="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600">Reset</button>
+      </div>
 
-    <!-- Table -->
-    <div class="overflow-auto border bg-white rounded-lg">
-      <table class="min-w-full table-auto border-collapse">
-        <thead class="sticky top-0 bg-gray-200">
-          <tr>
-            <th class="border px-4 py-2">#</th>
-            <th class="border px-4 py-2">Asset ID</th>
-            <th class="border px-4 py-2">Type</th>
-            <th class="border px-4 py-2">Model</th>
-            <th class="border px-4 py-2">Serial No</th>
-            <th class="border px-4 py-2">Allocated To</th>
-            <th class="border px-4 py-2">Allocation Date</th>
-            <th class="border px-4 py-2">Purchase Date</th>
-            <th class="border px-4 py-2">Status</th>
-            <th class="border px-4 py-2">Actions</th>
-          </tr>
-        </thead>
-        <tbody id="tableBody" class="text-center"></tbody>
-      </table>
-    </div>
+      <!-- Table -->
+      <div class="overflow-x-auto">
+        <table class="w-full bg-white shadow-md rounded">
+          <thead class="bg-gray-200 sticky top-0">
+            <tr>
+              <th class="px-4 py-2 text-left">#</th>
+              <th class="px-4 py-2 text-left">Asset ID</th>
+              <th class="px-4 py-2 text-left">Type</th>
+              <th class="px-4 py-2 text-left">Model</th>
+              <th class="px-4 py-2 text-left">Serial No.</th>
+              <th class="px-4 py-2 text-left">Allocated To</th>
+              <th class="px-4 py-2 text-left">Allocation Date</th>
+              <th class="px-4 py-2 text-left">Purchase Date</th>
+              <th class="px-4 py-2 text-left">Status</th>
+              <th class="px-4 py-2 text-left">Actions</th>
+            </tr>
+          </thead>
+          <tbody id="tableBody"></tbody>
+        </table>
+      </div>
 
-    <!-- Pagination -->
-    <div id="pagination" class="mt-4 text-center"></div>
-  </main>
+      <!-- Pagination -->
+      <div id="pagination" class="mt-4"></div>
 
-  <script type="module" src="firebaseConfig.js"></script>
+      <!-- History Modal -->
+      <div id="historyModal" class="fixed top-0 left-0 w-full h-full bg-black bg-opacity-50 flex items-center justify-center hidden">
+        <div class="bg-white rounded p-4 w-96">
+          <h2 class="text-lg font-bold mb-2">Asset History</h2>
+          <ul id="historyList" class="list-disc pl-5 text-sm"></ul>
+          <button onclick="document.getElementById('historyModal').classList.add('hidden')" class="mt-4 bg-blue-500 text-white px-4 py-2 rounded">Close</button>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <!-- JavaScript -->
   <script type="module" src="asset-inventory.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/tom-select@2.3.1/dist/js/tom-select.complete.min.js"></script>
 </body>
 </html>
