@@ -1,5 +1,15 @@
+
+// Firebase imports
 import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
-import { getFirestore, collection, getDocs } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+import {
+  getFirestore,
+  collection,
+  getDocs,
+  deleteDoc,
+  doc,
+  updateDoc,
+  getDoc
+} from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
 const firebaseConfig = {
   apiKey: "AIzaSyAspahfUUGnBzh0mh6U53evGQzWQP956xQ",
@@ -9,99 +19,120 @@ const firebaseConfig = {
   messagingSenderId: "803858971008",
   appId: "1:803858971008:web:72d69ddce6cbc85010a965"
 };
+
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
-const assetsCol = collection(db, "assets");
+const assetsCollection = collection(db, "assets");
 
-let allAssets = [], currentPage = 1, rowsPerPage = 25;
+let allAssets = [];
+let currentPage = 1;
+const rowsPerPage = 10;
 
-const tableBody = document.getElementById("tableBody");
-const paginationDiv = document.getElementById("pagination");
+document.addEventListener("DOMContentLoaded", async () => {
+  const tableBody = document.getElementById("tableBody");
+  const searchInput = document.getElementById("searchInput");
+  const statusFilter = document.getElementById("statusFilter");
+  const typeFilter = document.getElementById("typeFilter");
+  const resetBtn = document.getElementById("resetFilters");
 
-const searchInput = document.getElementById("searchInput");
-const typeFilter = new TomSelect("#typeFilter", { placeholder: "Filter by Type" });
-const statusFilter = document.getElementById("statusFilter");
-const resetBtn = document.getElementById("resetFilters");
+  const renderTable = () => {
+    tableBody.innerHTML = "";
 
-async function loadAssets() {
-  const snap = await getDocs(assetsCol);
-  allAssets = snap.docs.map(d => ({ id: d.id, ...d.data() }));
-  populateTypeFilter();
-  applyFilters();
-}
+    const start = (currentPage - 1) * rowsPerPage;
+    const end = start + rowsPerPage;
+    const currentAssets = filterAssets().slice(start, end);
 
-function populateTypeFilter() {
-  const options = Array.from(new Set(allAssets.map(a => a.type))).sort();
-  typeFilter.clearOptions();
-  typeFilter.addOption({ value: "", text: "All Types" });
-  options.forEach(o => typeFilter.addOption({ value: o.toLowerCase(), text: o }));
-}
+    currentAssets.forEach((asset, index) => {
+      const row = document.createElement("tr");
+      row.innerHTML = `
+        <td class="border px-2 py-1">${start + index + 1}</td>
+        <td class="border px-2 py-1">${asset.assetId}</td>
+        <td class="border px-2 py-1">${asset.type}</td>
+        <td class="border px-2 py-1">${asset.model}</td>
+        <td class="border px-2 py-1">${asset.serialNumber}</td>
+        <td class="border px-2 py-1">${asset.allocatedTo || "-"}</td>
+        <td class="border px-2 py-1">${asset.allocationDate || "-"}</td>
+        <td class="border px-2 py-1">${asset.purchaseDate || "-"}</td>
+        <td class="border px-2 py-1">${asset.status}</td>
+        <td class="border px-2 py-1 text-center">
+          <button class="text-blue-600 hover:underline" onclick="viewHistory('${asset.id}')">History</button>
+        </td>
+      `;
+      tableBody.appendChild(row);
+    });
 
-function applyFilters() {
-  let filtered = allAssets;
-  const search = searchInput.value.toLowerCase();
-  const type = typeFilter.getValue();
-  const status = statusFilter.value.toLowerCase();
+    renderPagination();
+  };
 
-  filtered = filtered.filter(a => {
-    return (!search ||
-        a.assetId.toLowerCase().includes(search) ||
-        a.model.toLowerCase().includes(search) ||
-        a.serialNumber.toLowerCase().includes(search)) &&
-      (!type || a.type.toLowerCase() === type) &&
-      (!status || a.status.toLowerCase() === status);
+  const filterAssets = () => {
+    const searchValue = searchInput.value.toLowerCase();
+    const statusValue = statusFilter.value;
+    const typeValue = typeFilter.value;
+
+    return allAssets.filter(asset => {
+      const matchesSearch =
+        asset.assetId.toLowerCase().includes(searchValue) ||
+        asset.model.toLowerCase().includes(searchValue);
+      const matchesStatus = statusValue === "" || asset.status === statusValue;
+      const matchesType = typeValue === "" || asset.type === typeValue;
+
+      return matchesSearch && matchesStatus && matchesType;
+    });
+  };
+
+  const renderPagination = () => {
+    const totalPages = Math.ceil(filterAssets().length / rowsPerPage);
+    const pagination = document.getElementById("paginationControls");
+    pagination.innerHTML = "";
+
+    if (totalPages <= 1) return;
+
+    for (let i = 1; i <= totalPages; i++) {
+      const btn = document.createElement("button");
+      btn.textContent = i;
+      btn.className = `px-3 py-1 mx-1 rounded ${i === currentPage ? "bg-blue-500 text-white" : "bg-gray-200 hover:bg-gray-300"}`;
+      btn.addEventListener("click", () => {
+        currentPage = i;
+        renderTable();
+      });
+      pagination.appendChild(btn);
+    }
+  };
+
+  const loadAssets = async () => {
+    const querySnapshot = await getDocs(assetsCollection);
+    allAssets = querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+    renderTable();
+  };
+
+  searchInput.addEventListener("input", renderTable);
+  statusFilter.addEventListener("change", renderTable);
+  typeFilter.addEventListener("change", renderTable);
+  resetBtn.addEventListener("click", () => {
+    searchInput.value = "";
+    statusFilter.value = "";
+    typeFilter.value = "";
+    renderTable();
   });
 
-  currentPage = 1;
-  render(filtered);
-}
+  window.viewHistory = async (assetId) => {
+    const modal = document.getElementById("historyModal");
+    const list = document.getElementById("historyList");
+    list.innerHTML = "<li>Loading...</li>";
 
-function render(data) {
-  tableBody.innerHTML = "";
-  const start = (currentPage - 1) * rowsPerPage;
-  const chunk = data.slice(start, start + rowsPerPage);
+    const docRef = doc(db, "assets", assetId);
+    const docSnap = await getDoc(docRef);
+    if (docSnap.exists()) {
+      const history = docSnap.data().history || [];
+      list.innerHTML = history.length === 0
+        ? "<li>No history available.</li>"
+        : history.map(entry => `<li>${entry}</li>`).join("");
+    } else {
+      list.innerHTML = "<li>No data found.</li>";
+    }
 
-  chunk.forEach((a, i) => {
-    tableBody.insertAdjacentHTML("beforeend", `
-      <tr>
-        <td class="p-2 border">${start + i + 1}</td>
-        <td class="p-2 border">${a.assetId || "-"}</td>
-        <td class="p-2 border">${a.type || "-"}</td>
-        <td class="p-2 border">${a.model || "-"}</td>
-        <td class="p-2 border">${a.serialNumber || "-"}</td>
-        <td class="p-2 border">${a.AllocatedTo || "-"}</td>
-        <td class="p-2 border">${a.allocationDate || "-"}</td>
-        <td class="p-2 border">${a.purchaseDate || "-"}</td>
-        <td class="p-2 border">${a.status || "-"}</td>
-        <td class="p-2 border">...</td>
-      </tr>`);
-  });
+    modal.classList.remove("hidden");
+  };
 
-  const totalPages = Math.ceil(data.length / rowsPerPage) || 1;
-
-  paginationDiv.innerHTML = `
-    <button ${currentPage===1?'disabled':''} onclick="goPage(${currentPage-1})" class="px-4 py-2 bg-gray-200 rounded">Previous</button>
-    <span>Page ${currentPage} of ${totalPages}</span>
-    <button ${currentPage===totalPages?'disabled':''} onclick="goPage(${currentPage+1})" class="px-4 py-2 bg-gray-200 rounded">Next</button>
-  `;
-}
-
-window.goPage = (page) => {
-  const filtered = allAssets; 
-  const totalPages = Math.ceil(filtered.length / rowsPerPage);
-  if (page < 1 || page > totalPages) return;
-  currentPage = page;
-  render(filtered);
-};
-
-searchInput.addEventListener("input", applyFilters);
-statusFilter.addEventListener("change", applyFilters);
-typeFilter.on('change', applyFilters);
-resetBtn.addEventListener("click", () => {
-  searchInput.value = "";
-  statusFilter.value = "";
-  typeFilter.clear();
-  applyFilters();
+  await loadAssets();
 });
-
-loadAssets();
