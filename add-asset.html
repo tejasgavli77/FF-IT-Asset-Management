@@ -7,35 +7,35 @@
   <script src="https://cdn.tailwindcss.com"></script>
   <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css" rel="stylesheet" />
 </head>
-<body class="flex h-screen bg-gray-100">
+<body class="bg-[#F8FAFC] flex h-screen">
 
   <!-- Sidebar -->
-  <aside class="w-36 bg-white shadow-md px-4 py-4">
-    <h2 class="text-2xl font-bold mb-6 text-center text-blue-600">FF Inventory</h2>
+  <aside class="w-36 bg-[#1E293B] shadow-md px-4 py-4">
+    <h2 class="text-2xl font-bold mb-6 text-center text-white">FF Inventory</h2>
     <nav class="space-y-4">
-      <a href="add-asset.html" class="flex items-center gap-2 text-blue-600 font-semibold">
+      <a href="add-asset.html" class="flex items-center gap-2 text-white hover:text-[#38BDF8]">
         <i class="bi bi-plus-circle"></i> Add Asset
       </a>
-      <a href="allocate-asset.html" class="flex items-center gap-2 text-gray-700 hover:text-blue-600">
+      <a href="allocate-asset.html" class="flex items-center gap-2 text-white hover:text-[#38BDF8]">
         <i class="bi bi-arrow-left-right"></i> Allocate Asset
       </a>
-      <a href="asset-inventory.html" class="flex items-center gap-2 text-gray-700 hover:text-blue-600">
+      <a href="asset-inventory.html" class="flex items-center gap-2 text-white hover:text-[#38BDF8]">
         <i class="bi bi-layers"></i> Asset Inventory
       </a>
-      <a href="user-asset-overview.html" class="flex items-center gap-2 text-gray-700 hover:text-blue-600">
+      <a href="user-asset-overview.html" class="flex items-center gap-2 text-white hover:text-[#38BDF8]">
         <i class="bi bi-people-fill"></i> User Asset Overview
       </a>
-      <a href="asset-summary.html" class="flex items-center gap-2 text-gray-700 hover:text-blue-600">
-  <i class="bi bi-bar-chart-line-fill"></i> Asset Summary
-</a>
+      <a href="asset-summary.html" class="flex items-center gap-2 text-white hover:text-[#38BDF8]">
+        <i class="bi bi-bar-chart-line-fill"></i> Asset Summary
+      </a>
     </nav>
-    <button id="logoutBtn" class="bg-red-500 text-white px-4 py-2 rounded mt-6 w-full">Logout</button>
+    <button id="logoutBtn" class="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded mt-6 w-full">Logout</button>
   </aside>
 
   <!-- Main Content -->
-  <main class="flex-1 p-6 overflow-y-auto">
+   <main class="flex-1 p-6 overflow-y-auto">
     <header class="mb-6">
-      <h1 class="text-3xl font-semibold text-gray-800">Add New Asset</h1>
+      <h1 class="text-3xl font-semibold text-gray-800">Add Asset</h1>
     </header>
 
     <div class="bg-white rounded-lg shadow-md p-6 mb-8">
