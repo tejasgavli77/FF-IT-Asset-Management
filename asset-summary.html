@@ -45,7 +45,13 @@
     </div>
   </main>
 
-  <!-- ✅ Auth + Dynamic Import -->
+  <!-- ✅ Choices.js Script -->
+  <script src="https://cdn.jsdelivr.net/npm/choices.js/public/assets/scripts/choices.min.js"></script>
+
+  <!-- ✅ Keep original JS loading method -->
+  <script type="module" src="js/asset-summary.js"></script>
+
+  <!-- ✅ Auth Logic -->
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
     import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
@@ -62,6 +68,12 @@
     const app = initializeApp(firebaseConfig);
     const auth = getAuth(app);
 
+    onAuthStateChanged(auth, user => {
+      if (!user) {
+        window.location.href = "login.html";
+      }
+    });
+
     const logoutBtn = document.getElementById("logoutBtn");
     if (logoutBtn) {
       logoutBtn.addEventListener("click", () => {
@@ -70,15 +82,6 @@
         });
       });
     }
-
-    // ✅ Load table logic only after login
-    onAuthStateChanged(auth, user => {
-      if (!user) {
-        window.location.href = "login.html";
-      } else {
-        import('./js/asset-summary.js');
-      }
-    });
   </script>
 </body>
 </html>
