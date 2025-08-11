@@ -3,71 +3,44 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Asset Summary</title>
-  <!-- Tailwind CSS CDN -->
+  <title>Asset Summary | IT Asset Management</title>
   <script src="https://cdn.tailwindcss.com"></script>
-
-  <!-- Bootstrap Icons -->
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" />
-
-  <!-- ✅ Choices.js CSS -->
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/choices.js/public/assets/styles/choices.min.css" />
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css" rel="stylesheet" />
+  <link href="css/theme.css" rel="stylesheet" />
 </head>
-<body class="bg-gray-100 flex h-screen">
 
-  <!-- ✅ Sidebar -->
-  <aside class="w-36 bg-white shadow-md px-4 py-4">
-    <h2 class="text-2xl font-bold mb-6 text-center text-blue-600">FF Inventory</h2>
-    <nav class="space-y-4">
-      <a href="add-asset.html" class="flex items-center gap-2 text-gray-700 hover:text-blue-600">
-        <i class="bi bi-plus-circle"></i> Add Asset
-      </a>
-      <a href="allocate-asset.html" class="flex items-center gap-2 text-gray-700 hover:text-blue-600">
-        <i class="bi bi-arrow-left-right"></i> Allocate Asset
-      </a>
-      <a href="asset-inventory.html" class="flex items-center gap-2 text-gray-700 hover:text-blue-600">
-        <i class="bi bi-layers"></i> Asset Inventory
-      </a>
-      <a href="user-asset-overview.html" class="flex items-center gap-2 text-gray-700 hover:text-blue-600">
-        <i class="bi bi-people-fill"></i> User Asset Overview
-      </a>
-      <a href="asset-summary.html" class="flex items-center gap-2 text-blue-600 font-semibold">
-        <i class="bi bi-bar-chart-line-fill"></i> Asset Summary
-      </a>
+<body class="flex h-screen bg-main">
+  <!-- Sidebar -->
+  <aside class="sidebar bg-sidebar text-white w-36 shadow-md px-4 py-4">
+    <h2 class="sidebar-title">FF Inventory</h2>
+    <nav class="sidebar-nav">
+      <a href="add-asset.html" class="sidebar-link"><i class="bi bi-plus-circle"></i> Add Asset</a>
+      <a href="allocate-asset.html" class="sidebar-link"><i class="bi bi-arrow-left-right"></i> Allocate Asset</a>
+      <a href="asset-inventory.html" class="sidebar-link"><i class="bi bi-layers"></i> Asset Inventory</a>
+      <a href="user-asset-overview.html" class="sidebar-link"><i class="bi bi-people-fill"></i> User Asset Overview</a>
+      <a href="asset-summary.html" class="sidebar-link active"><i class="bi bi-bar-chart-line-fill"></i> Asset Summary</a>
     </nav>
-    <button id="logoutBtn" class="bg-red-500 text-white px-4 py-2 rounded mt-6 w-full">Logout</button>
+    <button id="logoutBtn" class="btn-logout mt-6 w-full">Logout</button>
   </aside>
 
-  <!-- ✅ Main Content -->
-  <main class="flex-1 p-6 overflow-y-auto">
+  <!-- Main Content -->
+  <main class="flex-1 p-6 overflow-y-auto w-full">
     <header class="mb-6">
       <h1 class="text-3xl font-semibold text-gray-800">Asset Summary</h1>
     </header>
 
-    <!-- 🔍 Filter Dropdown -->
-    <!-- 🔍 Filter by Type (Live Search) -->
-<div class="mb-4">
-  <label for="typeFilter" class="font-medium text-gray-700 block mb-1">Filter by Type:</label>
-  <input type="text" id="typeSearch" placeholder="Search or select type..." class="w-72 px-3 py-2 border rounded mb-2" />
-  <select id="typeFilter" size="6" class="w-72 px-3 py-2 border rounded shadow-sm block overflow-y-auto"></select>
-</div>
-
     <!-- 📊 Asset Summary Table -->
     <div class="bg-white rounded-lg shadow-md overflow-auto max-h-[85vh]">
       <table class="min-w-full table-auto text-sm">
-       <thead class="bg-gray-200 text-gray-700 font-semibold sticky top-0 z-10">  
+        <thead class="bg-gray-200 text-gray-700 font-semibold sticky top-0 z-10">
           <tr>
             <th class="border px-4 py-2">Type</th>
             <th class="border px-4 py-2">Total</th>
-            <th class="border px-4 py-2">Available</th>
             <th class="border px-4 py-2">Allocated</th>
+            <th class="border px-4 py-2">Available</th>
           </tr>
         </thead>
-       
-        <tbody id="summaryTableBody" class="text-gray-800">
-          
-          <!-- JS will populate this -->
-        </tbody>
+        <tbody id="summaryTableBody" class="text-sm"></tbody>
       </table>
     </div>
   </main>
