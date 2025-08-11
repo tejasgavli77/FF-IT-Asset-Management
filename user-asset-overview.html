@@ -16,27 +16,17 @@
 </head>
 
 <body class="bg-body flex h-screen">
+  
   <!-- Sidebar -->
-  <aside class="w-36 sidebar shadow-md px-4 py-4">
+   <aside class="sidebar bg-sidebar text-white w-36 shadow-md px-4 py-4">
     <h2 class="sidebar-title">FF Inventory</h2>
-    <nav class="space-y-4 mt-2">
-      <a href="add-asset.html" class="nav-link">
-        <i class="bi bi-plus-circle"></i> Add Asset
-      </a>
-      <a href="allocate-asset.html" class="nav-link">
-        <i class="bi bi-arrow-left-right"></i> Allocate Asset
-      </a>
-      <a href="asset-inventory.html" class="nav-link">
-        <i class="bi bi-layers"></i> Asset Inventory
-      </a>
-      <a href="user-asset-overview.html" class="nav-link active">
-        <i class="bi bi-people-fill"></i> User Asset Overview
-      </a>
-      <a href="asset-summary.html" class="nav-link">
-        <i class="bi bi-bar-chart-line-fill"></i> Asset Summary
-      </a>
+    <nav class="sidebar-nav">
+      <a href="add-asset.html" class="sidebar-link active"><i class="bi bi-plus-circle"></i> Add Asset</a>
+      <a href="allocate-asset.html" class="sidebar-link"><i class="bi bi-arrow-left-right"></i> Allocate Asset</a>
+      <a href="asset-inventory.html" class="sidebar-link"><i class="bi bi-layers"></i> Asset Inventory</a>
+      <a href="user-asset-overview.html" class="sidebar-link"><i class="bi bi-people-fill"></i> User Asset Overview</a>
+      <a href="asset-summary.html" class="sidebar-link"><i class="bi bi-bar-chart-line-fill"></i> Asset Summary</a>
     </nav>
-
     <button id="logoutBtn" class="btn-logout mt-6 w-full">Logout</button>
   </aside>
 
