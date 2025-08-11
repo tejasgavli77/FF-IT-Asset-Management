@@ -34,12 +34,24 @@
   <label for="typeFilter" class="text-sm font-medium text-gray-700 whitespace-nowrap">
     Filter by Type:
   </label>
+
+  <!-- Search box -->
+  <input
+    type="text"
+    id="typeSearch"
+    placeholder="Search type..."
+    class="w-48 rounded-lg border border-gray-300 px-3 py-2 text-sm text-gray-700
+           focus:border-[#0F766E] focus:ring focus:ring-[#0F766E]/20 focus:outline-none"
+  />
+
+  <!-- Dropdown -->
   <select id="typeFilter"
     class="w-60 rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm text-gray-700
            focus:border-[#0F766E] focus:ring focus:ring-[#0F766E]/20 focus:outline-none">
     <option value="all">All Types</option>
   </select>
 </div>
+
 
     <!-- 📊 Asset Summary Table -->
     <div class="bg-white rounded-lg shadow-md overflow-auto max-h-[85vh]">
