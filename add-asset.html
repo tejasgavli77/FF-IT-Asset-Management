@@ -7,29 +7,28 @@
   <script src="https://cdn.tailwindcss.com"></script>
   <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css" rel="stylesheet" />
 </head>
-<body class="bg-[#F9FAFB] flex h-screen">
+<link rel="stylesheet" href="css/theme.css" />
 
   <!-- Sidebar -->
- <aside class="w-36 bg-[#134E4A] shadow-md px-4 py-4">
     <h2 class="text-2xl font-bold mb-6 text-center text-white">FF Inventory</h2>
     <nav class="space-y-4">
-      <a href="add-asset.html" class="flex items-center gap-2 text-white hover:text-[#5EEAD4]">
+      <a href="add-asset.html" class="flex items-center gap-2 text-white">
         <i class="bi bi-plus-circle"></i> Add Asset
       </a>
-      <a href="allocate-asset.html" class="flex items-center gap-2 text-white hover:text-[#5EEAD4]">
+      <a href="allocate-asset.html" class="flex items-center gap-2 text-white">
         <i class="bi bi-arrow-left-right"></i> Allocate Asset
       </a>
-      <a href="asset-inventory.html" class="flex items-center gap-2 text-white hover:text-[#5EEAD4]">
+      <a href="asset-inventory.html" class="flex items-center gap-2 text-white">
         <i class="bi bi-layers"></i> Asset Inventory
       </a>
-      <a href="user-asset-overview.html" class="flex items-center gap-2 text-white hover:text-[#5EEAD4]">
+      <a href="user-asset-overview.html" class="flex items-center gap-2 text-white">
         <i class="bi bi-people-fill"></i> User Asset Overview
       </a>
-      <a href="asset-summary.html" class="flex items-center gap-2 text-white hover:text-[#5EEAD4]">
+      <a href="asset-summary.html" class="flex items-center gap-2 text-white">
         <i class="bi bi-bar-chart-line-fill"></i> Asset Summary
       </a>
     </nav>
-    <button id="logoutBtn" class="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded mt-6 w-full">Logout</button>
+    <button id="logoutBtn" class="btn-logout mt-6 w-full">Logout</button>
   </aside>
 
   <!-- Main Content -->
