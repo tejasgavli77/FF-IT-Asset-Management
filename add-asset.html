@@ -6,73 +6,53 @@
   <title>Add Asset | IT Asset Management</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css" rel="stylesheet" />
+  <link rel="stylesheet" href="css/theme.css" />
 </head>
-<link rel="stylesheet" href="css/theme.css" />
+<body class="bg-body flex h-screen">
 
   <!-- Sidebar -->
-    <h2 class="text-2xl font-bold mb-6 text-center text-white">FF Inventory</h2>
-    <nav class="space-y-4">
-      <a href="add-asset.html" class="flex items-center gap-2 text-white">
-        <i class="bi bi-plus-circle"></i> Add Asset
-      </a>
-      <a href="allocate-asset.html" class="flex items-center gap-2 text-white">
-        <i class="bi bi-arrow-left-right"></i> Allocate Asset
-      </a>
-      <a href="asset-inventory.html" class="flex items-center gap-2 text-white">
-        <i class="bi bi-layers"></i> Asset Inventory
-      </a>
-      <a href="user-asset-overview.html" class="flex items-center gap-2 text-white">
-        <i class="bi bi-people-fill"></i> User Asset Overview
-      </a>
-      <a href="asset-summary.html" class="flex items-center gap-2 text-white">
-        <i class="bi bi-bar-chart-line-fill"></i> Asset Summary
-      </a>
+  <aside class="sidebar w-36 shadow-md px-4 py-4">
+    <h2 class="sidebar-title">FF Inventory</h2>
+    <nav class="sidebar-nav">
+      <a href="add-asset.html"><i class="bi bi-plus-circle"></i> Add Asset</a>
+      <a href="allocate-asset.html"><i class="bi bi-arrow-left-right"></i> Allocate Asset</a>
+      <a href="asset-inventory.html"><i class="bi bi-layers"></i> Asset Inventory</a>
+      <a href="user-asset-overview.html"><i class="bi bi-people-fill"></i> User Asset Overview</a>
+      <a href="asset-summary.html"><i class="bi bi-bar-chart-line-fill"></i> Asset Summary</a>
     </nav>
     <button id="logoutBtn" class="btn-logout mt-6 w-full">Logout</button>
   </aside>
 
   <!-- Main Content -->
-   <main class="flex-1 p-6 overflow-y-auto">
+  <main class="flex-1 p-6 overflow-y-auto">
     <header class="mb-6">
-      <h1 class="text-3xl font-semibold text-gray-800">Add Asset</h1>
+      <h1 class="page-title">Add Asset</h1>
     </header>
 
-    <div class="bg-white rounded-lg shadow-md p-6 mb-8">
-      <h2 class="text-xl font-semibold mb-4">Asset Information</h2>
+    <div class="card mb-8">
+      <h2 class="card-title">Asset Information</h2>
       
       <form id="assetForm" class="space-y-4">
         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
 
           <!-- Add New Asset Type -->
           <div class="col-span-2">
-            <label for="newAssetType" class="block text-sm font-semibold text-gray-700 mb-2">
-              Add New Asset Type
-            </label>
+            <label for="newAssetType" class="form-label">Add New Asset Type</label>
             <div class="flex flex-col sm:flex-row items-stretch sm:items-center gap-3">
-              <input 
-                type="text" 
-                id="newAssetType" 
-                class="flex-grow p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-400" 
-                placeholder="e.g. Docking Station"
-              >
-              <button 
-                type="button" 
-                id="addAssetTypeBtn" 
-                class="flex items-center gap-2 bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 transition-colors"
-              >
-                <i class="bi bi-plus-circle"></i>
-                <span>Add</span>
+              <input type="text" id="newAssetType" class="form-input flex-grow" placeholder="e.g. Docking Station">
+              <button type="button" id="addAssetTypeBtn" class="btn-primary flex items-center gap-2">
+                <i class="bi bi-plus-circle"></i> <span>Add</span>
               </button>
             </div>
           </div>
 
-          <!-- Asset Type & Model Side-by-Side -->
+          <!-- Asset Type & Model -->
           <div class="col-span-2">
             <div class="flex flex-col md:flex-row gap-4">
               <div class="w-full md:w-1/2">
-                <label for="assetType" class="block text-sm font-medium mb-1">Asset Type</label>
+                <label for="assetType" class="form-label">Asset Type</label>
                 <div class="flex items-center gap-2">
-                  <select id="assetType" class="flex-1 p-2 border rounded" required>
+                  <select id="assetType" class="form-input flex-1" required>
                     <option value="">Select Type</option>
                     <option value="laptop">Laptop</option>
                     <option value="desktop">Desktop</option>
@@ -82,53 +62,47 @@
                     <option value="headset">Headset</option>
                     <option value="keyboard">Keyboard</option>
                   </select>
-                  <button id="manageTypesBtn" type="button" title="Manage custom types"
-                    class="text-blue-600 hover:text-blue-800 text-xl">
+                  <button id="manageTypesBtn" type="button" class="text-blue-600 hover:text-blue-800 text-xl" title="Manage custom types">
                     <i class="bi bi-gear"></i>
                   </button>
                 </div>
               </div>
               <div class="w-full md:w-1/2">
-                <label class="block text-sm font-medium mb-1">Model</label>
-                <input type="text" id="model" class="w-full p-2 border rounded" required />
+                <label for="model" class="form-label">Model</label>
+                <input type="text" id="model" class="form-input" required />
               </div>
             </div>
           </div>
 
           <!-- Serial Number -->
           <div>
-            <label class="block text-sm font-medium mb-1">Serial Number</label>
-            <input type="text" id="serialNumber" class="w-full p-2 border rounded" required />
+            <label for="serialNumber" class="form-label">Serial Number</label>
+            <input type="text" id="serialNumber" class="form-input" required />
           </div>
 
           <!-- Purchase Date -->
           <div>
-            <label class="block text-sm font-medium mb-1">Purchase Date</label>
-            <input type="date" id="purchaseDate" class="w-full p-2 border rounded" required />
+            <label for="purchaseDate" class="form-label">Purchase Date</label>
+            <input type="date" id="purchaseDate" class="form-input" required />
           </div>
 
         </div>
 
-        <button type="submit" class="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600">
-          Add Asset
-        </button>
+        <button type="submit" class="btn-primary">Add Asset</button>
       </form>
     </div>
   </main>
 
   <!-- Manage Asset Types Modal -->
-  <div id="manageTypesModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center hidden z-50">
-    <div class="bg-white rounded-lg p-6 w-96">
-      <h3 class="text-lg font-semibold mb-4">Manage Custom Asset Types</h3>
-      <ul id="customTypesList" class="space-y-2 max-h-60 overflow-y-auto">
-        <!-- Populated by JS -->
-      </ul>
+  <div id="manageTypesModal" class="modal hidden">
+    <div class="modal-content">
+      <h3 class="modal-title">Manage Custom Asset Types</h3>
+      <ul id="customTypesList" class="space-y-2 max-h-60 overflow-y-auto"></ul>
       <div class="mt-4 text-right">
-        <button id="closeManageModal" class="px-4 py-2 bg-gray-300 rounded hover:bg-gray-400">Close</button>
+        <button id="closeManageModal" class="btn-secondary">Close</button>
       </div>
     </div>
   </div>
-
   <!-- Firebase Firestore Script -->
   <script type="module">
   import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
