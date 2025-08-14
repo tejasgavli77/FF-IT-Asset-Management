@@ -131,13 +131,13 @@
     if (!user) window.location.href = "login.html";
   });
 
-  document.getElementById("logoutBtn").addEventListener("click", () => {
+ /* document.getElementById("logoutBtn").addEventListener("click", () => {
     signOut(auth).then(() => window.location.href = "login.html")
       .catch(error => {
         alert("Logout failed.");
         console.error("Logout error:", error);
       });
-  });
+  });*/
 
   async function loadAssetTypes() {
     assetTypeSelect.innerHTML = `<option value="">Select Type</option>`;
