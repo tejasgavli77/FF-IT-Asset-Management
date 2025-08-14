@@ -56,3 +56,32 @@ window.logout = function () {
       console.error("Logout failed:", error);
     });
 };
+
+/* ===============================
+   🕒 Auto Logout After Inactivity
+   =============================== */
+let lastActivityTime = Date.now();
+
+const maxInactivity = 1 * 60 * 1000; // 1 minute
+
+/*const maxInactivity = 2 * 60 * 60 * 1000; // 2 hours */
+
+function resetInactivityTimer() {
+  lastActivityTime = Date.now();
+}
+
+// Track user activity
+['mousemove', 'keydown', 'click', 'scroll', 'touchstart'].forEach(event => {
+  window.addEventListener(event, resetInactivityTimer);
+});
+
+// Check every minute
+setInterval(() => {
+  if (auth.currentUser && (Date.now() - lastActivityTime > maxInactivity)) {
+    console.log("Logging out due to inactivity...");
+    signOut(auth).then(() => {
+      window.location.href = "login.html";
+    });
+  }
+}, 60 * 1000);
+
