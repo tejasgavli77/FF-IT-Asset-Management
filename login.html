@@ -3,56 +3,64 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Login | Final Funnel Asset Manager</title>
+  <title>Login | FinalFunnel Asset Manager</title>
 
   <!-- Tailwind CDN -->
   <script src="https://cdn.tailwindcss.com"></script>
 
-  <!-- Firebase V9 compat -->
+  <!-- Firebase v9 compat -->
   <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-auth-compat.js"></script>
 </head>
-<body class="bg-[#F3F4F6] flex items-center justify-center h-screen">
+<body class="bg-[#F3F4F6] flex items-center justify-center min-h-screen">
 
   <div class="bg-white w-[350px] rounded-xl shadow-lg p-6">
-    <h2 class="text-center text-2xl font-semibold mb-6 text-gray-700">Login</h2>
+    <!-- 🖼️ Logo -->
+    <div class="flex justify-center mb-4">
+      <img src="https://i.imgur.com/hb9cV6Z.png" alt="FinalFunnel logo" class="h-14">
+    </div>
 
-    <div class="space-y-4">
-      <input type="text"
-             id="email"
-             placeholder="Email"
-             class="w-full border border-gray-300 rounded-md px-3 py-2 focus:ring-[#0F766E] focus:border-[#0F766E]"/>
+    <h2 class="text-center text-xl font-semibold mb-4 text-gray-700">Admin Login</h2>
 
-      <div class="relative">
-        <input type="password"
-               id="password"
-               placeholder="Password"
-               class="w-full pr-10 border border-gray-300 rounded-md px-3 py-2 focus:ring-[#0F766E] focus:border-[#0F766E]"/>
-        <button type="button" id="togglePwd" class="absolute inset-y-0 right-0 flex items-center px-3 text-gray-500">
-          <svg id="eyeOpen" xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-             d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-             d="M2.458 12C3.732 7.943 7.522 5 12 5s8.268 2.943 9.542 7c-1.274 4.057-5.064 7-9.542 7S3.732 16.057 2.458 12z" />
-          </svg>
-          <svg id="eyeOff" xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 hidden" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-             d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.542-7a10.044 10.044 0 013.016-4.605m14.033.19A10.05 10.05 0 0121.542 12c-1.274 4.057-5.064 7-9.542 7a10.05 10.05 0 01-1.875-.175M15 12a3 3 0 11-6 0 3 3 0 016 0zm-9.9-5.1L4.2 4.2m15.6 15.6L19.8 19.8" />
-          </svg>
-        </button>
-      </div>
+    <!-- Email -->
+    <input id="email"
+           type="text"
+           placeholder="Email"
+           class="w-full border border-gray-300 rounded-md px-3 py-2 mb-3 focus:ring-[#0F766E] focus:border-[#0F766E]"/>
 
-      <button id="loginBtn"
-              class="w-full flex justify-center items-center gap-2 bg-[#0F766E] hover:bg-[#0c5e57] text-white rounded-md py-2 transition-colors disabled:opacity-60 disabled:cursor-wait">
-        <span>Sign in</span>
-        <svg id="loader" class="animate-spin h-5 w-5 hidden" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-          <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-          <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8z"></path>
+    <!-- Password with toggle eye -->
+    <div class="relative mb-3">
+      <input id="password" type="password"
+             placeholder="Password"
+             class="w-full pr-10 border border-gray-300 rounded-md px-3 py-2 focus:ring-[#0F766E] focus:border-[#0F766E]"/>
+
+      <button id="togglePwd" type="button" class="absolute inset-y-0 right-0 flex items-center px-3 text-gray-500">
+        <!-- eye open -->
+        <svg id="eyeOpen" xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                d="M2.458 12C3.732 7.943 7.522 5 12 5s8.268 2.943 9.542 7c-1.274 4.057-5.064 7-9.542 7S3.732 16.057 2.458 12z"/>
+        </svg>
+        <!-- eye off -->
+        <svg id="eyeOff" xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 hidden" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.542-7a10.044 10.044 0 013.016-4.605m14.033.19A10.05 10.05 0 0121.542 12c-1.274 4.057-5.064 7-9.542 7a10.05 10.05 0 01-1.875-.175M15 12a3 3 0 11-6 0 3 3 0 016 0zm-9.9-5.1L4.2 4.2m15.6 15.6L19.8 19.8"/>
         </svg>
       </button>
     </div>
 
-    <div id="error" class="text-red-500 text-sm mt-4 text-center hidden"></div>
+    <!-- Login button with spinner -->
+    <button id="loginBtn"
+            class="w-full flex justify-center items-center gap-2 bg-[#0F766E] hover:bg-[#0c5e57] text-white rounded-md py-2 transition disabled:opacity-60 disabled:cursor-wait">
+      <span>Sign in</span>
+      <svg id="loader" class="animate-spin h-5 w-5 hidden" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+        <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" />
+        <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8z" />
+      </svg>
+    </button>
+
+    <div id="error" class="text-red-500 text-sm mt-3 text-center hidden"></div>
   </div>
 
 <script>
@@ -64,19 +72,17 @@
     messagingSenderId: "803858971008",
     appId: "1:803858971008:web:72d69ddce6cbc85010a965"
   };
-
   firebase.initializeApp(firebaseConfig);
   const auth = firebase.auth();
 
   const loginBtn = document.getElementById("loginBtn");
-  const loader = document.getElementById("loader");
+  const loader   = document.getElementById("loader");
   const errorDiv = document.getElementById("error");
 
   loginBtn.addEventListener("click", () => {
     const email = document.getElementById("email").value.trim();
     const password = document.getElementById("password").value;
 
-    // show loader
     loader.classList.remove("hidden");
     loginBtn.disabled = true;
 
@@ -87,12 +93,12 @@
       .catch((error) => {
         let msg;
         switch (error.code) {
-          case 'auth/user-not-found':       msg = "No user found with this email."; break;
-          case 'auth/wrong-password':       msg = "Incorrect password."; break;
-          case 'auth/invalid-email':        msg = "Invalid email format."; break;
-          case 'auth/invalid-credential':   msg = "Invalid credentials."; break;
-          case 'auth/too-many-requests':    msg = "Too many attempts. Please try again later."; break;
-          default:                          msg = "Login failed: " + error.message;
+          case 'auth/user-not-found':     msg = "No user found."; break;
+          case 'auth/wrong-password':     msg = "Incorrect password."; break;
+          case 'auth/invalid-email':      msg = "Invalid email."; break;
+          case 'auth/invalid-credential': msg = "Invalid credentials."; break;
+          case 'auth/too-many-requests':  msg = "Too many attempts."; break;
+          default:                        msg = "Login failed: " + error.message;
         }
         errorDiv.textContent = msg;
         errorDiv.classList.remove("hidden");
@@ -101,24 +107,18 @@
       });
   });
 
-  // Toggle eye icon
-  const pwd = document.getElementById("password");
+  const pwd       = document.getElementById("password");
   const togglePwd = document.getElementById("togglePwd");
-  const eyeOpen = document.getElementById("eyeOpen");
-  const eyeOff = document.getElementById("eyeOff");
+  const eyeOpen   = document.getElementById("eyeOpen");
+  const eyeOff    = document.getElementById("eyeOff");
+
   togglePwd.addEventListener("click", () => {
-    if (pwd.type === "password") {
-      pwd.type = "text";
-      eyeOpen.classList.add("hidden");
-      eyeOff.classList.remove("hidden");
-    } else {
-      pwd.type = "password";
-      eyeOpen.classList.remove("hidden");
-      eyeOff.classList.add("hidden");
-    }
+    const isHidden = pwd.type === "password";
+    pwd.type = isHidden ? "text" : "password";
+    eyeOpen.classList.toggle("hidden", !isHidden);
+    eyeOff.classList.toggle("hidden", isHidden);
   });
 
-  // auto redirect if already logged in
   auth.onAuthStateChanged((user) => {
     if (user) {
       window.location.href = "add-asset.html";
