@@ -116,3 +116,16 @@ document.getElementById("assetForm").addEventListener("submit", async (e) => {
     alert("Failed to add asset.");
   }
 });
+
+// ✅ Global logout function
+window.logout = function () {
+  signOut(auth)
+    .then(() => {
+      window.location.href = "login.html";
+    })
+    .catch((error) => {
+      alert("Logout failed: " + error.message);
+      console.error("Logout error:", error);
+    });
+};
+
