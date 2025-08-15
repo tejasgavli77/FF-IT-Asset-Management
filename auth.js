@@ -62,9 +62,9 @@ window.logout = function () {
    =============================== */
 let lastActivityTime = Date.now();
 
-const maxInactivity = 1 * 60 * 1000; // 1 minute
+/* const maxInactivity = 1 * 60 * 1000; // 1 minute */
 
-/*const maxInactivity = 2 * 60 * 60 * 1000; // 2 hours */
+ const maxInactivity = 30 * 60 * 1000; // 30 minutes
 
 function resetInactivityTimer() {
   lastActivityTime = Date.now();
