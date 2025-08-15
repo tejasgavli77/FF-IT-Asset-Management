@@ -1,7 +1,8 @@
+// Firebase imports
 <script type="module">
   import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
   import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-
+/* ---------------- 🔧 Config & Setup ----------------- */
   const firebaseConfig = {
     apiKey: "AIzaSyAspahfUUGnBzh0mh6U53evGQzWQP956xQ",
     authDomain: "ffassetmanager.firebaseapp.com",
@@ -33,6 +34,12 @@
   <link rel="stylesheet" href="css/theme.css" />
 </head>
 <body class="bg-body flex h-screen">
+
+  <!-- Global loader overlay -->
+<div id="loaderOverlay"
+     style="position:fixed; inset:0; background:rgba(255,255,255,0.6); display:flex; align-items:center; justify-content:center; z-index:9999; visibility:hidden;">
+  <div class="animate-spin rounded-full h-12 w-12 border-t-4 border-[#0F766E] border-solid"></div>
+</div>
 
   <!-- Sidebar -->
   <aside class="sidebar w-36 shadow-md px-4 py-4">
