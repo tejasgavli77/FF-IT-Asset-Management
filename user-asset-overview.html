@@ -27,7 +27,7 @@
       <a href="user-asset-overview.html" class="sidebar-link"><i class="bi bi-people-fill"></i> User Asset Overview</a>
       <a href="asset-summary.html" class="sidebar-link"><i class="bi bi-bar-chart-line-fill"></i> Asset Summary</a>
     </nav>
-    <button id="logoutBtn" class="btn-logout mt-6 w-full">Logout</button>
+   <button class="btn-logout mt-6 w-full" onclick="logout()">Logout</button>
   </aside>
 
   <!-- Main Content -->
@@ -91,36 +91,10 @@
     });
   </script>
 
-  <!-- Logout Script -->
-  <script type="module">
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
-    import { getAuth, signOut } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-
-    const firebaseConfig = {
-      apiKey: "AIzaSyAspahfUUGnBzh0mh6U53evGQzWQP956xQ",
-      authDomain: "ffassetmanager.firebaseapp.com",
-      projectId: "ffassetmanager",
-      storageBucket: "ffassetmanager.appspot.com",
-      messagingSenderId: "803858971008",
-      appId: "1:803858971008:web:72d69ddce6cbc85010a965"
-    };
-
-    const app = initializeApp(firebaseConfig);
-    const auth = getAuth(app);
-
-    const logoutBtn = document.getElementById("logoutBtn");
-    if (logoutBtn) {
-      logoutBtn.addEventListener("click", () => {
-        signOut(auth).then(() => {
-          window.location.href = "login.html";
-        }).catch(error => {
-          alert("Logout failed: " + error.message);
-        });
-      });
-    }
-  </script>
-
   <!-- Data Script -->
   <script type="module" src="js/user-asset-overview.js"></script>
+
+  <!-- 🔐 Global auth + auto logout (make sure auth.js is in root) -->
+  <script type="module" src="auth.js"></script>
 </body>
 </html>
