@@ -273,7 +273,7 @@ document.getElementById("typeSearch").addEventListener("input", (e) => {
     modal.classList.add("hidden");
   });
 
-  // 🔁 Refresh List in Modal
+    // 🔁 Refresh List in Modal/Popover
   async function refreshCustomList() {
     customList.innerHTML = "";
     const snapshot = await getDocs(collection(db, "assetTypes"));
