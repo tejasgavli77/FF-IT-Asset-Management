@@ -20,7 +20,7 @@
       <a href="user-asset-overview.html" class="sidebar-link"><i class="bi bi-people-fill"></i> User Asset Overview</a>
       <a href="asset-summary.html" class="sidebar-link"><i class="bi bi-bar-chart-line-fill"></i> Asset Summary</a>
     </nav>
-    <button class="btn-logout mt-6 w-full" onclick="logout()">Logout</button>
+   <button class="btn-logout mt-6 w-full" onclick="logout()">Logout</button> 
   </aside>
 
   <!-- Main Content -->
@@ -31,173 +31,296 @@
 
     <div class="card mb-8">
       <h2 class="card-title">Asset Information</h2>
-
+      
       <form id="assetForm" class="space-y-4">
         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
 
           <!-- Add New Asset Type -->
           <div class="col-span-2">
-            <label class="form-label">Add New Asset Type</label>
-            <div class="flex flex-col sm:flex-row gap-3">
-              <input id="newAssetType" class="form-input flex-grow" placeholder="e.g. Docking Station">
+            <label for="newAssetType" class="form-label">Add New Asset Type</label>
+            <div class="flex flex-col sm:flex-row items-stretch sm:items-center gap-3">
+              <input type="text" id="newAssetType" class="form-input flex-grow" placeholder="e.g. Docking Station">
               <button type="button" id="addAssetTypeBtn" class="btn-primary flex items-center gap-2">
-                <i class="bi bi-plus-circle"></i> Add
+                <i class="bi bi-plus-circle"></i> <span>Add</span>
               </button>
             </div>
           </div>
 
-          <!-- Asset Type + gear -->
+          <!-- Asset Type & Model -->
           <div class="col-span-2">
             <div class="flex flex-col md:flex-row gap-4">
               <div class="w-full md:w-1/2">
-                <label class="form-label">Asset Type</label>
+                <label for="assetType" class="form-label">Asset Type</label>
                 <div class="flex items-center gap-2">
                   <select id="assetType" class="form-input flex-1" required>
                     <option value="">Select Type</option>
+                    <option value="laptop">Laptop</option>
+                    <option value="desktop">Desktop</option>
+                    <option value="monitor">Monitor</option>
+                    <option value="printer">Printer</option>
+                    <option value="mouse">Mouse</option>
+                    <option value="headset">Headset</option>
+                    <option value="keyboard">Keyboard</option>
                   </select>
-                  <button id="manageTypesBtn" type="button" class="text-accent text-xl" title="Manage custom types">
+                  <button id="manageTypesBtn" type="button" class="text-accent hover:text-accent-dark text-xl" title="Manage custom types">
                     <i class="bi bi-gear"></i>
                   </button>
                 </div>
               </div>
               <div class="w-full md:w-1/2">
-                <label class="form-label">Model</label>
+                <label for="model" class="form-label">Model</label>
                 <input type="text" id="model" class="form-input" required />
               </div>
             </div>
           </div>
 
+          <!-- Serial Number -->
           <div>
-            <label class="form-label">Serial Number</label>
-            <input id="serialNumber" class="form-input" required />
+            <label for="serialNumber" class="form-label">Serial Number</label>
+            <input type="text" id="serialNumber" class="form-input" required />
           </div>
 
+          <!-- Purchase Date -->
           <div>
-            <label class="form-label">Purchase Date</label>
+            <label for="purchaseDate" class="form-label">Purchase Date</label>
             <input type="date" id="purchaseDate" class="form-input" required />
           </div>
+
         </div>
 
         <button type="submit" class="btn-primary">Add Asset</button>
       </form>
     </div>
+    
   </main>
+  
+<!-- 🔧 Mini Popover for managing custom types -->
+<div id="manageTypesPopover"
+     class="hidden absolute bg-white border rounded-lg shadow-lg z-50 p-4 w-64 transition ease-out duration-200">
+  <!-- Search -->
+  <input id="typeSearch" type="text"
+         placeholder="Search type..."
+         class="w-full mb-3 p-2 border rounded text-sm"/>
 
-  <!-- 🔧 Gear Popover -->
-  <div id="manageTypesPopover" class="hidden absolute bg-white border rounded-lg shadow-lg z-50 p-4 w-64 transition">
-    <input id="typeSearch" placeholder="Search type..." class="w-full mb-3 p-2 border rounded text-sm"/>
-    <ul id="customTypesList" class="space-y-2 max-h-40 overflow-y-auto text-sm"></ul>
-    <div class="text-right mt-3">
-      <button id="closeManagePopover" class="px-3 py-1 bg-gray-300 rounded hover:bg-gray-400 text-sm">Close</button>
-    </div>
+  <!-- List -->
+  <ul id="customTypesList" class="space-y-2 max-h-40 overflow-y-auto text-sm"></ul>
+
+  <!-- Close -->
+  <div class="text-right mt-3">
+    <button id="closeManagePopover" class="px-3 py-1 bg-gray-300 rounded hover:bg-gray-400 text-sm">Close</button>
   </div>
+</div>
 
-<script type="module" src="add-asset.js"></script>
-<script type="module" src="auth.js"></script>
 </body>
 </html>
-  
-<script type="module">
-import {initializeApp} from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
-import {getFirestore, collection, addDoc, query, where, getDocs, deleteDoc} from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
-import {getAuth, onAuthStateChanged} from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
 
-const firebaseConfig = {
-  apiKey: "AIzaSyAspahfUUGnBzh0mh6U53evGQzWQP956xQ",
-  authDomain: "ffassetmanager.firebaseapp.com",
-  projectId: "ffassetmanager",
-  storageBucket: "ffassetmanager.appspot.com",
-  messagingSenderId: "803858971008",
-  appId: "1:803858971008:web:72d69ddce6cbc85010a965"
-};
 
-const app = initializeApp(firebaseConfig);
-const db   = getFirestore(app);
-const auth = getAuth(app);
+  <!-- Firebase Firestore Script -->
+  <script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+  import {
+    getFirestore, collection, addDoc, query, where, getDocs, deleteDoc
+  } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+  import {
+    getAuth, onAuthStateChanged, signOut
+  } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
 
-const assetTypeSelect = document.getElementById("assetType");
-const manageBtn       = document.getElementById("manageTypesBtn");
-const popover         = document.getElementById("manageTypesPopover");
-const customList      = document.getElementById("customTypesList");
-const typeSearch      = document.getElementById("typeSearch");
-const closePopoverBtn = document.getElementById("closeManagePopover");
+  const firebaseConfig = {
+    apiKey: "AIzaSyAspahfUUGnBzh0mh6U53evGQzWQP956xQ",
+    authDomain: "ffassetmanager.firebaseapp.com",
+    projectId: "ffassetmanager",
+    storageBucket: "ffassetmanager.appspot.com",
+    messagingSenderId: "803858971008",
+    appId: "1:803858971008:web:72d69ddce6cbc85010a965"
+  };
 
-onAuthStateChanged(auth, user => {
-  if (!user) window.location.href = "login.html";
-});
+  const app = initializeApp(firebaseConfig);
+  const db = getFirestore(app);
+  const auth = getAuth(app);
+  const assetsCollection = collection(db, "assets");
 
-async function loadAssetTypes() {
-  assetTypeSelect.innerHTML = `<option value="">Select Type</option>`;
-  const snap = await getDocs(collection(db, 'assetTypes'));
-  snap.forEach(doc => {
-    const type = doc.data().name;
-    const op   = document.createElement("option");
-    op.value   = type.toLowerCase();
-    op.textContent = type;
-    assetTypeSelect.appendChild(op);
+  const assetTypeSelect = document.getElementById("assetType");
+  const manageBtn = document.getElementById("manageTypesBtn");
+  const modal = document.getElementById("manageTypesModal");
+  const closeModal = document.getElementById("closeManageModal");
+  const customList = document.getElementById("customTypesList");
+
+  onAuthStateChanged(auth, user => {
+    if (!user) window.location.href = "login.html";
   });
-}
-await loadAssetTypes();
 
-document.getElementById("addAssetTypeBtn").addEventListener("click", async () => {
-  const newVal = document.getElementById("newAssetType").value.trim();
-  if (!newVal) return alert("Enter a valid type");
-  const q  = query(collection(db, "assetTypes"), where("name", "==", newVal));
-  const ex = await getDocs(q);
-  if (!ex.empty) return alert("Already exists");
+ /* document.getElementById("logoutBtn").addEventListener("click", () => {
+    signOut(auth).then(() => window.location.href = "login.html")
+      .catch(error => {
+        alert("Logout failed.");
+        console.error("Logout error:", error);
+      });
+  });*/
 
-  await addDoc(collection(db, "assetTypes"), { name: newVal });
-  alert("Added");
-  document.getElementById("newAssetType").value = "";
+  async function loadAssetTypes() {
+    assetTypeSelect.innerHTML = `<option value="">Select Type</option>`;
+    const snapshot = await getDocs(collection(db, "assetTypes"));
+    snapshot.forEach(doc => {
+      const type = doc.data().name;
+      const option = document.createElement("option");
+      option.value = type.toLowerCase();
+      option.textContent = type;
+      assetTypeSelect.appendChild(option);
+    });
+  }
+
   await loadAssetTypes();
-});
 
-manageBtn.addEventListener("click", async () => {
+  document.getElementById("addAssetTypeBtn").addEventListener("click", async () => {
+    const newTypeInput = document.getElementById("newAssetType");
+    const newType = newTypeInput.value.trim();
+    if (!newType) return alert("Please enter a valid asset type.");
+
+    const q = query(collection(db, "assetTypes"), where("name", "==", newType));
+    const existing = await getDocs(q);
+    if (!existing.empty) {
+      alert("This asset type already exists.");
+      return;
+    }
+
+    await addDoc(collection(db, "assetTypes"), { name: newType });
+    alert("✅ Asset type added.");
+    newTypeInput.value = "";
+    await loadAssetTypes();
+  });
+
+  async function generateAssetId(assetType) {
+    const prefixMap = {
+      laptop: "L",
+      desktop: "D",
+      monitor: "M",
+      printer: "P",
+      mouse: "Mo",
+      headset: "H",
+      pendrive: "PD",
+      keyboard: "Key"
+    };
+    const cleanedType = assetType.trim().toLowerCase();
+    const prefix = prefixMap[cleanedType] || "X";
+    let assetId, exists = true;
+
+    while (exists) {
+      const randomId = Math.floor(1000 + Math.random() * 9000);
+      assetId = `${prefix}-${randomId}`;
+      const q = query(assetsCollection, where("assetId", "==", assetId));
+      const snapshot = await getDocs(q);
+      exists = !snapshot.empty;
+    }
+
+    return assetId;
+  }
+
+  document.getElementById("assetForm").addEventListener("submit", async (e) => {
+    e.preventDefault();
+    const type = document.getElementById("assetType").value;
+    const assetId = await generateAssetId(type);
+
+    const assetData = {
+      assetId,
+      type,
+      model: document.getElementById("model").value,
+      serialNumber: document.getElementById("serialNumber").value,
+      purchaseDate: document.getElementById("purchaseDate").value,
+      status: "Available",
+      history: [{
+        date: new Date().toISOString(),
+        action: "Asset Added",
+        details: "Initial registration"
+      }]
+    };
+
+    try {
+      await addDoc(assetsCollection, assetData);
+      alert(`✅ Asset ${assetId} added successfully!`);
+      document.getElementById("assetForm").reset();
+      await loadAssetTypes();
+    } catch (error) {
+      console.error("❌ Error adding asset:", error);
+      alert("Failed to add asset.");
+    }
+  });
+
+  // 🚀 Gear Icon: Show Modal
+const popover = document.getElementById("manageTypesPopover");
+
+manageBtn.addEventListener("click", async (e) => {
   await refreshCustomList();
-  const box = manageBtn.getBoundingClientRect();
-  popover.style.top  = (box.bottom + window.scrollY) + "px";
-  popover.style.left = (box.left + window.scrollX)   + "px";
+  const rect = manageBtn.getBoundingClientRect();
+  popover.style.top = (rect.bottom + window.scrollY + 10) + "px";
+  popover.style.left = (rect.left + window.scrollX) + "px";
   popover.classList.remove("hidden");
 });
-closePopoverBtn.addEventListener("click", () => popover.classList.add("hidden"));
 
-typeSearch.addEventListener("input", (e) => {
+// close button
+document.getElementById("closeManagePopover")
+  .addEventListener("click", () => popover.classList.add("hidden"));
+
+// 🔍 simple live filter
+document.getElementById("typeSearch").addEventListener("input", (e) => {
   const term = e.target.value.toLowerCase();
-  customList.querySelectorAll("li").forEach(li => {
+  document.querySelectorAll("#customTypesList li").forEach(li => {
     li.style.display = li.textContent.toLowerCase().includes(term) ? "flex" : "none";
   });
 });
 
-async function refreshCustomList() {
-  customList.innerHTML = "";
-  const snap = await getDocs(collection(db, "assetTypes"));
-  snap.forEach(d => {
-    const type = d.data().name;
-    const li   = document.createElement("li");
-    li.setAttribute("data-value", type);
-    li.className = "flex justify-between items-center bg-gray-100 px-3 py-2 rounded";
-    li.innerHTML = `<span>${type}</span>
-       <i class="bi bi-trash text-red-600 hover:text-red-800 cursor-pointer"></i>`;
-    customList.appendChild(li);
+  // ❌ Close Modal
+  closeModal.addEventListener("click", () => {
+    modal.classList.add("hidden");
   });
-}
 
-customList.addEventListener("click", async (e) => {
-  const li  = e.target.closest("li[data-value]");
-  if (!li) return;
-  const val = li.getAttribute("data-value");
-  if (!confirm(`Delete "${val}"?`)) return;
-
-  const q    = query(collection(db, "assetTypes"), where("name", "==", val));
-  const snap = await getDocs(q);
-  for (const d of snap.docs) {
-    await deleteDoc(d.ref);
+    // 🔁 Refresh List in Modal/Popover
+  async function refreshCustomList() {
+    customList.innerHTML = "";
+    const snapshot = await getDocs(collection(db, "assetTypes"));
+    snapshot.forEach((doc) => {
+      const type = doc.data().name;
+      const li = document.createElement("li");
+      li.className = "flex justify-between items-center bg-gray-100 px-3 py-2 rounded";
+      li.innerHTML = `
+        <span>${type}</span>
+        <button data-value="${type}" class="text-red-600 hover:text-red-800">
+          <i class="bi bi-trash"></i>
+        </button>
+      `;
+      customList.appendChild(li);
+    });
   }
-  await loadAssetTypes();
-  await refreshCustomList();
-  alert("Deleted.");
-});
-</script>
 
+  // 🗑️ Delete Asset Type from Modal List
+  customList.addEventListener("click", async (e) => {
+    const btn = e.target.closest("button[data-value]");
+    if (!btn) return;
+
+    const valToRemove = btn.dataset.value;
+    const confirmDelete = confirm(`Are you sure you want to delete asset type "${valToRemove}"?`);
+    if (!confirmDelete) return;
+
+    try {
+      const q = query(collection(db, "assetTypes"), where("name", "==", valToRemove));
+      const snapshot = await getDocs(q);
+
+      snapshot.forEach(async (docSnap) => {
+        await deleteDoc(docSnap.ref);
+      });
+
+      // Remove from dropdown
+      Array.from(assetTypeSelect.options).forEach(opt => {
+        if (opt.textContent === valToRemove) opt.remove();
+      });
+
+      await refreshCustomList();
+      alert(`✅ "${valToRemove}" deleted successfully.`);
+    } catch (err) {
+      console.error("❌ Failed to delete asset type:", err);
+      alert("Error deleting asset type.");
+    }
+  });
+</script>
+  <script type="module" src="auth.js"></script>
 </body>
 </html>
