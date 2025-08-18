@@ -31,55 +31,49 @@
 
     <div class="card mb-8">
       <h2 class="card-title">Asset Information</h2>
-      
+
       <form id="assetForm" class="space-y-4">
         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+
           <!-- Add New Asset Type -->
           <div class="col-span-2">
-            <label for="newAssetType" class="form-label">Add New Asset Type</label>
-            <div class="flex flex-col sm:flex-row items-stretch sm:items-center gap-3">
-              <input type="text" id="newAssetType" class="form-input flex-grow" placeholder="e.g. Docking Station">
+            <label class="form-label">Add New Asset Type</label>
+            <div class="flex flex-col sm:flex-row gap-3">
+              <input id="newAssetType" class="form-input flex-grow" placeholder="e.g. Docking Station">
               <button type="button" id="addAssetTypeBtn" class="btn-primary flex items-center gap-2">
-                <i class="bi bi-plus-circle"></i> <span>Add</span>
+                <i class="bi bi-plus-circle"></i> Add
               </button>
             </div>
           </div>
 
-          <!-- Asset Type & Model -->
+          <!-- Asset Type + gear -->
           <div class="col-span-2">
             <div class="flex flex-col md:flex-row gap-4">
               <div class="w-full md:w-1/2">
-                <label for="assetType" class="form-label">Asset Type</label>
+                <label class="form-label">Asset Type</label>
                 <div class="flex items-center gap-2">
                   <select id="assetType" class="form-input flex-1" required>
                     <option value="">Select Type</option>
-                    <option value="laptop">Laptop</option>
-                    <option value="desktop">Desktop</option>
-                    <option value="monitor">Monitor</option>
-                    <option value="printer">Printer</option>
-                    <option value="mouse">Mouse</option>
-                    <option value="headset">Headset</option>
-                    <option value="keyboard">Keyboard</option>
                   </select>
-                  <button id="manageTypesBtn" type="button" class="text-accent hover:text-accent-dark text-xl" title="Manage custom types">
+                  <button id="manageTypesBtn" type="button" class="text-accent text-xl" title="Manage custom types">
                     <i class="bi bi-gear"></i>
                   </button>
                 </div>
               </div>
               <div class="w-full md:w-1/2">
-                <label for="model" class="form-label">Model</label>
+                <label class="form-label">Model</label>
                 <input type="text" id="model" class="form-input" required />
               </div>
             </div>
           </div>
 
           <div>
-            <label for="serialNumber" class="form-label">Serial Number</label>
-            <input type="text" id="serialNumber" class="form-input" required />
+            <label class="form-label">Serial Number</label>
+            <input id="serialNumber" class="form-input" required />
           </div>
 
           <div>
-            <label for="purchaseDate" class="form-label">Purchase Date</label>
+            <label class="form-label">Purchase Date</label>
             <input type="date" id="purchaseDate" class="form-input" required />
           </div>
         </div>
@@ -89,19 +83,19 @@
     </div>
   </main>
 
-<!-- 🔧 Popover -->
-<div id="manageTypesPopover"
-     class="hidden absolute bg-white border rounded-lg shadow-lg z-50 p-4 w-64 transition ease-out duration-200">
-  <input id="typeSearch" type="text" placeholder="Search type..."
-         class="w-full mb-3 p-2 border rounded text-sm"/>
-  <ul id="customTypesList" class="space-y-2 max-h-40 overflow-y-auto text-sm"></ul>
-  <div class="text-right mt-3">
-    <button id="closeManagePopover"
-            class="px-3 py-1 bg-gray-300 rounded hover:bg-gray-400 text-sm">Close</button>
+  <!-- 🔧 Gear Popover -->
+  <div id="manageTypesPopover" class="hidden absolute bg-white border rounded-lg shadow-lg z-50 p-4 w-64 transition">
+    <input id="typeSearch" placeholder="Search type..." class="w-full mb-3 p-2 border rounded text-sm"/>
+    <ul id="customTypesList" class="space-y-2 max-h-40 overflow-y-auto text-sm"></ul>
+    <div class="text-right mt-3">
+      <button id="closeManagePopover" class="px-3 py-1 bg-gray-300 rounded hover:bg-gray-400 text-sm">Close</button>
+    </div>
   </div>
-</div>
+
 <script type="module" src="add-asset.js"></script>
 <script type="module" src="auth.js"></script>
+</body>
+</html>
   
 <script type="module">
 import {initializeApp} from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
