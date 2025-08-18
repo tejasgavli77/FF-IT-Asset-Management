@@ -246,10 +246,27 @@
   });
 
   // 🚀 Gear Icon: Show Modal
-  manageBtn.addEventListener("click", async () => {
-    await refreshCustomList();
-    modal.classList.remove("hidden");
+const popover = document.getElementById("manageTypesPopover");
+
+manageBtn.addEventListener("click", async (e) => {
+  await refreshCustomList();
+  const rect = manageBtn.getBoundingClientRect();
+  popover.style.top = (rect.bottom + window.scrollY + 10) + "px";
+  popover.style.left = (rect.left + window.scrollX) + "px";
+  popover.classList.remove("hidden");
+});
+
+// close button
+document.getElementById("closeManagePopover")
+  .addEventListener("click", () => popover.classList.add("hidden"));
+
+// 🔍 simple live filter
+document.getElementById("typeSearch").addEventListener("input", (e) => {
+  const term = e.target.value.toLowerCase();
+  document.querySelectorAll("#customTypesList li").forEach(li => {
+    li.style.display = li.textContent.toLowerCase().includes(term) ? "flex" : "none";
   });
+});
 
   // ❌ Close Modal
   closeModal.addEventListener("click", () => {
