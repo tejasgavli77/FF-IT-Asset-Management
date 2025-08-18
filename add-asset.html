@@ -102,112 +102,108 @@
 </div>
 <script type="module" src="add-asset.js"></script>
 <script type="module" src="auth.js"></script>
+  
 <script type="module">
-  import {initializeApp} from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
-  import {getFirestore, collection, addDoc, query, where, getDocs, deleteDoc} from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
-  import {getAuth, onAuthStateChanged} from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+import {initializeApp} from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+import {getFirestore, collection, addDoc, query, where, getDocs, deleteDoc} from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+import {getAuth, onAuthStateChanged} from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
 
-  const firebaseConfig = {
-    apiKey: "AIzaSyAspahfUUGnBzh0mh6U53evGQzWQP956xQ",
-    authDomain: "ffassetmanager.firebaseapp.com",
-    projectId: "ffassetmanager",
-    storageBucket: "ffassetmanager.appspot.com",
-    messagingSenderId: "803858971008",
-    appId: "1:803858971008:web:72d69ddce6cbc85010a965"
-  };
+const firebaseConfig = {
+  apiKey: "AIzaSyAspahfUUGnBzh0mh6U53evGQzWQP956xQ",
+  authDomain: "ffassetmanager.firebaseapp.com",
+  projectId: "ffassetmanager",
+  storageBucket: "ffassetmanager.appspot.com",
+  messagingSenderId: "803858971008",
+  appId: "1:803858971008:web:72d69ddce6cbc85010a965"
+};
 
-  const app = initializeApp(firebaseConfig);
-  const db = getFirestore(app);
-  const auth = getAuth(app);
-  const assetTypeSelect = document.getElementById("assetType");
-  const manageBtn = document.getElementById("manageTypesBtn");
-  const popover = document.getElementById("manageTypesPopover");
-  const closePopoverBtn = document.getElementById("closeManagePopover");
-  const customList = document.getElementById("customTypesList");
+const app = initializeApp(firebaseConfig);
+const db   = getFirestore(app);
+const auth = getAuth(app);
 
-  onAuthStateChanged(auth, user => {
-    if (!user) window.location.href = "login.html";
+const assetTypeSelect = document.getElementById("assetType");
+const manageBtn       = document.getElementById("manageTypesBtn");
+const popover         = document.getElementById("manageTypesPopover");
+const customList      = document.getElementById("customTypesList");
+const typeSearch      = document.getElementById("typeSearch");
+const closePopoverBtn = document.getElementById("closeManagePopover");
+
+onAuthStateChanged(auth, user => {
+  if (!user) window.location.href = "login.html";
+});
+
+async function loadAssetTypes() {
+  assetTypeSelect.innerHTML = `<option value="">Select Type</option>`;
+  const snap = await getDocs(collection(db, 'assetTypes'));
+  snap.forEach(doc => {
+    const type = doc.data().name;
+    const op   = document.createElement("option");
+    op.value   = type.toLowerCase();
+    op.textContent = type;
+    assetTypeSelect.appendChild(op);
   });
+}
+await loadAssetTypes();
 
-  async function loadAssetTypes(){
-    assetTypeSelect.innerHTML = '<option value="">Select Type</option>';
-    const snapshot = await getDocs(collection(db,'assetTypes'));
-    snapshot.forEach(d=>{
-      const type = d.data().name;
-      const o = document.createElement('option');
-      o.value=type.toLowerCase();
-      o.textContent = type;
-      assetTypeSelect.appendChild(o);
-    });
+document.getElementById("addAssetTypeBtn").addEventListener("click", async () => {
+  const newVal = document.getElementById("newAssetType").value.trim();
+  if (!newVal) return alert("Enter a valid type");
+  const q  = query(collection(db, "assetTypes"), where("name", "==", newVal));
+  const ex = await getDocs(q);
+  if (!ex.empty) return alert("Already exists");
+
+  await addDoc(collection(db, "assetTypes"), { name: newVal });
+  alert("Added");
+  document.getElementById("newAssetType").value = "";
+  await loadAssetTypes();
+});
+
+manageBtn.addEventListener("click", async () => {
+  await refreshCustomList();
+  const box = manageBtn.getBoundingClientRect();
+  popover.style.top  = (box.bottom + window.scrollY) + "px";
+  popover.style.left = (box.left + window.scrollX)   + "px";
+  popover.classList.remove("hidden");
+});
+closePopoverBtn.addEventListener("click", () => popover.classList.add("hidden"));
+
+typeSearch.addEventListener("input", (e) => {
+  const term = e.target.value.toLowerCase();
+  customList.querySelectorAll("li").forEach(li => {
+    li.style.display = li.textContent.toLowerCase().includes(term) ? "flex" : "none";
+  });
+});
+
+async function refreshCustomList() {
+  customList.innerHTML = "";
+  const snap = await getDocs(collection(db, "assetTypes"));
+  snap.forEach(d => {
+    const type = d.data().name;
+    const li   = document.createElement("li");
+    li.setAttribute("data-value", type);
+    li.className = "flex justify-between items-center bg-gray-100 px-3 py-2 rounded";
+    li.innerHTML = `<span>${type}</span>
+       <i class="bi bi-trash text-red-600 hover:text-red-800 cursor-pointer"></i>`;
+    customList.appendChild(li);
+  });
+}
+
+customList.addEventListener("click", async (e) => {
+  const li  = e.target.closest("li[data-value]");
+  if (!li) return;
+  const val = li.getAttribute("data-value");
+  if (!confirm(`Delete "${val}"?`)) return;
+
+  const q    = query(collection(db, "assetTypes"), where("name", "==", val));
+  const snap = await getDocs(q);
+  for (const d of snap.docs) {
+    await deleteDoc(d.ref);
   }
   await loadAssetTypes();
-
-  document.getElementById("addAssetTypeBtn").addEventListener("click", async()=>{
-    const newVal = document.getElementById("newAssetType").value.trim();
-    if(!newVal) return alert("Enter type.");
-    const q = query(collection(db,"assetTypes"), where("name","==",newVal));
-    const res = await getDocs(q);
-    if(!res.empty) return alert("Exists!");
-    await addDoc(collection(db,"assetTypes"),{name:newVal});
-    alert("Added");
-    document.getElementById("newAssetType").value="";
-    await loadAssetTypes();
-  });
-
-  // ⭐ POPUP logic
-  manageBtn.addEventListener("click", async ()=>{
-    await refreshCustomList();
-    const box = manageBtn.getBoundingClientRect();
-    popover.style.top = box.bottom + window.scrollY + "px";
-    popover.style.left = box.left + window.scrollX + "px";
-    popover.classList.remove("hidden");
-  });
-  closePopoverBtn.addEventListener("click",()=>popover.classList.add("hidden"));
-
-  // filter inside popup
-  document.getElementById("typeSearch").addEventListener("input",(e)=>{
-    const term = e.target.value.toLowerCase();
-    document.querySelectorAll("#customTypesList li").forEach(li=>{
-      li.style.display = li.textContent.toLowerCase().includes(term)?"flex":"none";
-    });
-  });
-
-  async function refreshCustomList(){
-    customList.innerHTML="";
-    const snapshot = await getDocs(collection(db,"assetTypes"));
-    snapshot.forEach(doc=>{
-      const type = doc.data().name;
-      const li = document.createElement("li");
-      li.setAttribute("data-value",type);
-      li.className="flex justify-between items-center bg-gray-100 px-3 py-2 rounded";
-      li.innerHTML = `
-        <span>${type}</span>
-        <i class="bi bi-trash text-red-600 hover:text-red-800 cursor-pointer"></i>
-      `;
-      customList.appendChild(li);
-    });
-  }
-
-  // 🗑 delete clicked
-  customList.addEventListener("click",async(e)=>{
-    const li = e.target.closest("li[data-value]");
-    if(!li) return;
-    const val = li.getAttribute("data-value");
-    if(!confirm(`Delete "${val}" ?`)) return;
-    try{
-      const q = query(collection(db,"assetTypes"), where("name","==",val));
-      const snap=await getDocs(q);
-      for(const d of snap.docs){
-        await deleteDoc(d.ref);
-      }
-      await loadAssetTypes();
-      await refreshCustomList();
-      alert("Deleted.");
-    }catch(err){
-      console.error(err);
-      alert("Error");
-    }
-  });
+  await refreshCustomList();
+  alert("Deleted.");
+});
 </script>
+
 </body>
 </html>
