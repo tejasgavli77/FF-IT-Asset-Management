@@ -293,33 +293,32 @@ document.getElementById("typeSearch").addEventListener("input", (e) => {
 
   // 🗑️ Delete Asset Type from Modal List
   customList.addEventListener("click", async (e) => {
-    const btn = e.target.closest("button[data-value]");
-    if (!btn) return;
+  const btn = e.target.closest("button[data-value]");
+  if (!btn) return;
+  const valToRemove = btn.dataset.value;
+  const confirmDelete = confirm(`Are you sure you want to delete asset type "${valToRemove}"?`);
+  if (!confirmDelete) return;
+  try {
+    const q = query(collection(db, "assetTypes"), where("name", "==", valToRemove));
+    const snapshot = await getDocs(q);
+    // Instead of forEach, use Promise.all for async deletes
+    const deletePromises = [];
+    snapshot.forEach((docSnap) => {
+      deletePromises.push(deleteDoc(docSnap.ref));
+    });
+    await Promise.all(deletePromises);
+    // Remove from dropdown
+    Array.from(assetTypeSelect.options).forEach(opt => {
+      if (opt.textContent === valToRemove) opt.remove();
+    });
+    await refreshCustomList();
+    alert(`✅ "${valToRemove}" deleted successfully.`);
+  } catch (err) {
+    console.error("❌ Failed to delete asset type:", err);
+    alert("Error deleting asset type.");
+  }
+});
 
-    const valToRemove = btn.dataset.value;
-    const confirmDelete = confirm(`Are you sure you want to delete asset type "${valToRemove}"?`);
-    if (!confirmDelete) return;
-
-    try {
-      const q = query(collection(db, "assetTypes"), where("name", "==", valToRemove));
-      const snapshot = await getDocs(q);
-
-      snapshot.forEach(async (docSnap) => {
-        await deleteDoc(docSnap.ref);
-      });
-
-      // Remove from dropdown
-      Array.from(assetTypeSelect.options).forEach(opt => {
-        if (opt.textContent === valToRemove) opt.remove();
-      });
-
-      await refreshCustomList();
-      alert(`✅ "${valToRemove}" deleted successfully.`);
-    } catch (err) {
-      console.error("❌ Failed to delete asset type:", err);
-      alert("Error deleting asset type.");
-    }
-  });
 </script>
   <script type="module" src="auth.js"></script>
 </body>
