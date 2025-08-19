@@ -292,32 +292,39 @@ document.getElementById("typeSearch").addEventListener("input", (e) => {
   }
 
   // 🗑️ Delete Asset Type from Modal List
-  customList.addEventListener("click", async (e) => {
-  const btn = e.target.closest("button[data-value]");
-  if (!btn) return;
-  const valToRemove = btn.dataset.value;
-  const confirmDelete = confirm(`Are you sure you want to delete asset type "${valToRemove}"?`);
-  if (!confirmDelete) return;
+ // 🗑️ Delete Asset Type (using delegation so it always works)
+customList.addEventListener("click", async (e) => {
+  const trashBtn = e.target.closest("[data-value]");
+  if (!trashBtn) return;
+
+  const typeToDelete = trashBtn.dataset.value;
+
+  if (!confirm(`Delete "${typeToDelete}"?`)) return;
+
   try {
-    const q = query(collection(db, "assetTypes"), where("name", "==", valToRemove));
-    const snapshot = await getDocs(q);
-    // Instead of forEach, use Promise.all for async deletes
-    const deletePromises = [];
-    snapshot.forEach((docSnap) => {
-      deletePromises.push(deleteDoc(docSnap.ref));
-    });
-    await Promise.all(deletePromises);
-    // Remove from dropdown
+    // delete from Firestore
+    const q = query(collection(db, "assetTypes"), where("name", "==", typeToDelete));
+    const snap = await getDocs(q);
+    for (const d of snap.docs) {
+      await deleteDoc(d.ref);
+    }
+
+    // Remove option from select box
     Array.from(assetTypeSelect.options).forEach(opt => {
-      if (opt.textContent === valToRemove) opt.remove();
+      if (opt.textContent === typeToDelete) {
+        opt.remove();
+      }
     });
+
+    // Refresh the list in the popover
     await refreshCustomList();
-    alert(`✅ "${valToRemove}" deleted successfully.`);
+    alert("Deleted successfully!");
   } catch (err) {
-    console.error("❌ Failed to delete asset type:", err);
-    alert("Error deleting asset type.");
+    console.error(err);
+    alert("Error deleting asset type");
   }
 });
+
 
 </script>
   <script type="module" src="auth.js"></script>
