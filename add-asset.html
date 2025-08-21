@@ -114,9 +114,7 @@
 </body>
 </html>
 
-
-  <!-- Firebase Firestore Script -->
-  <script type="module">
+<script type="module">
   import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
   import {
     getFirestore, collection, addDoc, query, where, getDocs, deleteDoc
@@ -141,21 +139,12 @@
 
   const assetTypeSelect = document.getElementById("assetType");
   const manageBtn = document.getElementById("manageTypesBtn");
-  const modal = document.getElementById("manageTypesModal");
-  const closeModal = document.getElementById("closeManageModal");
   const customList = document.getElementById("customTypesList");
+  const popover = document.getElementById("manageTypesPopover");
 
   onAuthStateChanged(auth, user => {
     if (!user) window.location.href = "login.html";
   });
-
- /* document.getElementById("logoutBtn").addEventListener("click", () => {
-    signOut(auth).then(() => window.location.href = "login.html")
-      .catch(error => {
-        alert("Logout failed.");
-        console.error("Logout error:", error);
-      });
-  });*/
 
   async function loadAssetTypes() {
     assetTypeSelect.innerHTML = `<option value="">Select Type</option>`;
@@ -168,9 +157,9 @@
       assetTypeSelect.appendChild(option);
     });
   }
-
   await loadAssetTypes();
 
+  // ➕ Add new asset type
   document.getElementById("addAssetTypeBtn").addEventListener("click", async () => {
     const newTypeInput = document.getElementById("newAssetType");
     const newType = newTypeInput.value.trim();
@@ -189,16 +178,12 @@
     await loadAssetTypes();
   });
 
+  // 🔢 Generate Asset ID
   async function generateAssetId(assetType) {
     const prefixMap = {
-      laptop: "L",
-      desktop: "D",
-      monitor: "M",
-      printer: "P",
-      mouse: "Mo",
-      headset: "H",
-      pendrive: "PD",
-      keyboard: "Key"
+      laptop: "L", desktop: "D", monitor: "M",
+      printer: "P", mouse: "Mo", headset: "H",
+      pendrive: "PD", keyboard: "Key"
     };
     const cleanedType = assetType.trim().toLowerCase();
     const prefix = prefixMap[cleanedType] || "X";
@@ -211,10 +196,10 @@
       const snapshot = await getDocs(q);
       exists = !snapshot.empty;
     }
-
     return assetId;
   }
 
+  // 📥 Add Asset Form
   document.getElementById("assetForm").addEventListener("submit", async (e) => {
     e.preventDefault();
     const type = document.getElementById("assetType").value;
@@ -245,30 +230,28 @@
     }
   });
 
-  // 🚀 Gear Icon: Show Modal
-const popover = document.getElementById("manageTypesPopover");
-
-manageBtn.addEventListener("click", async (e) => {
-  await refreshCustomList();
-  const rect = manageBtn.getBoundingClientRect();
-  popover.style.top = (rect.bottom + window.scrollY + 10) + "px";
-  popover.style.left = (rect.left + window.scrollX) + "px";
-  popover.classList.remove("hidden");
-});
-
-// close button
-document.getElementById("closeManagePopover")
-  .addEventListener("click", () => popover.classList.add("hidden"));
-
-// 🔍 simple live filter
-document.getElementById("typeSearch").addEventListener("input", (e) => {
-  const term = e.target.value.toLowerCase();
-  document.querySelectorAll("#customTypesList li").forEach(li => {
-    li.style.display = li.textContent.toLowerCase().includes(term) ? "flex" : "none";
+  // ⚙️ Open popover
+  manageBtn.addEventListener("click", async () => {
+    await refreshCustomList();
+    const rect = manageBtn.getBoundingClientRect();
+    popover.style.top = (rect.bottom + window.scrollY + 10) + "px";
+    popover.style.left = (rect.left + window.scrollX) + "px";
+    popover.classList.remove("hidden");
   });
-});
 
-    // 🔁 Refresh List in Modal/Popover
+  // ❌ Close popover
+  document.getElementById("closeManagePopover")
+    .addEventListener("click", () => popover.classList.add("hidden"));
+
+  // 🔍 Search filter
+  document.getElementById("typeSearch").addEventListener("input", (e) => {
+    const term = e.target.value.toLowerCase();
+    document.querySelectorAll("#customTypesList li").forEach(li => {
+      li.style.display = li.textContent.toLowerCase().includes(term) ? "flex" : "none";
+    });
+  });
+
+  // 🔁 Refresh custom types list
   async function refreshCustomList() {
     customList.innerHTML = "";
     const snapshot = await getDocs(collection(db, "assetTypes"));
@@ -286,43 +269,33 @@ document.getElementById("typeSearch").addEventListener("input", (e) => {
     });
   }
 
-  // 🗑️ Delete Asset Type (using delegation so it always works)
-customList.addEventListener("click", async (e) => {
-  const trashBtn = e.target.closest("button[data-value]");
-  if (!trashBtn) return;
+  // 🗑️ Delete custom type (delegation)
+  customList.addEventListener("click", async (e) => {
+    const trashBtn = e.target.closest("button[data-value]");
+    if (!trashBtn) return;
 
-  const typeToDelete = trashBtn.getAttribute("data-value");
-  console.log("🗑️ Deleting:", typeToDelete); // debug
+    const typeToDelete = trashBtn.dataset.value;
+    if (!confirm(`Delete "${typeToDelete}"?`)) return;
 
-  if (!confirm(`Delete "${typeToDelete}"?`)) return;
-
-  try {
-    // delete from Firestore
-    const q = query(collection(db, "assetTypes"), where("name", "==", typeToDelete));
-    const snap = await getDocs(q);
-    for (const d of snap.docs) {
-      await deleteDoc(d.ref);
-    }
-
-    // Remove option from select box
-    Array.from(assetTypeSelect.options).forEach(opt => {
-      if (opt.textContent === typeToDelete) {
-        opt.remove();
+    try {
+      const q = query(collection(db, "assetTypes"), where("name", "==", typeToDelete));
+      const snap = await getDocs(q);
+      for (const d of snap.docs) {
+        await deleteDoc(d.ref);
       }
-    });
 
-    // Refresh the list in the popover
-    await refreshCustomList();
-    alert("Deleted successfully!");
-  } catch (err) {
-    console.error(err);
-    alert("Error deleting asset type");
-  }
-});
+      // Remove from dropdown
+      Array.from(assetTypeSelect.options).forEach(opt => {
+        if (opt.textContent === typeToDelete) {
+          opt.remove();
+        }
+      });
 
-
-
+      await refreshCustomList();
+      alert("Deleted successfully!");
+    } catch (err) {
+      console.error(err);
+      alert("Error deleting asset type");
+    }
+  });
 </script>
-  <script type="module" src="auth.js"></script>
-</body>
-</html>
