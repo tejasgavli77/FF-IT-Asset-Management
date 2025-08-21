@@ -292,31 +292,24 @@ document.getElementById("typeSearch").addEventListener("input", (e) => {
   }
 
   // 🗑️ Delete Asset Type from Modal List
- // 🗑️ Delete Asset Type (using delegation so it always works)
-customList.addEventListener("click", async (e) => {
+ customList.addEventListener("click", async (e) => {
   const trashBtn = e.target.closest("button[data-value]");
   if (!trashBtn) return;
 
-  const typeToDelete = trashBtn.dataset.value;
+  const typeToDelete = trashBtn.getAttribute("data-value");
+  console.log("🗑️ Deleting:", typeToDelete);  // debug
 
   if (!confirm(`Delete "${typeToDelete}"?`)) return;
-
+  
   try {
-    // delete from Firestore
     const q = query(collection(db, "assetTypes"), where("name", "==", typeToDelete));
     const snap = await getDocs(q);
-    for (const d of snap.docs) {
-      await deleteDoc(d.ref);
-    }
+    for (const d of snap.docs) await deleteDoc(d.ref);
 
-    // Remove option from select box
     Array.from(assetTypeSelect.options).forEach(opt => {
-      if (opt.textContent === typeToDelete) {
-        opt.remove();
-      }
+      if (opt.textContent === typeToDelete) opt.remove();
     });
 
-    // Refresh the list in the popover
     await refreshCustomList();
     alert("Deleted successfully!");
   } catch (err) {
