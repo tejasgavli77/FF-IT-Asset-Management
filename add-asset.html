@@ -294,7 +294,7 @@ document.getElementById("typeSearch").addEventListener("input", (e) => {
   // 🗑️ Delete Asset Type from Modal List
  // 🗑️ Delete Asset Type (using delegation so it always works)
 customList.addEventListener("click", async (e) => {
-  const trashBtn = e.target.closest("[data-value]");
+  const trashBtn = e.target.closest("button[data-value]");
   if (!trashBtn) return;
 
   const typeToDelete = trashBtn.dataset.value;
