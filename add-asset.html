@@ -243,6 +243,15 @@
   document.getElementById("closeManagePopover")
     .addEventListener("click", () => popover.classList.add("hidden"));
 
+  // 🖱️ Close popover if clicking outside
+document.addEventListener("click", (event) => {
+  if (!popover.classList.contains("hidden") &&
+      !popover.contains(event.target) &&
+      !manageBtn.contains(event.target)) {
+    popover.classList.add("hidden");
+  }
+});
+
   // 🔍 Search filter
   document.getElementById("typeSearch").addEventListener("input", (e) => {
     const term = e.target.value.toLowerCase();
