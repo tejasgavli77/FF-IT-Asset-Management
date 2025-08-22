@@ -28,17 +28,20 @@ function renderTable(filteredType = "all") {
     const assets = snapshot.docs.map(doc => doc.data());
     const grouped = {};
 
-    assets.forEach(asset => {
-      const type = asset.type || "Unknown";
-      if (!grouped[type]) {
-        grouped[type] = { total: 0, allocated: 0, available: 0 };
-      }
-      grouped[type].total += 1;
-      if ((asset.status || "").toLowerCase() === "allocated") {
-        grouped[type].allocated += 1;
-      } else {
-        grouped[type].available += 1;
-      }
+   assets.forEach(asset => {
+  const type = asset.type || "Unknown";
+  if (!grouped[type]) {
+    grouped[type] = { total: 0, allocated: 0, available: 0 };
+  }
+  grouped[type].total += 1;
+
+  const status = (asset.status || "").toLowerCase();
+
+  if (status === "allocated") {
+    grouped[type].allocated += 1;
+  } else if (status === "available") {
+    grouped[type].available += 1;
+  }
     });
 
     // Clear table
