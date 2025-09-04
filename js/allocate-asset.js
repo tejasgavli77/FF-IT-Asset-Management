@@ -1,20 +1,5 @@
-import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js"; 
-import { getFirestore, getDocs, collection, doc, updateDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
-
-// Firebase config
-const firebaseConfig = {
-  apiKey: "AIzaSyAspahfUUGnBzh0mh6U53evGQzWQP956xQ",
-  authDomain: "ffassetmanager.firebaseapp.com",
-  projectId: "ffassetmanager",
-  storageBucket: "ffassetmanager.appspot.com",
-  messagingSenderId: "803858971008",
-  appId: "1:803858971008:web:72d69ddce6cbc85010a965"
-};
-
-// Init Firebase
-const app = initializeApp(firebaseConfig);
-const db = getFirestore(app);
-const assetsCollection = collection(db, "assets");
+import { db } from "./auth.js";
+import { getDocs, collection, doc, updateDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
 document.addEventListener('DOMContentLoaded', async function () {
   const assetDropdown = document.getElementById('assetSelect');
