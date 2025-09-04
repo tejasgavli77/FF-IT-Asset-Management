@@ -1,7 +1,10 @@
 // Import Firebase modules + your init file
-import { db, auth } from "./firebase-init.js";
-import { collection, addDoc, query, where, getDocs } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
-import { signOut } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+import { db, auth } from "./auth.js";  
+import { collection, addDoc, query, where, getDocs } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore.js";
+import { signOut } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-auth.js";
+
+const assetsCollection = collection(db, "assets");
+
 
 // ✅ Collection reference
 const assetsCollection = collection(db, "assets");
