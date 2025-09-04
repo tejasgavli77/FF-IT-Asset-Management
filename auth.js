@@ -1,21 +1,20 @@
 // auth.js
 import { auth } from "./firebaseConfig.js";
-import { signInWithEmailAndPassword, onAuthStateChanged, signOut } 
-  from "https://www.gstatic.com/firebasejs/9.23.0/firebase-auth.js";
+import { 
+  signInWithEmailAndPassword, 
+  onAuthStateChanged, 
+  signOut 
+} from "https://www.gstatic.com/firebasejs/9.23.0/firebase-auth.js";
 
 // ✅ Login
 window.login = function () {
-  const usernameInput = document.getElementById("username").value.trim();
+  const email = document.getElementById("username").value.trim(); // direct email
   const password = document.getElementById("password").value;
   const errorDiv = document.getElementById("error");
 
-  const email = usernameInput.toLowerCase() === "asset admin"
-    ? "it@finalfunnel.com"
-    : usernameInput;
-
   signInWithEmailAndPassword(auth, email, password)
     .then(() => {
-      window.location.href = "add-asset.html";
+      window.location.href = "add-asset.html"; // redirect after login
     })
     .catch((error) => {
       console.error("Login failed:", error);
@@ -39,7 +38,7 @@ window.logout = function () {
     .catch((error) => console.error("Logout failed:", error));
 };
 
-// ✅ Auto logout on inactivity
+// ✅ Auto logout on inactivity (30 minutes)
 let lastActivityTime = Date.now();
 const maxInactivity = 30 * 60 * 1000; // 30 mins
 
