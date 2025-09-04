@@ -1,23 +1,24 @@
-// auth.js
-import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
-import {
-  getAuth,
-  signInWithEmailAndPassword,
-  signOut,
-  onAuthStateChanged
-} from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+// Import the functions you need from the SDKs you need
+import { initializeApp } from "firebase/app";
+import { getAnalytics } from "firebase/analytics";
+// TODO: Add SDKs for Firebase products that you want to use
+// https://firebase.google.com/docs/web/setup#available-libraries
 
+// Your web app's Firebase configuration
+// For Firebase JS SDK v7.20.0 and later, measurementId is optional
 const firebaseConfig = {
-  apiKey: "AIzaSyAspahfUUGnBzh0mh6U53evGQzWQP956xQ",
-  authDomain: "ffassetmanager.firebaseapp.com",
-  projectId: "ffassetmanager",
-  storageBucket: "ffassetmanager.appspot.com",
-  messagingSenderId: "803858971008",
-  appId: "1:803858971008:web:72d69ddce6cbc85010a965"
+  apiKey: "AIzaSyAj5x6hsWKmy3l0I2j8npj4u2woUXkIEp4",
+  authDomain: "asset-inventory-f6b04.firebaseapp.com",
+  projectId: "asset-inventory-f6b04",
+  storageBucket: "asset-inventory-f6b04.firebasestorage.app",
+  messagingSenderId: "988574661528",
+  appId: "1:988574661528:web:ec0808edf25cad1ef5c9ed",
+  measurementId: "G-JEN1YSKN2L"
 };
 
+// Initialize Firebase
 const app = initializeApp(firebaseConfig);
-const auth = getAuth(app);
+const analytics = getAnalytics(app);
 
 window.login = function () {
   const usernameInput = document.getElementById("username").value.trim();
