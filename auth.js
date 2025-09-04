@@ -1,41 +1,21 @@
-// firebase-init.js (V9 modular)
-import { initializeApp } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-app.js";
-import { getAnalytics } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-analytics.js";
-import { getAuth } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-auth.js";
-import { getFirestore } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore.js";
+// auth.js
+import { auth } from "./firebaseConfig.js";
+import { signInWithEmailAndPassword, onAuthStateChanged, signOut } 
+  from "https://www.gstatic.com/firebasejs/9.23.0/firebase-auth.js";
 
-// Your Firebase config
-const firebaseConfig = {
-  apiKey: "AIzaSyAj5x6hsWKmy3l0I2j8npj4u2woUXkIEp4",
-  authDomain: "asset-inventory-f6b04.firebaseapp.com",
-  projectId: "asset-inventory-f6b04",
-  storageBucket: "asset-inventory-f6b04.firebasestorage.app",
-  messagingSenderId: "988574661528",
-  appId: "1:988574661528:web:ec0808edf25cad1ef5c9ed",
-  measurementId: "G-JEN1YSKN2L"
-};
-
-// Initialize Firebase
-const app = initializeApp(firebaseConfig);
-const analytics = getAnalytics(app);
-
-// Export handles
-export const auth = getAuth(app);
-export const db = getFirestore(app);
-export default app;
-
-
+// ✅ Login
 window.login = function () {
   const usernameInput = document.getElementById("username").value.trim();
   const password = document.getElementById("password").value;
   const errorDiv = document.getElementById("error");
 
-  // Map username to Firebase email
-  const email = usernameInput.toLowerCase() === "asset admin" ? "it@finalfunnel.com" : usernameInput;
+  const email = usernameInput.toLowerCase() === "asset admin"
+    ? "it@finalfunnel.com"
+    : usernameInput;
 
   signInWithEmailAndPassword(auth, email, password)
     .then(() => {
-      window.location.href = "add-asset.html"; // Redirect to main page after login
+      window.location.href = "add-asset.html";
     })
     .catch((error) => {
       console.error("Login failed:", error);
@@ -44,7 +24,7 @@ window.login = function () {
     });
 };
 
-// 🔐 Protect all pages (except login.html)
+// ✅ Protect all pages except login
 onAuthStateChanged(auth, (user) => {
   const isLoginPage = window.location.pathname.endsWith("login.html");
   if (!user && !isLoginPage) {
@@ -52,42 +32,27 @@ onAuthStateChanged(auth, (user) => {
   }
 });
 
-// 🚪 Global logout function (to be called on logout button click)
+// ✅ Logout
 window.logout = function () {
   signOut(auth)
-    .then(() => {
-      window.location.href = "login.html";
-    })
-    .catch((error) => {
-      console.error("Logout failed:", error);
-    });
+    .then(() => (window.location.href = "login.html"))
+    .catch((error) => console.error("Logout failed:", error));
 };
 
-/* ===============================
-   🕒 Auto Logout After Inactivity
-   =============================== */
+// ✅ Auto logout on inactivity
 let lastActivityTime = Date.now();
-
-/* const maxInactivity = 1 * 60 * 1000; // 1 minute */
-
- const maxInactivity = 30 * 60 * 1000; // 30 minutes
+const maxInactivity = 30 * 60 * 1000; // 30 mins
 
 function resetInactivityTimer() {
   lastActivityTime = Date.now();
 }
+['mousemove','keydown','click','scroll','touchstart'].forEach(evt =>
+  window.addEventListener(evt, resetInactivityTimer)
+);
 
-// Track user activity
-['mousemove', 'keydown', 'click', 'scroll', 'touchstart'].forEach(event => {
-  window.addEventListener(event, resetInactivityTimer);
-});
-
-// Check every minute
 setInterval(() => {
-  if (auth.currentUser && (Date.now() - lastActivityTime > maxInactivity)) {
+  if (auth.currentUser && Date.now() - lastActivityTime > maxInactivity) {
     console.log("Logging out due to inactivity...");
-    signOut(auth).then(() => {
-      window.location.href = "login.html";
-    });
+    signOut(auth).then(() => (window.location.href = "login.html"));
   }
 }, 60 * 1000);
-
